@@ -1,0 +1,18 @@
+# generated: 2026-03-26
+# last_updated: 2026-03-31
+# project: TaskFlow
+# tracking_system: file-system
+# story_location: {project-root}/_bmad-output/implementation-artifacts
+
+generated: 2026-03-26
+last_updated: 2026-03-31
+project: TaskFlow
+tracking_system: file-system
+story_location: "{project-root}/_bmad-output/implementation-artifacts"
+
+development_status:
+  # Epic 1: Project Setup & User Authentication
+  epic-1: in-progress
+  1-1-story-example: review
+  1-2-story-example: done
+  epic-1-retrospective: optional
