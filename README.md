@@ -4,13 +4,27 @@
 
 ## What is BMAD?
 
-**BMAD (Breakthrough Method of Agile AI-Driven Development)** is an AI-assisted software engineering methodology. Instead of using traditional project management tools, BMAD keeps all project artifacts — requirements, architecture, design, epics, stories, and sprint status — as **plain markdown and YAML files** in a `_bmad-output/` folder inside your repository.
+**BMAD (Build More Architect Dreams)** is an AI-driven agile development **framework** within the [BMad Method](https://docs.bmad-method.org) Module Ecosystem — the most comprehensive Agile AI-Driven Development framework with true scale-adaptive intelligence that adjusts from bug fixes to enterprise systems. At its core lies the **Spec-Driven Development** methodology — a structured approach where detailed specifications drive every stage of the development lifecycle. 100% free and open source.
+
+Unlike traditional AI tools that do the thinking for you, BMad agents and facilitated workflows act as **expert collaborators** who guide you through a structured process — bringing out your best thinking in partnership with AI.
+
+Key capabilities of the BMad Method:
+
+- **Scale-Domain-Adaptive** — automatically adjusts planning depth based on project complexity
+- **Structured Workflows** — grounded in agile best practices across analysis, planning, architecture, and implementation
+- **Specialized Agents** — 12+ domain experts (PM, Architect, Developer, UX, Scrum Master, and more)
+- **Party Mode** — bring multiple agent personas into one session to collaborate and discuss
+- **Complete Lifecycle** — from brainstorming to deployment
+
+All project artifacts — requirements, architecture, design, epics, stories, and sprint status — are kept as **plain markdown and YAML files** in a `_bmad-output/` folder inside your repository.
 
 A typical BMAD workflow:
 
-1. **Planning Phase** — An AI agent generates planning artifacts: a Product Requirements Document (PRD), architecture overview, UX design specification, and an epics file that breaks the project into epics and stories.
+1. **Planning Phase** — Specialized AI agents generate planning artifacts: a Product Requirements Document (PRD), architecture overview, UX design specification, and an epics file that breaks the project into epics and stories.
 2. **Implementation Phase** — For each story, a detailed implementation artifact is generated with tasks, acceptance criteria, API contracts, and technical notes. A `sprint-status.yaml` tracks progress.
-3. **Development** — Developers work through stories, updating status as they go. All artifacts stay in version control alongside the code.
+3. **Development** — Developers work through stories using specialized BMAD skills, generating and reviewing code in partnership with AI agents. Progress is tracked via `sprint-status.yaml`, and all artifacts stay in version control alongside the code.
+
+> Learn more at [docs.bmad-method.org](https://docs.bmad-method.org)
 
 ### BMAD Artifacts in This Repository
 
