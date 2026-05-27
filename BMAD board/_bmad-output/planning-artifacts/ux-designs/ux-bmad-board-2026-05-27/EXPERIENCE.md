@@ -19,7 +19,9 @@ ui_system: null
 
 ## Foundation
 
-Desktop-only web application. Next.js 14 with App Router, React 18, Tailwind CSS. No component library — the current build uses hand-rolled Tailwind utility classes. The visual identity reference is `DESIGN.md`; this spine defines behavior, information architecture, interactions, and flows.
+Desktop-only Electron application. React 18 SPA with React Router v6 and Zustand, running inside an Electron shell. Tailwind CSS with CSS custom properties for theming. No component library — the current build uses hand-rolled Tailwind utility classes. The visual identity reference is `DESIGN.md`; this spine defines behavior, information architecture, interactions, and flows.
+
+**Content creation model (v1).** BMAD Board is a read-first application: the UI displays and allows status updates for epics, stories, and documents. Creating and deleting artifacts is the exclusive responsibility of BMAD AI agents — the app does not expose Create or Delete buttons for epics, stories, tasks, or documents. Manual editing of markdown source is allowed with a warning dialog, as a fallback for exceptional cases.
 
 **Icon system.** Lucide (stroke-based, outline style) replaces `@heroicons/react` and all emoji icons. 18px default, 1.5px stroke width. Sidebar nav: `layout-dashboard`, `kanban`, `list`, `zap`, `file-text`, `activity`. Stat cards: `box`, `book-open`, `check-square`, `target`. Actions: `plus`, `refresh-cw`, `pencil`, `x`, `chevron-down`. Empty states: Lucide icons inside a `rounded.lg` tinted container — never bare emoji. This is a hard rule: zero emoji-as-icons in the product.
 
@@ -83,9 +85,9 @@ Behavioral. Visual specs live in `DESIGN.md.Components`.
 | State | Surface | Treatment |
 |---|---|---|
 | Cold app load | Any | Skeleton placeholders matching expected layout shape. Card skeletons (animated pulse in `surface-sunken`). Resolve on data fetch. |
-| Empty dashboard | Dashboard | Stat cards show "0". Epic list shows empty state card with icon + "No epics yet. Add markdown files or create one." + primary button. |
-| Empty backlog | Backlog | Empty state: "No stories yet." with create story button. Epic headers still show if epics exist, with "No stories" under each. |
-| Empty epics | Epics | Empty state card: "No epics yet." with create epic button. |
+| Empty dashboard | Dashboard | Stat cards show "0". Epic list shows empty state card with icon + "No epics yet. Run BMAD AI agents to generate artifacts." + link to "Add Project" if no project configured. |
+| Empty backlog | Backlog | Empty state: "No stories yet." Epic headers still show if epics exist, with "No stories" under each. |
+| Empty epics | Epics | Empty state card: "No epics yet. Run BMAD AI agents to generate artifacts." |
 | Empty kanban | Sprint Board | Each column shows count 0. Column well is visible, spacious. |
 | Empty docs | Documents | Category headers present, "No documents" in each group. |
 | Empty diagnostics | Diagnostics | List of health checks with "not configured" or "no data" status indicators. |
@@ -96,6 +98,10 @@ Behavioral. Visual specs live in `DESIGN.md.Components`.
 | 404 / not found | Stories, Epics, Documents | Centered empty state: icon + "Not found" message + back link. |
 | Drag in progress | Sprint Board | Card being dragged: `opacity: 0.5`, `scale: 0.95`, cursor: grabbing. Drop target column: dashed `accent` border. |
 | Offline | Global | Not currently handled. Desktop-only, assumed always online for v1. |
+| Update available | Global | Toast (default variant): "Update available" / "Доступно обновление" with download button. |
+| Update downloading | Global | Toast with progress indicator. Auto-dismiss after download completes. |
+| Update ready to install | Global | Modal (non-blocking): "Restart to update" / "Перезапустите для обновления" with "Restart now" (primary) and "Later" (secondary) buttons. Escape dismisses (same as "Later"). |
+| Update check failed | Global | Silent fail. Retry on next launch. No user-facing notification for check failures. |
 
 ## Interaction Primitives
 
@@ -104,13 +110,13 @@ Behavioral. Visual specs live in `DESIGN.md.Components`.
 | Action | Binding | Surface |
 |---|---|---|
 | Navigate | Click sidebar item | Global |
-| Create (context) | Button → modal | Backlog (story), Epics (epic), Story detail (task) |
 | Status change | Select dropdown or drag | Backlog (select), Board (drag) |
 | Edit markdown | Tab → edit button → warning → textarea | Stories, Documents |
 | Theme toggle | Click sun/moon icon in sidebar | Global |
 | Language toggle | Click RU/EN in sidebar | Global |
 | Sync | Click sync button in sidebar | Global |
 | Collapse sidebar | Click chevron | Sidebar |
+| Update | Toast notification + restart modal | Global |
 
 **Drag and drop.** Sprint Board uses HTML5 drag-and-drop. Drag ghost: card preview at reduced opacity. Drop feedback: column border flashes `accent` for 200ms on successful drop. Optimistic UI update: card moves immediately, PATCH request fires in background.
 

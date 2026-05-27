@@ -106,15 +106,16 @@ BMAD Board is a companion tool for the BMAD Method ecosystem — a local Jira-li
 
 ### 5.4 Edit Functions Verification and Warning
 
-**Description:** All existing edit functions (document editing, story/epic creation and updates) are verified to work correctly in the Electron environment. A warning is displayed before any manual file edit. Realizes UJ-4.
+**Description:** Existing read and status-update functions are verified to work correctly in the Electron environment. Creation and deletion of epics, stories, and documents are the responsibility of BMAD AI agents — the UI is read-first and update-only. A warning is displayed before any manual file edit. Realizes UJ-4.
 
 **Requirements:**
 
-- **FR-9 — Edit Functions Verification:** All CRUD operations on epics, stories, tasks, and documents write correctly to markdown files.
-  - Creating an epic writes a valid markdown entry with YAML frontmatter (title, status, description, priority) to the epics file.
-  - Updating a story status writes the change to the story's markdown file frontmatter and the file remains valid markdown.
-  - Deleting a story removes the story's markdown file from disk and removes references from sprint-status.yaml.
-  - Document edits save correctly to the target markdown file, preserving existing frontmatter and markdown structure.
+- **FR-9 — Edit Functions Verification (Read-First / Update-Only):** All data-reading and status-update operations on epics, stories, and documents work correctly in the Electron environment. Creation and deletion of artifacts are handled by AI agents, not the UI.
+  - Reading and parsing all epics, stories, and documents from markdown files displays correctly in the UI.
+  - Updating a story status (via drag-and-drop on Kanban or select dropdown) writes the change to the story's markdown file frontmatter and the file remains valid markdown.
+  - Document manual edits save correctly to the target markdown file, preserving existing frontmatter and markdown structure.
+  - A file lock mechanism prevents concurrent writes between the UI and AI agents; lock owner is tracked, and stale locks auto-release after 30 seconds.
+  - The UI does NOT expose Create or Delete actions for epics, stories, tasks, or documents — these operations are the exclusive responsibility of BMAD AI agents.
   - After any write operation, a re-sync confirms the change is reflected in the store.
 
 - **FR-10 — Manual Edit Warning:** Before a user manually edits a BMAD artifact through the document editor, a warning dialog is displayed.
@@ -250,10 +251,11 @@ The migration is considered complete when:
 
 ## 15. Assumptions
 
-- Minimize to system tray on close is not required for v1 (addresses Open Question 1).
+- Minimize to system tray on close is not required for v1 (was Open Question 1, now resolved).
 - "Don't show again" for the manual edit warning is per-session, not persistent.
 - Electron version ^33 or latest stable at project start.
+- NSIS selected for Windows installer (resolved from Open Question 1; documented in Epic 6 Story 6.1).
 
 ## 16. Open Questions
 
-1. Is there a preference for specific Electron builder configuration (e.g., NSIS vs. squirrel for Windows installer)?
+None. All open questions have been resolved.
