@@ -11,9 +11,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./src/renderer/*"]
-    }
+    "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
   "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/renderer/env.d.ts"],
   "exclude": ["node_modules", "dist"]

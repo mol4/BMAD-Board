@@ -10,11 +10,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./src/renderer/*"]
-    }
+    "types": ["node"]
   },
-  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/renderer/env.d.ts"],
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
