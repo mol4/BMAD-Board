@@ -15,6 +15,6 @@
       "@/*": ["./src/renderer/*"]
     }
   },
-  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/renderer/env.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/renderer/env.d.ts", "src/shared/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/renderer/**/*.test.ts", "src/renderer/**/*.test.tsx", "src/renderer/setupTests.ts"]
 }

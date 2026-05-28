@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-05-28
+last_updated: 2026-05-29
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -45,7 +45,7 @@ development_status:
   # Epic 1: Desktop Application Shell + Dashboard
   epic-1: in-progress
   1-1-initialize-electron-vite-project: done
-  1-2-setup-react-router-zustand-and-ipc-skeleton: backlog
+  1-2-setup-react-router-zustand-and-ipc-skeleton: done
   1-3-migrate-existing-react-components-to-renderer: backlog
   1-4-implement-native-window-management: backlog
   1-5-setup-vitest-and-render-minimal-dashboard: backlog

@@ -14,3 +14,12 @@
 - Empty `electronAPI` on `window` without TypeScript declaration — story 1-2 will add typed IPC bridge
 - No `app.requestSingleInstanceLock()` — consider adding for single-instance enforcement
 - `globals.css` deleted (Next.js) — story 1-3 will create new renderer stylesheet
+
+## Deferred from: code review of story 1-2 (2026-05-28)
+
+- `config:read` returns hardcoded stub — persistence comes in a later story
+- `project:switch` accepts any string without validation — stub by design
+- `project:remove` accepts any projectId without existence check — stub by design
+- `setEpics`/`setStories` replace arrays wholesale — merge/dedup comes later
+- `AppConfig.lastProjectId` is dead field — "remember last project" for future story
+- Store singleton via `globalThis.__store` — explicitly deferred to story 2-2
