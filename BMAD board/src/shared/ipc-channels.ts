@@ -42,6 +42,14 @@ export interface IPCChannels {
     params: { projectId: string };
     result: void;
   };
+  'file:read': {
+    params: { path: string };
+    result: { content: string; exists: boolean };
+  };
+  'file:readDirectory': {
+    params: { path: string };
+    result: { name: string; path: string; isFile: boolean }[];
+  };
 }
 
 export type IPCChannelName = keyof IPCChannels;

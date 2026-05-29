@@ -1,13 +1,17 @@
+// Polyfill Buffer for renderer process (required by gray-matter's internal YAML engine)
+import { Buffer } from 'buffer';
+(globalThis as any).Buffer = Buffer;
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import { I18nProvider } from '@/lib/i18n';
+import Providers from '@/components/Providers';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <I18nProvider>
+    <Providers>
       <App />
-    </I18nProvider>
+    </Providers>
   </React.StrictMode>,
 );

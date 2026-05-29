@@ -1,8 +1,58 @@
+import { useEffect, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
+
+interface DocItem {
+  name: string;
+  path: string;
+  category: string;
+}
+
 export default function DocsPage() {
+  const { t } = useI18n();
+  const [docs, setDocs] = useState<DocItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDocs = async () => {
+      try {
+        if (typeof window !== 'undefined' && (window as any).electronAPI) {
+          const config = await (window as any).electronAPI.configRead();
+          const response = await fetch(`file://${config.storiesDir}/../`);
+          if (!response.ok) throw new Error('Failed to list docs');
+        }
+      } catch {
+        console.log('Docs: listing not available via file:// in Electron browser — future IPC enhancement');
+      }
+      setDocs([]);
+      setLoading(false);
+    };
+    loadDocs();
+  }, []);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Documents</h1>
-      <p className="text-gray-400">Documents page placeholder</p>
+      <h1 className="text-2xl font-bold mb-2">{t('docs.title')}</h1>
+      <p className="text-sm text-jira-gray-400 mb-6">
+        {docs.length} {t('docs.count')}
+      </p>
+
+      {loading ? (
+        <p className="text-jira-gray-500">{t('common.loading')}</p>
+      ) : docs.length === 0 ? (
+        <div className="text-center py-12 text-jira-gray-500">
+          <p className="text-lg">{t('docs.noDocs')}</p>
+          <p className="text-sm mt-2">{t('docs.noDocsHint')}</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {docs.map((doc) => (
+            <div key={doc.path} className="p-3 bg-jira-gray-800 rounded-lg">
+              <div className="font-medium text-sm">{doc.name}</div>
+              <div className="text-xs text-jira-gray-500 mt-1">{doc.path}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

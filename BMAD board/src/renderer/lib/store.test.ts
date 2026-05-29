@@ -2,47 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useAppStore } from './store';
 import type { Epic, Story } from '@/lib/types';
 
-const mockEpics: Epic[] = [
-  {
-    id: 'epic-1',
-    key: 'EPIC-1',
-    title: 'Test Epic',
-    description: 'Test epic description',
-    status: 'draft',
-    priority: 'medium',
-    stories: [],
-    labels: [],
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  },
-];
-
-const mockStories: Story[] = [
-  {
-    id: 'story-1',
-    key: 'STORY-1',
-    epicId: 'epic-1',
-    title: 'Test Story',
-    description: 'Test story description',
-    acceptanceCriteria: [],
-    status: 'backlog',
-    priority: 'high',
-    tasks: [],
-    labels: [],
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  },
-];
-
 describe('useAppStore', () => {
   beforeEach(() => {
-    useAppStore.setState({
-      activeProjectId: null,
-      epics: [],
-      stories: [],
-      loading: false,
-      error: null,
-    });
+    useAppStore.getState().clear();
   });
 
   it('initializes with default values', () => {
@@ -50,8 +12,11 @@ describe('useAppStore', () => {
     expect(state.activeProjectId).toBeNull();
     expect(state.epics).toEqual([]);
     expect(state.stories).toEqual([]);
+    expect(state.tasks).toEqual([]);
+    expect(state.sprints).toEqual([]);
     expect(state.loading).toBe(false);
     expect(state.error).toBeNull();
+    expect(state.initialized).toBe(false);
   });
 
   it('setActiveProject updates activeProjectId', () => {
@@ -59,14 +24,58 @@ describe('useAppStore', () => {
     expect(useAppStore.getState().activeProjectId).toBe('project-1');
   });
 
-  it('setEpics updates epics array', () => {
-    useAppStore.getState().setEpics(mockEpics);
-    expect(useAppStore.getState().epics).toEqual(mockEpics);
+  it('createEpic adds epic to store', () => {
+    const epic = useAppStore.getState().createEpic({
+      title: 'Test Epic',
+      description: 'Test description',
+      priority: 'high',
+    });
+    expect(epic.key).toBe('EPIC-1');
+    expect(epic.title).toBe('Test Epic');
+    expect(useAppStore.getState().epics).toHaveLength(1);
   });
 
-  it('setStories updates stories array', () => {
-    useAppStore.getState().setStories(mockStories);
-    expect(useAppStore.getState().stories).toEqual(mockStories);
+  it('createStory adds story and links to epic', () => {
+    const epic = useAppStore.getState().createEpic({ title: 'Test Epic', description: '' });
+    const story = useAppStore.getState().createStory({
+      epicId: epic.id,
+      title: 'Test Story',
+      description: 'Test description',
+    });
+    expect(story.key).toBe('STORY-1');
+    expect(useAppStore.getState().stories).toHaveLength(1);
+    const updatedEpic = useAppStore.getState().getEpic(epic.id);
+    expect(updatedEpic?.stories).toContain(story.id);
+  });
+
+  it('updateStoryStatus recalculates epic status', () => {
+    const epic = useAppStore.getState().createEpic({ title: 'Test Epic', description: '' });
+    const story = useAppStore.getState().createStory({
+      epicId: epic.id,
+      title: 'Test Story',
+      description: '',
+    });
+    useAppStore.getState().updateStoryStatus(story.id, 'done');
+    const updatedEpic = useAppStore.getState().getEpic(epic.id);
+    expect(updatedEpic?.status).toBe('done');
+  });
+
+  it('getStats returns correct counts', () => {
+    useAppStore.getState().createEpic({ title: 'Epic 1', description: '' });
+    useAppStore.getState().createEpic({ title: 'Epic 2', description: '' });
+    const stats = useAppStore.getState().getStats();
+    expect(stats.totalEpics).toBe(2);
+    expect(stats.totalStories).toBe(0);
+  });
+
+  it('clear resets all state', () => {
+    useAppStore.getState().createEpic({ title: 'Test', description: '' });
+    useAppStore.getState().setInitialized(true);
+    useAppStore.getState().clear();
+    const state = useAppStore.getState();
+    expect(state.epics).toEqual([]);
+    expect(state.initialized).toBe(false);
+    expect(state.counters.epic).toBe(0);
   });
 
   it('setLoading updates loading state', () => {

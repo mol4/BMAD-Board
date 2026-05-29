@@ -23,3 +23,25 @@
 - `setEpics`/`setStories` replace arrays wholesale — merge/dedup comes later
 - `AppConfig.lastProjectId` is dead field — "remember last project" for future story
 - Store singleton via `globalThis.__store` — explicitly deferred to story 2-2
+
+## Deferred from: code review of story 1-3 (2026-05-29)
+
+- Emoji icons in StatusBadge (`🔴🟠🟡🔵⚡📖✅🐛`) — pre-existing pattern; Lucide replacement comes in Epic 5a
+- `initializeStore()` called in every page component — guard protects against re-init; architectural cleanup for later
+- `markdown-parser.ts` is a stub — `syncMarkdownToStore()` always returns 0; spec acknowledges this; real file sync comes in Epic 3
+- Missing i18n keys not verified — pre-existing issue, not caused by this change
+- `marked` library not imported in any migrated page component — markdown rendering not yet wired into UI
+
+## Deferred from: code review of story 1-3 round 2 (2026-05-29)
+
+- `loadConfigFromIPC` is never called — config always uses defaults; IPC loading path is dead code. Wire in during Epic 3 when sync engine is implemented
+- DocsPage `file://` fetch is non-functional — acknowledged as future IPC enhancement; page silently shows empty docs
+- `initializeStore()` called on every page mount — guard prevents re-init but wasteful; architectural cleanup for later
+- Path traversal risk in `file:read`/`file:readDirectory` IPC — no validation that paths are within project directory; security hardening deferred to Epic 3/4
+- `marked` not used in renderer components — AC#7 says it should work; it imports fine but is never invoked in UI
+
+## Deferred from: code review of story 1-3 round 3 (2026-05-29)
+
+- `file:read`/`file:readDirectory` return `exists: false` for `EACCES` (permission denied treated same as not found) — pre-existing design choice, harden in Epic 3/4
+- `recalculateEpicStatus` returns `in-progress` when all stories are `cancelled`/`skipped` — those statuses not yet in type union; revisit when status model is finalized
+- Test double mock-clear (`beforeEach` + `afterEach` both call `vi.clearAllMocks()`) — redundant but harmless; clean up in a future test pass

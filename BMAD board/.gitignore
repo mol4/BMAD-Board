@@ -6,6 +6,7 @@
 
 # testing
 /coverage
+/tests/visual-baselines/
 
 # electron-vite build output
 /dist/

@@ -1,15 +1,21 @@
 import { ipcMain } from 'electron';
+import { readFile, readdir, stat } from 'fs/promises';
+import { join, resolve } from 'path';
 import type { IPCChannels } from '../shared/ipc-channels';
 import { v4 as uuidv4 } from 'uuid';
 
 export function setupIPC(): void {
+  const projectRoot = process.cwd();
+
   ipcMain.handle('config:read', async (): Promise<IPCChannels['config:read']['result']> => {
-    return {
-      epicsDir: '../_bmad-output/planning-artifacts',
-      storiesDir: '../_bmad-output/implementation-artifacts',
+    const result = {
+      epicsDir: join(projectRoot, '_bmad-output', 'planning-artifacts'),
+      storiesDir: join(projectRoot, '_bmad-output', 'implementation-artifacts'),
       storiesMode: 'flat',
       lastProjectId: null,
     };
+    console.log('[IPC] config:read →', result);
+    return result;
   });
 
   ipcMain.handle('config:write', async (_event, params: IPCChannels['config:write']['params']): Promise<void> => {
@@ -42,5 +48,40 @@ export function setupIPC(): void {
 
   ipcMain.handle('project:remove', async (_event, params: IPCChannels['project:remove']['params']): Promise<void> => {
     console.log('[IPC] project:remove', params.projectId);
+  });
+
+  ipcMain.handle('file:read', async (_event, params: IPCChannels['file:read']['params']): Promise<IPCChannels['file:read']['result']> => {
+    try {
+      const resolved = resolve(params.path);
+      try {
+        await stat(resolved);
+      } catch {
+        console.log(`[IPC] file:read(${params.path}) → not found`);
+        return { content: '', exists: false };
+      }
+      const content = await readFile(resolved, 'utf-8');
+      console.log(`[IPC] file:read(${params.path}) → ${content.length} chars`);
+      return { content, exists: true };
+    } catch (err) {
+      console.error(`[IPC] file:read error for ${params.path}:`, err);
+      return { content: '', exists: false };
+    }
+  });
+
+  ipcMain.handle('file:readDirectory', async (_event, params: IPCChannels['file:readDirectory']['params']): Promise<IPCChannels['file:readDirectory']['result']> => {
+    try {
+      const resolved = resolve(params.path);
+      const entries = await readdir(resolved, { withFileTypes: true });
+      const result = entries.map((entry) => ({
+        name: entry.name,
+        path: join(resolved, entry.name),
+        isFile: entry.isFile(),
+      }));
+      console.log(`[IPC] file:readDirectory(${params.path}) → ${result.length} entries`);
+      return result;
+    } catch (err) {
+      console.error(`[IPC] file:readDirectory error for ${params.path}:`, err);
+      return [];
+    }
   });
 }

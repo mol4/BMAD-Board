@@ -30,6 +30,7 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  console.log('[Main] App ready, cwd:', process.cwd());
   setupIPC();
   createWindow();
 });

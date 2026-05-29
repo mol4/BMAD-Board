@@ -14,6 +14,10 @@ const electronAPI = {
     ipcRenderer.invoke('project:add', params),
   projectRemove: (params: IPCChannels['project:remove']['params']): Promise<void> =>
     ipcRenderer.invoke('project:remove', params),
+  fileRead: (path: string): Promise<IPCChannels['file:read']['result']> =>
+    ipcRenderer.invoke('file:read', { path }),
+  fileReadDirectory: (path: string): Promise<IPCChannels['file:readDirectory']['result']> =>
+    ipcRenderer.invoke('file:readDirectory', { path }),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

@@ -1,12 +1,131 @@
 import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useI18n } from '@/lib/i18n';
+import { useAppStore } from '@/lib/store';
+import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import type { Story } from '@/lib/types';
 
 export default function StoryDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useI18n();
+  const initialized = useAppStore((s) => s.initialized);
+  const [story, setStory] = useState<Story | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const getStory = useAppStore((s) => s.getStory);
+  const getStoryByKey = useAppStore((s) => s.getStoryByKey);
+  const getEpic = useAppStore((s) => s.getEpic);
+  const getTask = useAppStore((s) => s.getTask);
+
+  useEffect(() => {
+    if (!initialized) return;
+    const found = getStoryByKey(id || '') || getStory(id || '');
+    if (found) {
+      setStory(found);
+    } else {
+      setNotFound(true);
+    }
+  }, [id, initialized]);
+
+  if (!initialized) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-jira-gray-500">{t('common.loading')}</p>
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold text-jira-gray-400">{t('story.notFound')}</h2>
+      </div>
+    );
+  }
+
+  if (!story) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-jira-gray-500">{t('common.loading')}</p>
+      </div>
+    );
+  }
+
+  const epic = getEpic(story.epicId);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Story Detail</h1>
-      <p className="text-gray-400">Story ID: {id}</p>
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-2xl font-bold">{story.title}</h1>
+          <StatusBadge status={story.status} />
+          <PriorityBadge priority={story.priority} />
+        </div>
+        <div className="flex items-center gap-4 text-sm text-jira-gray-400">
+          <span>{story.key}</span>
+          {epic && <span>{t('story.epic')}: {epic.title}</span>}
+          {story.assignee && <span>{t('story.assignee')}: {story.assignee}</span>}
+          {story.storyPoints !== undefined && <span>{story.storyPoints} SP</span>}
+          {story.sourceFile && (
+            <span className="text-jira-gray-500">{t('story.hasFile')}</span>
+          )}
+        </div>
+      </div>
+
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold text-jira-gray-300 uppercase mb-2">{t('story.info')}</h2>
+        <p className="text-sm text-jira-gray-400">
+          {story.description || t('common.noDescription')}
+        </p>
+      </section>
+
+      {story.acceptanceCriteria.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-sm font-semibold text-jira-gray-300 uppercase mb-2">{t('story.acceptanceCriteria')}</h2>
+          <ul className="space-y-1">
+            {story.acceptanceCriteria.map((ac, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm text-jira-gray-400">
+                <span className="text-jira-blue mt-1">&#10003;</span>
+                {ac}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="mb-6">
+        <h2 className="text-sm font-semibold text-jira-gray-300 uppercase mb-2">
+          {t('story.tasks')} ({story.tasks.length})
+        </h2>
+        {story.tasks.length === 0 ? (
+          <p className="text-sm text-jira-gray-500">{t('story.noTasks')}</p>
+        ) : (
+          <div className="space-y-2">
+            {story.tasks.map((taskId) => {
+              const task = getTask(taskId);
+              if (!task) return null;
+              return (
+                <div key={task.id} className="flex items-center gap-3 p-2 bg-jira-gray-800 rounded">
+                  <StatusBadge status={task.status} />
+                  <span className="text-sm">{task.title}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {story.labels.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold text-jira-gray-300 uppercase mb-2">{t('story.labels')}</h2>
+          <div className="flex gap-2 flex-wrap">
+            {story.labels.map((label) => (
+              <span key={label} className="px-2 py-1 bg-jira-gray-700 rounded text-xs text-jira-gray-300">
+                {label}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
