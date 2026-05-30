@@ -15,13 +15,15 @@ export default function DashboardPage() {
   }
 
   const stats = getStats();
+  const active = stats.storiesByStatus['in-progress'] + stats.storiesByStatus['in-review'];
+  const completed = stats.storiesByStatus['done'];
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">{t('dashboard.title')}</h1>
       <p className="text-gray-400 mb-6">{t('dashboard.subtitle')}</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-jira-gray-800 rounded-lg p-4">
           <div className="text-3xl font-bold text-jira-blue">{stats.totalEpics}</div>
           <div className="text-sm text-jira-gray-400">{t('dashboard.epics')}</div>
@@ -31,17 +33,12 @@ export default function DashboardPage() {
           <div className="text-sm text-jira-gray-400">{t('dashboard.stories')}</div>
         </div>
         <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-yellow-500">{stats.totalTasks}</div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.tasks')}</div>
+          <div className="text-3xl font-bold text-yellow-500">{active}</div>
+          <div className="text-sm text-jira-gray-400">{t('dashboard.active')}</div>
         </div>
         <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-purple-500">
-            {stats.totalStoryPoints}
-            <span className="text-sm text-jira-gray-500 ml-1">
-              ({stats.completedStoryPoints} {t('dashboard.completed')})
-            </span>
-          </div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.storyPoints')}</div>
+          <div className="text-3xl font-bold text-purple-500">{completed}</div>
+          <div className="text-sm text-jira-gray-400">{t('dashboard.completedCard')}</div>
         </div>
       </div>
 

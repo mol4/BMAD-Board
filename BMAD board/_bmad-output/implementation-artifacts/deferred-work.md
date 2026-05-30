@@ -54,3 +54,7 @@
 - `file:read`/`file:readDirectory` return `exists: false` for `EACCES` (permission denied treated same as not found) — pre-existing design choice, harden in Epic 3/4
 - `recalculateEpicStatus` returns `in-progress` when all stories are `cancelled`/`skipped` — those statuses not yet in type union; revisit when status model is finalized
 - Test double mock-clear (`beforeEach` + `afterEach` both call `vi.clearAllMocks()`) — redundant but harmless; clean up in a future test pass
+
+## Deferred from: code review of story 1-5 (2026-05-30)
+
+- Global `:focus-visible` rule in `src/renderer/index.css` does not account for forced-colors / high-contrast mode — approach (global rule, hardcoded jira-blue `#0052cc`) is spec-mandated; revisit during token/teal-accent migration in Epic 5a
