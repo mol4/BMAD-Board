@@ -16,7 +16,7 @@ export default function BacklogPage() {
 
   if (!initialized) {
     return (
-      <div className="text-center py-12 text-jira-gray-500">
+      <div className="text-center py-12 text-foreground-tertiary">
         <p className="text-lg">{t('common.loading')}</p>
       </div>
     );
@@ -40,20 +40,20 @@ export default function BacklogPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">{t('backlog.title')}</h1>
-          <p className="text-sm text-jira-gray-400">
+          <p className="text-sm text-foreground-secondary">
             {t('backlog.storiesInEpics', { stories: stories.length, epics: epics.length })}
           </p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-jira-blue text-white text-sm rounded-md hover:bg-jira-blue-dark transition-colors"
+          className="px-4 py-2 bg-accent text-foreground-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors"
         >
           {t('backlog.createStory')}
         </button>
       </div>
 
       {epics.length === 0 ? (
-        <div className="text-center py-12 text-jira-gray-500">
+        <div className="text-center py-12 text-foreground-tertiary">
           <p className="text-lg">{t('backlog.empty')}</p>
           <p className="text-sm mt-2">{t('backlog.emptyHint')}</p>
         </div>
@@ -66,19 +66,19 @@ export default function BacklogPage() {
                 <div className="flex items-center gap-3 mb-3">
                   <h2 className="text-lg font-semibold">{epic.title}</h2>
                   <StatusBadge status={epic.status} />
-                  <span className="text-sm text-jira-gray-500">
+                  <span className="text-sm text-foreground-tertiary">
                     {epicStories.length} {t('backlog.storiesCount')}
                   </span>
                 </div>
                 {epicStories.length === 0 ? (
-                  <p className="text-sm text-jira-gray-500 ml-6">{t('backlog.noStories')}</p>
+                  <p className="text-sm text-foreground-tertiary ml-6">{t('backlog.noStories')}</p>
                 ) : (
                   <div className="space-y-2 ml-6">
                     {epicStories.map((story) => (
-                      <div key={story.id} className="flex items-center gap-3 p-3 bg-jira-gray-800 rounded-lg">
+                      <div key={story.id} className="flex items-center gap-3 p-3 bg-surface-elevated rounded-lg">
                         <div className="flex-1">
                           <div className="font-medium text-sm">{story.title}</div>
-                          <div className="text-xs text-jira-gray-500 mt-0.5">{story.key}</div>
+                          <div className="text-xs text-foreground-tertiary mt-0.5">{story.key}</div>
                         </div>
                         <StatusBadge status={story.status} />
                         <PriorityBadge priority={story.priority} />

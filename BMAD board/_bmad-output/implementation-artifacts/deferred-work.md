@@ -1,5 +1,11 @@
 # Deferred Work
 
+## Deferred from: code review of story 5a-1 (2026-05-30)
+
+- Tailwind `content` glob `./src/renderer/**/*` does not cover root-level `src/components/` — pre-existing, likely dead code from Next.js migration; verify and clean up
+- `--color-accent-light` token name semantically inverts in dark mode (resolves to `#134e4a`, a very dark value) — naming could confuse future consumers; consider renaming in Epic 5b
+- `--color-status-ready-bg` (light `#ccfbf1`) duplicates `--color-accent-light` value — two separate tokens will drift independently when either is updated; consider a shared base token
+
 ## Deferred from: code review of story 1-1 (2026-05-28)
 
 - `@heroicons/react` removed from deps but still imported in preserved `src/components/` — story 1-3 will replace with Lucide

@@ -12,7 +12,7 @@ export default function BoardPage() {
 
   if (!initialized) {
     return (
-      <div className="text-center py-12 text-jira-gray-500">
+      <div className="text-center py-12 text-foreground-tertiary">
         <p className="text-lg">{t('common.loading')}</p>
       </div>
     );
@@ -21,7 +21,7 @@ export default function BoardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">{t('board.title')}</h1>
-      <p className="text-sm text-jira-gray-400 mb-6">
+      <p className="text-sm text-foreground-secondary mb-6">
         {t('board.updated')}: {new Date().toLocaleTimeString()}
       </p>
 
@@ -29,19 +29,19 @@ export default function BoardPage() {
         {COLUMNS.map((status) => {
           const columnStories = getStoriesByStatus(status);
           return (
-            <div key={status} className="bg-jira-gray-800 rounded-lg p-3 min-h-[200px]">
+            <div key={status} className="bg-surface-elevated rounded-lg p-3 min-h-[200px]">
               <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                <span className="text-jira-gray-500">({columnStories.length})</span>
+                <span className="text-foreground-tertiary">({columnStories.length})</span>
               </h3>
               <div className="space-y-2">
                 {columnStories.map((story) => (
-                  <div key={story.id} className="bg-jira-gray-700 rounded p-2 text-sm">
-                    <div className="font-medium text-white">{story.title}</div>
-                    <div className="text-xs text-jira-gray-400 mt-1">{story.key}</div>
+                  <div key={story.id} className="bg-surface-sunken rounded p-2 text-sm">
+                    <div className="font-medium text-foreground-primary">{story.title}</div>
+                    <div className="text-xs text-foreground-tertiary mt-1">{story.key}</div>
                   </div>
                 ))}
                 {columnStories.length === 0 && (
-                  <p className="text-xs text-jira-gray-500 text-center py-4">{t('common.noDescription')}</p>
+                  <p className="text-xs text-foreground-tertiary text-center py-4">{t('common.noDescription')}</p>
                 )}
               </div>
             </div>

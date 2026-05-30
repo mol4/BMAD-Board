@@ -8,7 +8,7 @@ export default function DashboardPage() {
 
   if (!initialized) {
     return (
-      <div className="text-center py-12 text-jira-gray-500">
+      <div className="text-center py-12 text-foreground-tertiary">
         <p className="text-lg">{t('common.loading')}</p>
       </div>
     );
@@ -21,24 +21,24 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-2">{t('dashboard.title')}</h1>
-      <p className="text-gray-400 mb-6">{t('dashboard.subtitle')}</p>
+      <p className="text-foreground-secondary mb-6">{t('dashboard.subtitle')}</p>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-jira-blue">{stats.totalEpics}</div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.epics')}</div>
+        <div className="bg-surface-elevated rounded-lg p-4">
+          <div className="text-3xl font-bold text-accent">{stats.totalEpics}</div>
+          <div className="text-sm text-foreground-tertiary">{t('dashboard.epics')}</div>
         </div>
-        <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-green-500">{stats.totalStories}</div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.stories')}</div>
+        <div className="bg-surface-elevated rounded-lg p-4">
+          <div className="text-3xl font-bold text-status-done-fg">{stats.totalStories}</div>
+          <div className="text-sm text-foreground-tertiary">{t('dashboard.stories')}</div>
         </div>
-        <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-yellow-500">{active}</div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.active')}</div>
+        <div className="bg-surface-elevated rounded-lg p-4">
+          <div className="text-3xl font-bold text-status-in-progress-fg">{active}</div>
+          <div className="text-sm text-foreground-tertiary">{t('dashboard.active')}</div>
         </div>
-        <div className="bg-jira-gray-800 rounded-lg p-4">
-          <div className="text-3xl font-bold text-purple-500">{completed}</div>
-          <div className="text-sm text-jira-gray-400">{t('dashboard.completedCard')}</div>
+        <div className="bg-surface-elevated rounded-lg p-4">
+          <div className="text-3xl font-bold text-status-done-fg">{completed}</div>
+          <div className="text-sm text-foreground-tertiary">{t('dashboard.completedCard')}</div>
         </div>
       </div>
 
@@ -47,10 +47,10 @@ export default function DashboardPage() {
         <div className="space-y-2">
           {Object.entries(stats.storiesByStatus).map(([status, count]) => (
             <div key={status} className="flex items-center gap-3">
-              <span className="text-sm text-jira-gray-400 w-24">{status}</span>
-              <div className="flex-1 bg-jira-gray-700 rounded-full h-5 overflow-hidden">
+              <span className="text-sm text-foreground-tertiary w-24">{status}</span>
+              <div className="flex-1 bg-surface-sunken rounded-full h-5 overflow-hidden">
                 <div
-                  className="bg-jira-blue h-full rounded-full transition-all"
+                  className="bg-accent h-full rounded-full transition-all"
                   style={{ width: `${stats.totalStories > 0 ? (count / stats.totalStories) * 100 : 0}%` }}
                 />
               </div>
@@ -59,7 +59,7 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-jira-gray-500">
+        <div className="text-center py-8 text-foreground-tertiary">
           <p>{t('dashboard.noEpics')}</p>
           <p className="text-sm mt-1">{t('dashboard.orCreateEpic')}</p>
         </div>

@@ -1,10 +1,12 @@
+@import './styles/design-tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :focus-visible {
-    outline: 2px solid #0052cc; /* jira-blue — becomes var(--color-accent) teal in Epic 5a */
+    outline: 2px solid var(--color-accent);
     outline-offset: 1px;
   }
 }

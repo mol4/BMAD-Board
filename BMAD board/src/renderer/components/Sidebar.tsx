@@ -110,25 +110,24 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`bg-jira-gray-900 text-white flex flex-col transition-all duration-300 ${
-        collapsed ? 'w-16' : 'w-64'
-      }`}
+      className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'
+        }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-jira-gray-700">
+      <div className="flex items-center justify-between p-4 border-b border-border-default">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-jira-blue rounded flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent">
               BB
             </div>
             <div>
               <h1 className="font-bold text-sm">BMAD Board</h1>
-              <p className="text-xs text-jira-gray-400">{t('sidebar.localProject')}</p>
+              <p className="text-xs text-foreground-tertiary">{t('sidebar.localProject')}</p>
             </div>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded hover:bg-jira-gray-700 transition-colors"
+          className="p-1.5 rounded hover:bg-accent-subtle transition-colors"
         >
           <svg
             className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`}
@@ -150,11 +149,10 @@ export default function Sidebar() {
                 <NavLink
                   to={item.href}
                   end={item.href === '/'}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-jira-blue text-white'
-                      : 'text-jira-gray-300 hover:bg-jira-gray-700 hover:text-white'
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${isActive
+                      ? 'bg-accent text-foreground-on-accent'
+                      : 'text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary'
+                    }`}
                   title={collapsed ? t(item.key) : undefined}
                 >
                   {item.icon}
@@ -166,12 +164,11 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-jira-gray-700 space-y-2">
+      <div className="p-4 border-t border-border-default space-y-2">
         <button
           onClick={() => !collapsed && setShowSettings(!showSettings)}
-          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-jira-gray-300 hover:bg-jira-gray-700 hover:text-white transition-colors ${
-            collapsed ? 'justify-center' : ''
-          }`}
+          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''
+            }`}
           title={t('sidebar.pathSettings')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -182,33 +179,33 @@ export default function Sidebar() {
         </button>
 
         {showSettings && !collapsed && configLoaded && (
-          <div className="p-3 bg-jira-gray-800 rounded-lg space-y-3">
+          <div className="p-3 bg-surface-sunken rounded-lg space-y-3">
             <div>
-              <label className="block text-xs text-jira-gray-400 mb-1">{t('sidebar.epicsPath')}</label>
+              <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.epicsPath')}</label>
               <input
                 type="text"
                 value={config.epicsDir}
                 onChange={(e) => setConfig({ ...config, epicsDir: e.target.value })}
-                className="w-full px-2 py-1.5 bg-jira-gray-700 border border-jira-gray-600 rounded text-xs text-white placeholder-jira-gray-500 focus:border-jira-blue focus:outline-none"
+                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
                 placeholder="_bmad-output/planning-artifacts/epics"
               />
             </div>
             <div>
-              <label className="block text-xs text-jira-gray-400 mb-1">{t('sidebar.storiesPath')}</label>
+              <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.storiesPath')}</label>
               <input
                 type="text"
                 value={config.storiesDir}
                 onChange={(e) => setConfig({ ...config, storiesDir: e.target.value })}
-                className="w-full px-2 py-1.5 bg-jira-gray-700 border border-jira-gray-600 rounded text-xs text-white placeholder-jira-gray-500 focus:border-jira-blue focus:outline-none"
+                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
                 placeholder="_bmad-output/planning-artifacts/stories"
               />
             </div>
             <div>
-              <label className="block text-xs text-jira-gray-400 mb-1">{t('sidebar.storiesMode')}</label>
+              <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.storiesMode')}</label>
               <select
                 value={config.storiesMode}
                 onChange={(e) => setConfig({ ...config, storiesMode: e.target.value as 'nested' | 'flat' })}
-                className="w-full px-2 py-1.5 bg-jira-gray-700 border border-jira-gray-600 rounded text-xs text-white focus:border-jira-blue focus:outline-none"
+                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary focus:border-accent focus:outline-none"
               >
                 <option value="nested">{t('sidebar.nestedMode')}</option>
                 <option value="flat">{t('sidebar.flatMode')}</option>
@@ -217,7 +214,7 @@ export default function Sidebar() {
             <div className="flex gap-2">
               <button
                 onClick={saveConfig}
-                className="flex-1 px-2 py-1.5 bg-jira-blue text-white text-xs rounded hover:bg-jira-blue-dark transition-colors"
+                className="flex-1 px-2 py-1.5 bg-accent text-foreground-on-accent text-xs rounded hover:bg-accent-hover transition-colors"
               >
                 {t('sidebar.save')}
               </button>
@@ -239,7 +236,7 @@ export default function Sidebar() {
                     console.log('Config reset error');
                   }
                 }}
-                className="px-2 py-1.5 bg-jira-gray-600 text-white text-xs rounded hover:bg-jira-gray-500 transition-colors"
+                className="px-2 py-1.5 bg-surface-sunken text-foreground-secondary text-xs rounded hover:bg-border-default transition-colors"
               >
                 {t('sidebar.reset')}
               </button>
@@ -256,9 +253,8 @@ export default function Sidebar() {
               console.log(t('sidebar.syncError'));
             }
           }}
-          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-jira-gray-300 hover:bg-jira-gray-700 hover:text-white transition-colors ${
-            collapsed ? 'justify-center' : ''
-          }`}
+          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''
+            }`}
           title={t('sidebar.syncWithMd')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -275,21 +271,19 @@ export default function Sidebar() {
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-1'}`}>
           <button
             onClick={() => setLocale('ru')}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              locale === 'ru'
-                ? 'bg-jira-blue text-white'
-                : 'text-jira-gray-400 hover:text-white hover:bg-jira-gray-700'
-            }`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${locale === 'ru'
+                ? 'bg-accent text-foreground-on-accent'
+                : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
+              }`}
           >
             RU
           </button>
           <button
             onClick={() => setLocale('en')}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              locale === 'en'
-                ? 'bg-jira-blue text-white'
-                : 'text-jira-gray-400 hover:text-white hover:bg-jira-gray-700'
-            }`}
+            className={`px-2 py-1 text-xs rounded transition-colors ${locale === 'en'
+                ? 'bg-accent text-foreground-on-accent'
+                : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
+              }`}
           >
             EN
           </button>

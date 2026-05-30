@@ -52,8 +52,8 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 5a: Dark Theme & Polished Foundation
-  epic-5a: backlog
-  5a-1-implement-css-custom-properties-and-tailwind-config: backlog
+  epic-5a: in-progress
+  5a-1-implement-css-custom-properties-and-tailwind-config: done
   5a-2-setup-typography-and-lucide-icons: backlog
   5a-3-implement-toast-system-and-win11-snappy-transitions: backlog
   5a-4-implement-theme-toggle: backlog

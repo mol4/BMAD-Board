@@ -30,7 +30,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex items-center justify-center h-screen text-jira-gray-500">
+      <div className="flex items-center justify-center h-screen text-foreground-tertiary">
         <p className="text-lg">Loading...</p>
       </div>
     );

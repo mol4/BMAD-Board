@@ -13,7 +13,7 @@ export default function EpicsPage() {
 
   if (!initialized) {
     return (
-      <div className="text-center py-12 text-jira-gray-500">
+      <div className="text-center py-12 text-foreground-tertiary">
         <p className="text-lg">{t('common.loading')}</p>
       </div>
     );
@@ -32,32 +32,32 @@ export default function EpicsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">{t('epics.title')}</h1>
-          <p className="text-sm text-jira-gray-400">{t('epics.subtitle')}</p>
+          <p className="text-sm text-foreground-secondary">{t('epics.subtitle')}</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-jira-blue text-white text-sm rounded-md hover:bg-jira-blue-dark transition-colors"
+          className="px-4 py-2 bg-accent text-foreground-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors"
         >
           {t('epics.create')}
         </button>
       </div>
 
       {epics.length === 0 ? (
-        <div className="text-center py-12 text-jira-gray-500">
+        <div className="text-center py-12 text-foreground-tertiary">
           <p className="text-lg">{t('epics.noEpics')}</p>
           <p className="text-sm mt-2">{t('epics.noEpicsHint')}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {epics.map((epic) => (
-            <div key={epic.id} className="p-4 bg-jira-gray-800 rounded-lg">
+            <div key={epic.id} className="p-4 bg-surface-elevated rounded-lg">
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-semibold">{epic.title}</h3>
-                    <span className="text-xs text-jira-gray-500">{epic.key}</span>
+                    <span className="text-xs text-foreground-tertiary">{epic.key}</span>
                   </div>
-                  <p className="text-sm text-jira-gray-400">
+                  <p className="text-sm text-foreground-secondary">
                     {epic.description || t('common.noDescription')}
                   </p>
                 </div>
@@ -66,7 +66,7 @@ export default function EpicsPage() {
                   <PriorityBadge priority={epic.priority} />
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs text-jira-gray-500 mt-3 pt-3 border-t border-jira-gray-700">
+              <div className="flex items-center gap-4 text-xs text-foreground-tertiary mt-3 pt-3 border-t border-border-default">
                 <span>{epic.stories.length} {t('epic.storiesCount')}</span>
                 <span>{t('epic.created')}: {new Date(epic.createdAt).toLocaleDateString()}</span>
                 {epic.sourceFile && <span>{epic.sourceFile}</span>}
