@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import { FileText } from 'lucide-react';
+import MarkdownModal from '@/components/MarkdownModal';
 import type { Story } from '@/lib/types';
 
 export default function StoryDetailPage() {
@@ -15,6 +17,18 @@ export default function StoryDetailPage() {
   const getStoryByKey = useAppStore((s) => s.getStoryByKey);
   const getEpic = useAppStore((s) => s.getEpic);
   const getTask = useAppStore((s) => s.getTask);
+  const [mdModalOpen, setMdModalOpen] = useState(false);
+  const [mdContent, setMdContent] = useState<string | null>(null);
+
+  const openMdModal = async (s: Story) => {
+    let content = s.rawMarkdown ?? null;
+    if (!content && s.sourceFile) {
+      const result = await window.electronAPI?.fileRead(s.sourceFile);
+      content = result?.content ?? null;
+    }
+    setMdContent(content);
+    setMdModalOpen(true);
+  };
 
   useEffect(() => {
     if (!initialized) return;
@@ -66,7 +80,14 @@ export default function StoryDetailPage() {
           {story.assignee && <span>{t('story.assignee')}: {story.assignee}</span>}
           {story.storyPoints !== undefined && <span>{story.storyPoints} SP</span>}
           {story.sourceFile && (
-            <span className="text-foreground-tertiary">{t('story.hasFile')}</span>
+            <button
+              onClick={() => openMdModal(story)}
+              className="inline-flex items-center gap-1 text-foreground-tertiary hover:text-foreground-primary transition-colors cursor-pointer"
+              title={story.sourceFile}
+            >
+              <FileText size={14} />
+              {t('story.hasFile')}
+            </button>
           )}
         </div>
       </div>
@@ -126,6 +147,14 @@ export default function StoryDetailPage() {
           </div>
         </section>
       )}
+
+      <MarkdownModal
+        isOpen={mdModalOpen}
+        onClose={() => setMdModalOpen(false)}
+        title={story.title}
+        markdownContent={mdContent}
+        filePath={story.sourceFile}
+      />
     </div>
   );
 }

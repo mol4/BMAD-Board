@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow } from 'electron';
+import { ipcMain, BrowserWindow, shell } from 'electron';
 import { readFile, readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import type { IPCChannels } from '../shared/ipc-channels';
@@ -86,5 +86,10 @@ export function setupIPC(getWindow: () => BrowserWindow | null): void {
     const win = getWindow();
     if (!win || win.isDestroyed()) return { isMaximized: false };
     return { isMaximized: win.isMaximized() };
+  });
+
+  ipcMain.handle('shell:openPath', async (_event, params: IPCChannels['shell:openPath']['params']): Promise<IPCChannels['shell:openPath']['result']> => {
+    const error = await shell.openPath(params.path);
+    return { error };
   });
 }

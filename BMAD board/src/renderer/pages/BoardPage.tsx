@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import type { StoryStatus } from '@/lib/types';
@@ -35,10 +36,14 @@ export default function BoardPage() {
               </h3>
               <div className="space-y-2">
                 {columnStories.map((story) => (
-                  <div key={story.id} className="bg-surface-sunken rounded p-2 text-sm">
+                  <Link
+                    key={story.id}
+                    to={`/stories/${story.id}`}
+                    className="block bg-surface-sunken rounded p-2 text-sm hover:bg-accent-subtle transition-colors"
+                  >
                     <div className="font-medium text-foreground-primary">{story.title}</div>
                     <div className="text-xs text-foreground-tertiary mt-1">{story.key}</div>
-                  </div>
+                  </Link>
                 ))}
                 {columnStories.length === 0 && (
                   <p className="text-xs text-foreground-tertiary text-center py-4">{t('common.noDescription')}</p>

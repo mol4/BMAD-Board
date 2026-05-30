@@ -48,10 +48,10 @@ const translations = {
     'priority.high': 'Высокий',
     'priority.medium': 'Средний',
     'priority.low': 'Низкий',
-    'priority.critical.icon': '🔴 Критический',
-    'priority.high.icon': '🟠 Высокий',
-    'priority.medium.icon': '🟡 Средний',
-    'priority.low.icon': '🔵 Низкий',
+    'priority.critical.icon': 'Критический',
+    'priority.high.icon': 'Высокий',
+    'priority.medium.icon': 'Средний',
+    'priority.low.icon': 'Низкий',
 
     'issueType.epic': 'Эпик',
     'issueType.story': 'Стори',
@@ -131,7 +131,7 @@ const translations = {
     'story.editWarningInline': 'Вы собираетесь редактировать исходный Markdown файл. Изменения будут записаны напрямую в память (inline-стори). Продолжить?',
     'story.loadError': 'Ошибка загрузки файла',
     'story.saveError': 'Ошибка сохранения',
-    'story.hasFile': '📄 Есть файл',
+    'story.hasFile': 'Есть файл',
     'story.acceptanceCriteria': 'Критерии приёмки',
     'story.tasks': 'Задачи',
     'story.addTask': '+ Задача',
@@ -166,7 +166,7 @@ const translations = {
 
     'diag.title': 'Диагностика BMAD',
     'diag.subtitle': 'Обзор файлов, конфигурации и импортированных данных',
-    'diag.resync': '🔄 Пересинхронизировать',
+    'diag.resync': 'Пересинхронизировать',
     'diag.syncing': 'Синхронизация...',
     'diag.config': 'Конфигурация',
     'diag.mode': 'Режим',
@@ -191,8 +191,8 @@ const translations = {
     'diag.storiesTable': 'Стори',
     'diag.epicCol': 'Эпик',
     'diag.source': 'Источник',
-    'diag.fileSource': '📄 Файл',
-    'diag.inlineSource': '📝 Inline',
+    'diag.fileSource': 'Файл',
+    'diag.inlineSource': 'Inline',
   },
   en: {
     'nav.dashboard': 'Dashboard',
@@ -239,10 +239,10 @@ const translations = {
     'priority.high': 'High',
     'priority.medium': 'Medium',
     'priority.low': 'Low',
-    'priority.critical.icon': '🔴 Critical',
-    'priority.high.icon': '🟠 High',
-    'priority.medium.icon': '🟡 Medium',
-    'priority.low.icon': '🔵 Low',
+    'priority.critical.icon': 'Critical',
+    'priority.high.icon': 'High',
+    'priority.medium.icon': 'Medium',
+    'priority.low.icon': 'Low',
 
     'issueType.epic': 'Epic',
     'issueType.story': 'Story',
@@ -322,7 +322,7 @@ const translations = {
     'story.editWarningInline': 'You are about to edit the source Markdown file. Changes will be written to memory (inline story). Continue?',
     'story.loadError': 'File load error',
     'story.saveError': 'Save error',
-    'story.hasFile': '📄 Has file',
+    'story.hasFile': 'Has file',
     'story.acceptanceCriteria': 'Acceptance Criteria',
     'story.tasks': 'Tasks',
     'story.addTask': '+ Task',
@@ -357,7 +357,7 @@ const translations = {
 
     'diag.title': 'BMAD Diagnostics',
     'diag.subtitle': 'Overview of files, configuration and imported data',
-    'diag.resync': '🔄 Resynchronize',
+    'diag.resync': 'Resynchronize',
     'diag.syncing': 'Syncing...',
     'diag.config': 'Configuration',
     'diag.mode': 'Mode',
@@ -382,8 +382,8 @@ const translations = {
     'diag.storiesTable': 'Stories',
     'diag.epicCol': 'Epic',
     'diag.source': 'Source',
-    'diag.fileSource': '📄 File',
-    'diag.inlineSource': '📝 Inline',
+    'diag.fileSource': 'File',
+    'diag.inlineSource': 'Inline',
   },
 } as const;
 
@@ -397,7 +397,7 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType>({
   locale: 'en',
-  setLocale: () => {},
+  setLocale: () => { },
   t: (key) => key,
 });
 

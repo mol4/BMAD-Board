@@ -2,61 +2,38 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import type { AppConfig } from '../../shared/ipc-channels';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw } from 'lucide-react';
 
 const navItems = [
   {
     key: 'nav.dashboard' as const,
     href: '/',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-      </svg>
-    ),
+    icon: <LayoutDashboard size={18} className="shrink-0" />,
   },
   {
     key: 'nav.board' as const,
     href: '/board',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7" />
-      </svg>
-    ),
+    icon: <Columns2 size={18} className="shrink-0" />,
   },
   {
     key: 'nav.backlog' as const,
     href: '/backlog',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-      </svg>
-    ),
+    icon: <AlignJustify size={18} className="shrink-0" />,
   },
   {
     key: 'nav.epics' as const,
     href: '/epics',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
+    icon: <Zap size={18} className="shrink-0" />,
   },
   {
     key: 'nav.docs' as const,
     href: '/docs',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-      </svg>
-    ),
+    icon: <FileText size={18} className="shrink-0" />,
   },
   {
     key: 'nav.diagnostics' as const,
     href: '/diagnostics',
-    icon: (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
+    icon: <BarChart3 size={18} className="shrink-0" />,
   },
 ];
 
@@ -129,14 +106,10 @@ export default function Sidebar() {
           onClick={() => setCollapsed(!collapsed)}
           className="p-1.5 rounded hover:bg-accent-subtle transition-colors"
         >
-          <svg
-            className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft
+            size={16}
+            className={`shrink-0 transition-transform ${collapsed ? 'rotate-180' : ''}`}
+          />
         </button>
       </div>
 
@@ -150,8 +123,8 @@ export default function Sidebar() {
                   to={item.href}
                   end={item.href === '/'}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${isActive
-                      ? 'bg-accent text-foreground-on-accent'
-                      : 'text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary'
+                    ? 'bg-accent text-foreground-on-accent'
+                    : 'text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary'
                     }`}
                   title={collapsed ? t(item.key) : undefined}
                 >
@@ -171,10 +144,7 @@ export default function Sidebar() {
             }`}
           title={t('sidebar.pathSettings')}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <Settings size={18} className="shrink-0" />
           {!collapsed && <span>{t('sidebar.pathSettings')}</span>}
         </button>
 
@@ -257,14 +227,7 @@ export default function Sidebar() {
             }`}
           title={t('sidebar.syncWithMd')}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
-          </svg>
+          <RefreshCw size={18} className="shrink-0" />
           {!collapsed && <span>{t('sidebar.syncMd')}</span>}
         </button>
 
@@ -272,8 +235,8 @@ export default function Sidebar() {
           <button
             onClick={() => setLocale('ru')}
             className={`px-2 py-1 text-xs rounded transition-colors ${locale === 'ru'
-                ? 'bg-accent text-foreground-on-accent'
-                : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
+              ? 'bg-accent text-foreground-on-accent'
+              : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
               }`}
           >
             RU
@@ -281,8 +244,8 @@ export default function Sidebar() {
           <button
             onClick={() => setLocale('en')}
             className={`px-2 py-1 text-xs rounded transition-colors ${locale === 'en'
-                ? 'bg-accent text-foreground-on-accent'
-                : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
+              ? 'bg-accent text-foreground-on-accent'
+              : 'text-foreground-tertiary hover:text-foreground-primary hover:bg-accent-subtle'
               }`}
           >
             EN

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { X } from 'lucide-react';
 
 interface CreateModalProps {
   isOpen: boolean;
@@ -42,9 +43,7 @@ export default function CreateModal({ isOpen, onClose, title, onSubmit, fields }
             onClick={onClose}
             className="p-1 rounded hover:bg-accent-subtle transition-colors"
           >
-            <svg className="w-5 h-5 text-foreground-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={18} className="text-foreground-tertiary" />
           </button>
         </div>
 

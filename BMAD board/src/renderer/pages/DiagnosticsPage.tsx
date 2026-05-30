@@ -3,6 +3,7 @@ import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { initializeStore, getSprintMeta } from '@/lib/markdown-parser';
 import { getConfig } from '@/lib/config';
+import { RefreshCw } from 'lucide-react';
 
 export default function DiagnosticsPage() {
   const { t } = useI18n();
@@ -43,7 +44,10 @@ export default function DiagnosticsPage() {
           disabled={syncing}
           className="px-4 py-2 bg-accent text-foreground-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors disabled:opacity-50"
         >
-          {syncing ? t('diag.syncing') : t('diag.resync')}
+          <span className="inline-flex items-center gap-1.5">
+            <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+            {syncing ? t('diag.syncing') : t('diag.resync')}
+          </span>
         </button>
       </div>
 

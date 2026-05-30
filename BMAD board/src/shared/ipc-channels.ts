@@ -54,6 +54,10 @@ export interface IPCChannels {
     params: void;
     result: { isMaximized: boolean };
   };
+  'shell:openPath': {
+    params: { path: string };
+    result: { error: string };
+  };
 }
 
 export type IPCChannelName = keyof IPCChannels;

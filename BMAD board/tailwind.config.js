@@ -6,6 +6,20 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["'Inter'", "'Segoe UI'", 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ["'JetBrains Mono'", "'Cascadia Code'", "'Fira Code'", 'monospace'],
+      },
+      fontSize: {
+        'display': ['1.875rem', { lineHeight: '1.2', fontWeight: '700', letterSpacing: '-0.02em' }],
+        'h1':      ['1.5rem',    { lineHeight: '1.3', fontWeight: '700', letterSpacing: '-0.01em' }],
+        'h2':      ['1.25rem',   { lineHeight: '1.35', fontWeight: '600', letterSpacing: '-0.01em' }],
+        'h3':      ['1rem',      { lineHeight: '1.4', fontWeight: '600' }],
+        'body':    ['0.875rem',  { lineHeight: '1.6', fontWeight: '400' }],
+        'body-sm': ['0.8125rem', { lineHeight: '1.5', fontWeight: '400' }],
+        'caption': ['0.75rem',   { lineHeight: '1.4', fontWeight: '500' }],
+        'mono':    ['0.8125rem', { lineHeight: '1.55', fontWeight: '400' }],
+      },
       colors: {
         surface: {
           base: 'var(--color-surface-base)',

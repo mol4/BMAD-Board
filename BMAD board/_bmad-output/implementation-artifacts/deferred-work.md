@@ -1,5 +1,9 @@
 # Deferred Work
 
+## Deferred from: code review of story 5a-2 (2026-05-30)
+
+- BoardPage.tsx story cards have no `<Link>` to StoryDetailPage — pre-existing, route `/stories/:id` exists and StoryDetailPage works; navigate-from-board is not scoped to any completed story; fix in Epic 2 or Epic 3
+
 ## Deferred from: code review of story 5a-1 (2026-05-30)
 
 - Tailwind `content` glob `./src/renderer/**/*` does not cover root-level `src/components/` — pre-existing, likely dead code from Next.js migration; verify and clean up

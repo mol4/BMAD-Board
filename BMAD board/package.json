@@ -13,10 +13,13 @@
     "test:visual": "npx tsx tests/visual-capture.ts"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "better-sqlite3": "^12.10.0",
     "buffer": "^6.0.3",
     "electron-log": "^5.4.4",
     "gray-matter": "^4.0.3",
+    "lucide-react": "^1.17.0",
     "marked": "^12.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
