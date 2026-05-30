@@ -40,6 +40,15 @@
 - Path traversal risk in `file:read`/`file:readDirectory` IPC — no validation that paths are within project directory; security hardening deferred to Epic 3/4
 - `marked` not used in renderer components — AC#7 says it should work; it imports fine but is never invoked in UI
 
+## Deferred from: code review of story 1-4 (2026-05-30)
+
+- Path traversal in `file:read`/`file:readDirectory` IPC — no validation that paths are within project directory; pre-existing issue, security hardening deferred to Epic 3/4
+- No `maxFiles` limit on log rotation — rotated log files accumulate indefinitely; set `log.transports.file.maxFiles` when log volume becomes a concern
+- No unit tests for `db.ts` (`getPref`, `setPref`, `getDb`) — entire persistence layer is untested; add in a future story or dedicated test pass
+- No round-trip test for `isMaximized: true` with preserved `x`/`y` — minor test coverage gap in `window-state.test.ts`
+- `PRAGMA foreign_keys = ON` not set in `db.ts` — FK enforcement off by default in SQLite; enable when first FK constraint is added to the schema
+- Global `setupFiles` still applies jest-dom matchers to node tests — vitest 2.1.x does not support inline workspace projects; safe in practice (matchers only fail when called, not when registered); fix requires creating `vitest.workspace.ts`
+
 ## Deferred from: code review of story 1-3 round 3 (2026-05-29)
 
 - `file:read`/`file:readDirectory` return `exists: false` for `EACCES` (permission denied treated same as not found) — pre-existing design choice, harden in Epic 3/4

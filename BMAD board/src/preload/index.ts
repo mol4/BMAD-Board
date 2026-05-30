@@ -18,6 +18,8 @@ const electronAPI = {
     ipcRenderer.invoke('file:read', { path }),
   fileReadDirectory: (path: string): Promise<IPCChannels['file:readDirectory']['result']> =>
     ipcRenderer.invoke('file:readDirectory', { path }),
+  windowGetState: (): Promise<IPCChannels['window:getState']['result']> =>
+    ipcRenderer.invoke('window:getState'),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

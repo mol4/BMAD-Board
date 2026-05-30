@@ -1,13 +1,21 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { setupIPC } from './ipc';
+import { getDb, closeDb } from './db';
+import logger from './logger';
+import { loadWindowState, saveWindowState } from './window-state';
 
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
+  const state = loadWindowState();
+  logger.info('[Main] Restoring window state:', state);
+
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
+    width: state.width,
+    height: state.height,
+    x: state.x,
+    y: state.y,
     minWidth: 1024,
     minHeight: 768,
     title: 'BMAD Board',
@@ -18,21 +26,55 @@ function createWindow(): void {
     },
   });
 
-  mainWindow.on('closed', () => {
+  if (state.isMaximized) {
+    mainWindow.maximize();
+  }
+
+  logger.info('[Main] Window created');
+
+  const win = mainWindow;
+  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function debouncedSave(w: BrowserWindow): void {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      saveWindowState(w);
+      logger.info('[Main] Window bounds saved');
+    }, 500);
+  }
+
+  win.on('resize', () => debouncedSave(win));
+  win.on('move', () => debouncedSave(win));
+
+  win.on('close', () => {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveWindowState(win);
+    logger.info('[Main] Window closed, state saved');
+  });
+
+  win.on('closed', () => {
     mainWindow = null;
   });
 
   if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
-    mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
+    win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    win.loadFile(join(__dirname, '../renderer/index.html'));
   }
 }
 
 app.whenReady().then(() => {
-  console.log('[Main] App ready, cwd:', process.cwd());
-  setupIPC();
+  logger.info('[Main] App ready, cwd:', process.cwd());
+  getDb();
+  setupIPC(() => mainWindow);
   createWindow();
+}).catch((err: unknown) => {
+  logger.error('[Main] Fatal error during startup:', err);
+  app.quit();
+});
+
+app.on('will-quit', () => {
+  closeDb();
 });
 
 app.on('window-all-closed', () => {

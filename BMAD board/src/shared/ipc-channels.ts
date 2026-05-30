@@ -50,6 +50,10 @@ export interface IPCChannels {
     params: { path: string };
     result: { name: string; path: string; isFile: boolean }[];
   };
+  'window:getState': {
+    params: void;
+    result: { isMaximized: boolean };
+  };
 }
 
 export type IPCChannelName = keyof IPCChannels;
