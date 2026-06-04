@@ -2,7 +2,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import type { AppConfig } from '../../shared/ipc-channels';
-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
 
@@ -138,6 +138,21 @@ export default function Sidebar() {
               </li>
             );
           })}
+          <li>
+            <NavLink
+              to="/welcome"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors ${isActive
+                  ? 'bg-accent text-foreground-on-accent'
+                  : 'text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary'
+                }`
+              }
+              title={collapsed ? t('nav.help') : undefined}
+            >
+              <CircleHelp size={18} className="shrink-0" />
+              {!collapsed && <span className="text-sm font-medium">{t('nav.help')}</span>}
+            </NavLink>
+          </li>
         </ul>
       </nav>
 

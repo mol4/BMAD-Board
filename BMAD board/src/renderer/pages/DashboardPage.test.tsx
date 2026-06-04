@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, within, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import type { StoryStatus } from '@/lib/types';
@@ -24,18 +25,21 @@ describe('DashboardPage', () => {
     useAppStore.getState().setInitialized(true);
   });
 
-  it('renders the 4-card stat grid with zeros on first run', () => {
+  it('renders the 4-card stat grid with zeros on first run when store has data', () => {
+    useAppStore.getState().createEpic({ title: 'Epic', description: '' });
     render(
-      <I18nProvider>
-        <DashboardPage />
-      </I18nProvider>,
+      <MemoryRouter>
+        <I18nProvider>
+          <DashboardPage />
+        </I18nProvider>
+      </MemoryRouter>,
     );
 
     expect(screen.getByText('Epics')).toBeInTheDocument();
     expect(screen.getByText('Stories')).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
     expect(screen.getByText('Completed')).toBeInTheDocument();
-    expect(screen.getAllByText('0')).toHaveLength(4);
+    expect(screen.getAllByText('0')).toHaveLength(3);
   });
 
   it('computes Active = (in-progress + in-review) and Completed = done', () => {
@@ -43,9 +47,11 @@ describe('DashboardPage', () => {
     seedStories(['in-progress', 'in-progress', 'in-review', 'done', 'done', 'backlog']);
 
     render(
-      <I18nProvider>
-        <DashboardPage />
-      </I18nProvider>,
+      <MemoryRouter>
+        <I18nProvider>
+          <DashboardPage />
+        </I18nProvider>
+      </MemoryRouter>,
     );
 
     // Scope each assertion to its card; the status-distribution block below also renders counts.

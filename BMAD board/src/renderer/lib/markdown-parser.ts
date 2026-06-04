@@ -69,6 +69,37 @@ export async function syncMarkdownToStore(): Promise<{ epics: number; stories: n
       storyCount = result.stories;
     }
 
+    // Apply sprint-status.yaml overrides
+    const sprintData = await parseSprintStatusAsync(storiesDir);
+    if (sprintData) {
+      _lastSprintMeta = {
+        project: sprintData.project || '',
+        generated: sprintData.generated || '',
+        lastUpdated: sprintData.last_updated || '',
+      };
+      const devStatus = sprintData.development_status || {};
+      for (const [key, statusVal] of Object.entries(devStatus)) {
+        const status = String(statusVal);
+        if (key.startsWith('epic-') && !key.includes('-retrospective')) {
+          const epicNum = key.replace('epic-', '');
+          const epic = useAppStore.getState().getEpicByKey(`EPIC-${epicNum}`);
+          if (epic) {
+            useAppStore.getState().updateEpic(epic.id, { status: mapSprintEpicStatus(status) });
+          }
+          continue;
+        }
+        if (key.includes('-retrospective')) continue;
+        const storyNumMatch = key.match(/^(\d+[\w]*)-(\d+)-/);
+        if (storyNumMatch) {
+          const storyKey = `STORY-${storyNumMatch[1]}.${storyNumMatch[2]}`;
+          const story = useAppStore.getState().getStoryByKey(storyKey);
+          if (story) {
+            useAppStore.getState().updateStory(story.id, { status: mapSprintStoryStatus(status) });
+          }
+        }
+      }
+    }
+
     useAppStore.getState().setInitialized(true);
     console.log(`[BMAD Sync] Sync complete: ${epicCount} epics, ${storyCount} stories`);
     return { epics: epicCount, stories: storyCount };
@@ -100,6 +131,7 @@ async function ipcReadAllFiles(dirPath: string): Promise<{ name: string; path: s
 async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epics: number; stories: number }> {
   let epicCount = 0;
   let storyCount = 0;
+  const inlineStoriesBuffer: Story[] = [];
 
   const epicFiles = await ipcReadAllFiles(epicsDir);
   console.log(`[BMAD Sync] Found ${epicFiles.length} .md files in epics dir`);
@@ -112,18 +144,17 @@ async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epi
       const hasMultipleEpics = (content.match(/^## Epic \d+:/gm) || []).length > 1;
 
       if (hasMultipleEpics) {
-        const epics = parseEpicsDocument(content);
+        const epics = parseEpicsDocument(content, entry.path);
         for (const epic of epics) {
           useAppStore.getState().insertEpic(epic);
           epicCount++;
         }
+        // Collect inline stories but do NOT add them to the store yet.
+        // They will be added after story files are loaded, skipping those
+        // that already have an implementation file.
         const inlineStories = getInlineStories(content);
         for (const story of inlineStories) {
-          const storyNum = story.key.split('-')[1]?.split('.')[0];
-          const foundEpic = useAppStore.getState().getEpicByKey(`EPIC-${storyNum}`);
-          if (foundEpic) story.epicId = foundEpic.id;
-          useAppStore.getState().insertStory(story);
-          storyCount++;
+          inlineStoriesBuffer.push(story);
         }
       } else {
         const hasEpicHeading = /^#{1,3}\s+Epic\s/i.test(content);
@@ -155,7 +186,9 @@ async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epi
       const { data: parsedFrontmatter } = matter(content);
       const epicKey = parsedFrontmatter?.epicId || parsedFrontmatter?.epic_key || parsedFrontmatter?.epic;
       if (epicKey) {
-        const epic = useAppStore.getState().getEpicByKey(String(epicKey));
+        const epicKeyStr = String(epicKey);
+        const normalizedEpicKey = epicKeyStr.startsWith('EPIC-') ? epicKeyStr : `EPIC-${epicKeyStr}`;
+        const epic = useAppStore.getState().getEpicByKey(normalizedEpicKey);
         if (epic) targetEpicId = epic.id;
       } else if (filenameEpicMatch) {
         const epicNum = parseInt(filenameEpicMatch[1], 10);
@@ -166,6 +199,10 @@ async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epi
       const story = parseStoryFile(content, targetEpicId, entry.path, storyCount + 1);
       if (story) {
         useAppStore.getState().insertStory(story);
+        const epic = useAppStore.getState().getEpic(targetEpicId);
+        if (epic && !epic.stories.includes(story.id)) {
+          epic.stories.push(story.id);
+        }
         storyCount++;
       }
     } catch (err) {
@@ -173,6 +210,31 @@ async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epi
     }
   }
 
+  // Fill in inline stories that do not have a dedicated story file
+  const existingStoryKeys = new Set(useAppStore.getState().stories.map((s) => s.key));
+  let inlineCount = 0;
+  for (const inlineStory of inlineStoriesBuffer) {
+    if (existingStoryKeys.has(inlineStory.key)) {
+      continue; // already imported from implementation-artifacts
+    }
+    // Re-resolve epicId: inline stories store the original epic UUID,
+    // but the epic's id may differ if it was re-inserted
+    const epicNumMatch = inlineStory.key.match(/STORY-(\d+[\w]*)\./);
+    const epicKey = epicNumMatch ? `EPIC-${epicNumMatch[1]}` : null;
+    const parentEpic = epicKey ? useAppStore.getState().getEpicByKey(epicKey) : null;
+    if (parentEpic) {
+      inlineStory.epicId = parentEpic.id;
+    }
+    useAppStore.getState().insertStory(inlineStory);
+    const epic = parentEpic || useAppStore.getState().getEpic(inlineStory.epicId);
+    if (epic && !epic.stories.includes(inlineStory.id)) {
+      epic.stories.push(inlineStory.id);
+    }
+    inlineCount++;
+    storyCount++;
+  }
+
+  console.log(`[BMAD Sync] Loaded ${epicCount} epics and ${storyCount} stories (${inlineCount} from epics.md inline)`);
   return { epics: epicCount, stories: storyCount };
 }
 
@@ -209,17 +271,19 @@ export async function initializeStore() {
 }
 
 export function persistStoryStatus(_storyKey: string, _newStatus: StoryStatus): boolean {
+  // TODO: Implement IPC file write when file:write channel is added
   return false;
 }
 
 export function persistEpicStatus(_epicKey: string, _newStatus: EpicStatus): boolean {
+  // TODO: Implement IPC file write when file:write channel is added
   return false;
 }
 
 export function ensureBmadDirectories() {
 }
 
-export function parseEpicsDocument(raw: string): Epic[] {
+export function parseEpicsDocument(raw: string, filePath?: string): Epic[] {
   const { content } = matter(raw);
   const matches = [...content.matchAll(/^## Epic (\d+):\s+(.+)$/gm)];
   const deduped = new Map<string, Epic>();
@@ -246,7 +310,7 @@ export function parseEpicsDocument(raw: string): Epic[] {
       labels: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      sourceFile: undefined,
+      sourceFile: filePath,
       rawMarkdown: section.trim(),
     });
   }
@@ -302,19 +366,17 @@ export function parseStoryFile(raw: string, epicId: string, _filePath: string, f
       extractFirstHeading(content) ||
       _filePath.replace(/^.*[\\\/]/, '').replace(/\.md$/, '').replace(/-/g, ' ');
 
-    const filenameEpicMatch = _filePath.match(/(\d+)[\.-]\d+/);
-    const storyNum = data.id
-      ? parseInt(String(data.id).replace(/\D/g, ''), 10) || fallbackNum
-      : filenameEpicMatch
-        ? parseInt(filenameEpicMatch[0].replace('.', '-').split('-')[1] || filenameEpicMatch[0], 10) || fallbackNum
-        : fallbackNum;
+    const rawStoryId = data.story_id || data.id;
+    const storyRef = rawStoryId
+      ? String(rawStoryId)
+      : extractStoryRefFromContentOrFilename(content, _filePath) || String(fallbackNum);
 
     const statusLine = content.match(/^Status:\s*(.+)$/im);
     const rawStatus = statusLine ? statusLine[1].trim() : (data.status as string);
 
     const story: Story = {
       id: uuidv4(),
-      key: `STORY-${storyNum}`,
+      key: `STORY-${storyRef}`,
       epicId,
       title,
       description: extractDescription(content),
@@ -516,4 +578,68 @@ function mapPriority(priority?: string): Priority {
     lowest: 'low',
   };
   return map[p] || 'medium';
+}
+
+function extractStoryRefFromContentOrFilename(content: string, filePath: string): string | null {
+  const headingMatch = content.match(/^#\s+Story\s+(\d+[\.\d]*):/im);
+  if (headingMatch) return headingMatch[1];
+
+  const basename = filePath.replace(/^.*[\\\/]/, '');
+  const dashMatch = basename.match(/^(\d+)-(\d+)-/);
+  if (dashMatch) return `${dashMatch[1]}.${dashMatch[2]}`;
+
+  const genericMatch = basename.match(/^story-(\d+)/i);
+  if (genericMatch) return genericMatch[1];
+
+  return null;
+}
+
+// ─── Sprint status parsing ───────────────────────────
+
+interface SprintYaml {
+  project?: string;
+  generated?: string;
+  last_updated?: string;
+  development_status?: Record<string, string>;
+}
+
+async function parseSprintStatusAsync(storiesDir: string): Promise<SprintYaml | null> {
+  const candidates = [
+    `${storiesDir}/sprint-status.yaml`,
+    `${storiesDir}/sprint-status.yml`,
+  ];
+  for (const filePath of candidates) {
+    try {
+      const content = await ipcReadFile(filePath);
+      if (content) {
+        const yaml = await import('js-yaml');
+        return yaml.load(content) as SprintYaml;
+      }
+    } catch (err) {
+      console.error('[BMAD Sync] Error parsing sprint-status.yaml:', err);
+    }
+  }
+  return null;
+}
+
+function mapSprintStoryStatus(status: string): StoryStatus {
+  const s = status.toLowerCase().replace(/\s+/g, '-');
+  const map: Record<string, StoryStatus> = {
+    backlog: 'backlog',
+    'ready-for-dev': 'todo',
+    'in-progress': 'in-progress',
+    review: 'in-review',
+    done: 'done',
+  };
+  return map[s] || 'backlog';
+}
+
+function mapSprintEpicStatus(status: string): EpicStatus {
+  const s = status.toLowerCase().replace(/\s+/g, '-');
+  const map: Record<string, EpicStatus> = {
+    backlog: 'draft',
+    'in-progress': 'in-progress',
+    done: 'done',
+  };
+  return map[s] || 'draft';
 }

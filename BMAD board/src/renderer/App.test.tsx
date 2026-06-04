@@ -24,6 +24,8 @@ function renderWithProviders(initialEntries: string[]) {
 
 describe('App', () => {
   it('renders Dashboard page at root route', async () => {
+    useAppStore.getState().createEpic({ title: 'Test', description: '' });
+    useAppStore.getState().setInitialized(true);
     renderWithProviders(['/']);
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Project Dashboard' })).toBeInTheDocument();

@@ -60,8 +60,8 @@ development_status:
   epic-5a-retrospective: done
 
   # Epic 2: Multi-Project Support
-  epic-2: backlog
-  2-0-build-welcome-onboarding-screen: backlog
+  epic-2: in-progress
+  2-0-build-welcome-onboarding-screen: done
   2-1-implement-sqlite-json-fallback-storage: backlog
   2-2-implement-storemanager-with-per-project-isolation: backlog
   2-3-build-project-switcher-ui: backlog

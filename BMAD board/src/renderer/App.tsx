@@ -7,6 +7,7 @@ import EpicsPage from '@/pages/EpicsPage';
 import StoryDetailPage from '@/pages/StoryDetailPage';
 import DocsPage from '@/pages/DocsPage';
 import DiagnosticsPage from '@/pages/DiagnosticsPage';
+import WelcomePage from '@/pages/WelcomePage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 export function AppRoutes() {
@@ -20,6 +21,7 @@ export function AppRoutes() {
         <Route path="stories/:id" element={<StoryDetailPage />} />
         <Route path="docs" element={<DocsPage />} />
         <Route path="diagnostics" element={<DiagnosticsPage />} />
+        <Route path="welcome" element={<WelcomePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

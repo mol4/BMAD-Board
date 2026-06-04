@@ -24,6 +24,21 @@ const translations = {
     'sidebar.syncError': 'Ошибка синхронизации',
     'sidebar.configSaveError': 'Ошибка сохранения конфигурации',
 
+    'nav.help': 'Справка',
+
+    'welcome.title': 'Добро пожаловать в BMAD Board',
+    'welcome.addProject': 'Добавить проект',
+    'welcome.saveAndLoad': 'Сохранить и загрузить',
+    'welcome.epicsDir': 'Директория эпиков',
+    'welcome.storiesDir': 'Директория сторей',
+    'welcome.browseFolder': 'Выбрать папку',
+    'welcome.step1.title': 'Запустите BMAD AI-агентов',
+    'welcome.step1.description': 'Создайте markdown-артефакты (эпики, стори, задачи) с помощью BMAD Method.',
+    'welcome.step2.title': 'Добавьте проект',
+    'welcome.step2.description': 'Выберите директории с эпиками и сторями для загрузки в доску.',
+    'welcome.step3.title': 'Откройте доску',
+    'welcome.step3.description': 'Изучите дашборд, доску спринта, бэклог и документы.',
+
     'theme.dark': 'Тёмная тема',
     'theme.light': 'Светлая тема',
 
@@ -223,6 +238,21 @@ const translations = {
     'sidebar.syncResult': 'Synchronization',
     'sidebar.syncError': 'Sync error',
     'sidebar.configSaveError': 'Config save error',
+
+    'nav.help': 'Help',
+
+    'welcome.title': 'Welcome to BMAD Board',
+    'welcome.addProject': 'Add Project',
+    'welcome.saveAndLoad': 'Save & Load',
+    'welcome.epicsDir': 'Epics directory',
+    'welcome.storiesDir': 'Stories directory',
+    'welcome.browseFolder': 'Browse folder',
+    'welcome.step1.title': 'Run BMAD AI agents',
+    'welcome.step1.description': 'Generate markdown artifacts (epics, stories, tasks) using the BMAD Method.',
+    'welcome.step2.title': 'Add Project',
+    'welcome.step2.description': 'Select your epics and stories directories to load them into the board.',
+    'welcome.step3.title': 'View Your Board',
+    'welcome.step3.description': 'Explore your dashboard, sprint board, backlog, and documents.',
 
     'theme.dark': 'Dark theme',
     'theme.light': 'Light theme',

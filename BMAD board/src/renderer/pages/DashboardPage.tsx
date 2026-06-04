@@ -1,3 +1,4 @@
+import { Navigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 
@@ -15,6 +16,10 @@ export default function DashboardPage() {
   }
 
   const stats = getStats();
+
+  if (stats.totalEpics === 0 && stats.totalStories === 0) {
+    return <Navigate to="/welcome" replace />;
+  }
   const active = stats.storiesByStatus['in-progress'] + stats.storiesByStatus['in-review'];
   const completed = stats.storiesByStatus['done'];
 
