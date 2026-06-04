@@ -3,19 +3,22 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from '@/lib/i18n';
 import { ToastProvider } from '@/components/Toast';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import { useAppStore } from '@/lib/store';
 import { AppRoutes } from './App';
 
 function renderWithProviders(initialEntries: string[]) {
   useAppStore.getState().setInitialized(true);
   return render(
-    <ToastProvider>
-      <MemoryRouter initialEntries={initialEntries}>
-        <I18nProvider>
-          <AppRoutes />
-        </I18nProvider>
-      </MemoryRouter>
-    </ToastProvider>,
+    <ThemeProvider>
+      <ToastProvider>
+        <MemoryRouter initialEntries={initialEntries}>
+          <I18nProvider>
+            <AppRoutes />
+          </I18nProvider>
+        </MemoryRouter>
+      </ToastProvider>
+    </ThemeProvider>,
   );
 }
 

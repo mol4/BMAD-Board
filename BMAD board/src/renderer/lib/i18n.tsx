@@ -24,6 +24,9 @@ const translations = {
     'sidebar.syncError': 'Ошибка синхронизации',
     'sidebar.configSaveError': 'Ошибка сохранения конфигурации',
 
+    'theme.dark': 'Тёмная тема',
+    'theme.light': 'Светлая тема',
+
     'toast.configSaved': 'Настройки сохранены',
     'toast.configSaveError': 'Ошибка сохранения настроек',
     'toast.configReset': 'Настройки сброшены',
@@ -220,6 +223,9 @@ const translations = {
     'sidebar.syncResult': 'Synchronization',
     'sidebar.syncError': 'Sync error',
     'sidebar.configSaveError': 'Config save error',
+
+    'theme.dark': 'Dark theme',
+    'theme.light': 'Light theme',
 
     'common.save': 'Save',
     'common.cancel': 'Cancel',

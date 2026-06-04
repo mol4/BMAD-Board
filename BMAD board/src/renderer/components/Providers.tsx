@@ -4,6 +4,7 @@ import { loadConfigFromIPC, getConfig } from '@/lib/config';
 import { initializeStore } from '@/lib/markdown-parser';
 import { useAppStore } from '@/lib/store';
 import { ToastProvider } from '@/components/Toast';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -38,8 +39,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ToastProvider>
-      <I18nProvider>{children}</I18nProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <I18nProvider>{children}</I18nProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }

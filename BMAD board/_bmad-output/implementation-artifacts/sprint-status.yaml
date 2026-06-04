@@ -1,5 +1,5 @@
 # generated: 2026-05-27
-# last_updated: 2026-05-29
+# last_updated: 2026-06-04
 # project: BMAD board
 # project_key: NOKEY
 # tracking_system: file-system
@@ -56,7 +56,7 @@ development_status:
   5a-1-implement-css-custom-properties-and-tailwind-config: done
   5a-2-setup-typography-and-lucide-icons: done
   5a-3-implement-toast-system-and-win11-snappy-transitions: done
-  5a-4-implement-theme-toggle: backlog
+  5a-4-implement-theme-toggle: done
   epic-5a-retrospective: optional
 
   # Epic 2: Multi-Project Support

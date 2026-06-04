@@ -2,8 +2,9 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import type { AppConfig } from '../../shared/ipc-channels';
-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder } from 'lucide-react';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon } from 'lucide-react';
 import { useToast } from '@/components/Toast';
+import { useTheme } from '@/components/ThemeProvider';
 
 const navItems = [
   {
@@ -42,6 +43,7 @@ export default function Sidebar() {
   const location = useLocation();
   const { t, locale, setLocale } = useI18n();
   const { showToast } = useToast();
+  const { isDark, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [config, setConfig] = useState<AppConfig>({
@@ -267,6 +269,17 @@ export default function Sidebar() {
             EN
           </button>
         </div>
+
+        <button
+          type="button"
+          aria-pressed={isDark}
+          onClick={toggleTheme}
+          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''}`}
+          title={isDark ? t('theme.light') : t('theme.dark')}
+        >
+          {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
+          {!collapsed && <span>{isDark ? t('theme.light') : t('theme.dark')}</span>}
+        </button>
       </div>
     </aside>
   );
