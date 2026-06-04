@@ -22,6 +22,8 @@ const electronAPI = {
     ipcRenderer.invoke('window:getState'),
   shellOpenPath: (path: string): Promise<IPCChannels['shell:openPath']['result']> =>
     ipcRenderer.invoke('shell:openPath', { path }),
+  dialogOpenDirectory: (): Promise<IPCChannels['dialog:openDirectory']['result']> =>
+    ipcRenderer.invoke('dialog:openDirectory'),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI);

@@ -2,7 +2,8 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import type { AppConfig } from '../../shared/ipc-channels';
-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder } from 'lucide-react';
+import { useToast } from '@/components/Toast';
 
 const navItems = [
   {
@@ -40,12 +41,13 @@ const navItems = [
 export default function Sidebar() {
   const location = useLocation();
   const { t, locale, setLocale } = useI18n();
+  const { showToast } = useToast();
   const [collapsed, setCollapsed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [config, setConfig] = useState<AppConfig>({
     epicsDir: '',
     storiesDir: '',
-    storiesMode: 'nested',
+    storiesMode: 'flat',
     lastProjectId: null,
   });
   const [configLoaded, setConfigLoaded] = useState(false);
@@ -78,16 +80,16 @@ export default function Sidebar() {
     try {
       if (window.electronAPI) {
         await window.electronAPI.configWrite(config);
-        console.log(t('sidebar.save'));
+        showToast(t('toast.configSaved'), 'success');
       }
     } catch {
-      console.error(t('sidebar.configSaveError'));
+      showToast(t('toast.configSaveError'), 'error');
     }
   };
 
   return (
     <aside
-      className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'
+      className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-200 ease-win11 ${collapsed ? 'w-16' : 'w-64'
         }`}
     >
       <div className="flex items-center justify-between p-4 border-b border-border-default">
@@ -152,34 +154,53 @@ export default function Sidebar() {
           <div className="p-3 bg-surface-sunken rounded-lg space-y-3">
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.epicsPath')}</label>
-              <input
-                type="text"
-                value={config.epicsDir}
-                onChange={(e) => setConfig({ ...config, epicsDir: e.target.value })}
-                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
-                placeholder="_bmad-output/planning-artifacts/epics"
-              />
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  value={config.epicsDir}
+                  onChange={(e) => setConfig({ ...config, epicsDir: e.target.value })}
+                  className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                  placeholder="_bmad-output/planning-artifacts/epics"
+                />
+                <button
+                  onClick={async () => {
+                    if (!window.electronAPI) return;
+                    const result = await window.electronAPI.dialogOpenDirectory();
+                    if (!result.canceled && result.filePaths[0]) {
+                      setConfig({ ...config, epicsDir: result.filePaths[0] });
+                    }
+                  }}
+                  className="px-2 py-1.5 bg-surface-elevated border border-border-default rounded hover:bg-accent-subtle transition-colors shrink-0"
+                  title={t('sidebar.browseFolder')}
+                >
+                  <Folder size={14} className="text-foreground-tertiary" />
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.storiesPath')}</label>
-              <input
-                type="text"
-                value={config.storiesDir}
-                onChange={(e) => setConfig({ ...config, storiesDir: e.target.value })}
-                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
-                placeholder="_bmad-output/planning-artifacts/stories"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.storiesMode')}</label>
-              <select
-                value={config.storiesMode}
-                onChange={(e) => setConfig({ ...config, storiesMode: e.target.value as 'nested' | 'flat' })}
-                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary focus:border-accent focus:outline-none"
-              >
-                <option value="nested">{t('sidebar.nestedMode')}</option>
-                <option value="flat">{t('sidebar.flatMode')}</option>
-              </select>
+              <div className="flex gap-1">
+                <input
+                  type="text"
+                  value={config.storiesDir}
+                  onChange={(e) => setConfig({ ...config, storiesDir: e.target.value })}
+                  className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                  placeholder="_bmad-output/planning-artifacts/stories"
+                />
+                <button
+                  onClick={async () => {
+                    if (!window.electronAPI) return;
+                    const result = await window.electronAPI.dialogOpenDirectory();
+                    if (!result.canceled && result.filePaths[0]) {
+                      setConfig({ ...config, storiesDir: result.filePaths[0] });
+                    }
+                  }}
+                  className="px-2 py-1.5 bg-surface-elevated border border-border-default rounded hover:bg-accent-subtle transition-colors shrink-0"
+                  title={t('sidebar.browseFolder')}
+                >
+                  <Folder size={14} className="text-foreground-tertiary" />
+                </button>
+              </div>
             </div>
             <div className="flex gap-2">
               <button
@@ -201,9 +222,9 @@ export default function Sidebar() {
                       await window.electronAPI.configWrite(defaultConfig);
                     }
                     setConfig(defaultConfig);
-                    console.log('Config reset');
+                    showToast(t('toast.configReset'), 'success');
                   } catch {
-                    console.log('Config reset error');
+                    showToast(t('toast.configResetError'), 'error');
                   }
                 }}
                 className="px-2 py-1.5 bg-surface-sunken text-foreground-secondary text-xs rounded hover:bg-border-default transition-colors"
@@ -215,13 +236,8 @@ export default function Sidebar() {
         )}
 
         <button
-          onClick={async () => {
-            try {
-              console.log('Sync triggered');
-              window.location.reload();
-            } catch {
-              console.log(t('sidebar.syncError'));
-            }
+          onClick={() => {
+            window.location.reload();
           }}
           className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''
             }`}

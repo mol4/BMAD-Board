@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
+import MarkdownModal from '@/components/MarkdownModal';
+import { FileText } from 'lucide-react';
 
 interface DocItem {
   name: string;
@@ -7,27 +9,69 @@ interface DocItem {
   category: string;
 }
 
+async function scanDirectory(
+  dirPath: string,
+  category = 'root',
+  api: NonNullable<typeof window.electronAPI>,
+): Promise<DocItem[]> {
+  const entries = await api.fileReadDirectory(dirPath);
+  const docs: DocItem[] = [];
+
+  for (const entry of entries) {
+    if (entry.isFile && entry.name.endsWith('.md')) {
+      docs.push({ name: entry.name, path: entry.path, category });
+    } else if (!entry.isFile) {
+      const subDocs = await scanDirectory(entry.path, entry.name, api);
+      docs.push(...subDocs);
+    }
+  }
+
+  return docs;
+}
+
 export default function DocsPage() {
   const { t } = useI18n();
   const [docs, setDocs] = useState<DocItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mdModalOpen, setMdModalOpen] = useState(false);
+  const [mdContent, setMdContent] = useState<string | null>(null);
+  const [mdTitle, setMdTitle] = useState('');
 
   useEffect(() => {
     const loadDocs = async () => {
       try {
-        if (typeof window !== 'undefined' && (window as any).electronAPI) {
-          const config = await (window as any).electronAPI.configRead();
-          const response = await fetch(`file://${config.storiesDir}/../`);
-          if (!response.ok) throw new Error('Failed to list docs');
+        if (typeof window !== 'undefined' && window.electronAPI) {
+          const config = await window.electronAPI.configRead();
+          const result = await scanDirectory(config.epicsDir, 'root', window.electronAPI);
+          setDocs(result);
         }
-      } catch {
-        console.log('Docs: listing not available via file:// in Electron browser — future IPC enhancement');
+      } catch (err) {
+        console.warn('Docs: failed to scan planning artifacts:', err);
+        setDocs([]);
       }
-      setDocs([]);
       setLoading(false);
     };
     loadDocs();
   }, []);
+
+  const openDoc = async (path: string) => {
+    if (!window.electronAPI) return;
+    const result = await window.electronAPI.fileRead(path);
+    if (result.exists) {
+      setMdContent(result.content);
+      setMdTitle(path.split(/[\\/]/).pop() || path);
+      setMdModalOpen(true);
+    }
+  };
+
+  const grouped = docs.reduce<Record<string, DocItem[]>>((acc, doc) => {
+    const cat = doc.category;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(doc);
+    return acc;
+  }, {});
+
+  const categoryOrder = ['root', ...Object.keys(grouped).filter((c) => c !== 'root').sort()];
 
   return (
     <div>
@@ -44,15 +88,38 @@ export default function DocsPage() {
           <p className="text-sm mt-2">{t('docs.noDocsHint')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {docs.map((doc) => (
-            <div key={doc.path} className="p-3 bg-surface-elevated rounded-lg">
-              <div className="font-medium text-sm">{doc.name}</div>
-              <div className="text-xs text-foreground-tertiary mt-1">{doc.path}</div>
-            </div>
+        <div className="space-y-6">
+          {categoryOrder.map((category) => (
+            <section key={category}>
+              <h2 className="text-sm font-semibold text-foreground-secondary uppercase mb-2">
+                {category === 'root' ? t('docs.rootCategory') : category}
+              </h2>
+              <div className="space-y-2">
+                {grouped[category].map((doc) => (
+                  <button
+                    key={doc.path}
+                    onClick={() => openDoc(doc.path)}
+                    className="w-full text-left p-3 bg-surface-elevated rounded-lg hover:bg-accent-subtle transition-colors group"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileText size={14} className="text-foreground-tertiary group-hover:text-foreground-secondary shrink-0" />
+                      <div className="font-medium text-sm text-foreground-primary">{doc.name}</div>
+                    </div>
+                    <div className="text-xs text-foreground-tertiary mt-1 truncate">{doc.path}</div>
+                  </button>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}
+
+      <MarkdownModal
+        isOpen={mdModalOpen}
+        onClose={() => setMdModalOpen(false)}
+        title={mdTitle}
+        markdownContent={mdContent}
+      />
     </div>
   );
 }

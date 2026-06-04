@@ -58,6 +58,10 @@ export interface IPCChannels {
     params: { path: string };
     result: { error: string };
   };
+  'dialog:openDirectory': {
+    params: void;
+    result: { canceled: boolean; filePaths: string[] };
+  };
 }
 
 export type IPCChannelName = keyof IPCChannels;

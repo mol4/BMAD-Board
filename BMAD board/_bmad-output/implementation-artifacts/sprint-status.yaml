@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-05-30
+last_updated: 2026-06-04
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -55,7 +55,7 @@ development_status:
   epic-5a: in-progress
   5a-1-implement-css-custom-properties-and-tailwind-config: done
   5a-2-setup-typography-and-lucide-icons: done
-  5a-3-implement-toast-system-and-win11-snappy-transitions: backlog
+  5a-3-implement-toast-system-and-win11-snappy-transitions: done
   5a-4-implement-theme-toggle: backlog
   epic-5a-retrospective: optional
 

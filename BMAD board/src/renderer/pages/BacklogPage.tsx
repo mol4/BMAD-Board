@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
@@ -75,14 +76,18 @@ export default function BacklogPage() {
                 ) : (
                   <div className="space-y-2 ml-6">
                     {epicStories.map((story) => (
-                      <div key={story.id} className="flex items-center gap-3 p-3 bg-surface-elevated rounded-lg">
+                      <Link
+                        key={story.id}
+                        to={`/stories/${story.id}`}
+                        className="flex items-center gap-3 p-3 bg-surface-elevated rounded-lg hover:bg-accent-subtle transition-colors"
+                      >
                         <div className="flex-1">
                           <div className="font-medium text-sm">{story.title}</div>
                           <div className="text-xs text-foreground-tertiary mt-0.5">{story.key}</div>
                         </div>
                         <StatusBadge status={story.status} />
                         <PriorityBadge priority={story.priority} />
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}

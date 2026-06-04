@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { X } from 'lucide-react';
 
@@ -19,9 +19,32 @@ interface CreateModalProps {
 
 export default function CreateModal({ isOpen, onClose, title, onSubmit, fields }: CreateModalProps) {
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
   const { t } = useI18n();
+  const innerRafRef = useRef<number | null>(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      const raf1 = requestAnimationFrame(() => {
+        innerRafRef.current = requestAnimationFrame(() => setVisible(true));
+      });
+      return () => {
+        cancelAnimationFrame(raf1);
+        if (innerRafRef.current !== null) {
+          cancelAnimationFrame(innerRafRef.current);
+          innerRafRef.current = null;
+        }
+      };
+    } else {
+      setVisible(false);
+      const timer = setTimeout(() => setMounted(false), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!mounted) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +58,8 @@ export default function CreateModal({ isOpen, onClose, title, onSubmit, fields }
   };
 
   return (
-    <div className="fixed inset-0 bg-surface-overlay flex items-center justify-center z-50">
-      <div className="bg-surface-elevated rounded-lg shadow-xl w-full max-w-lg mx-4">
+    <div className={`fixed inset-0 bg-surface-overlay flex items-center justify-center z-50 transition-opacity duration-200 ease-win11 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`bg-surface-elevated rounded-lg shadow-xl w-full max-w-lg mx-4 transition-all duration-200 ease-modal ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-[0.98]'}`}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-default">
           <h2 className="text-lg font-semibold text-foreground-primary">{title}</h2>
           <button

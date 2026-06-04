@@ -1,15 +1,15 @@
-import { app, BrowserWindow } from 'electron';
-import { join } from 'path';
-import { setupIPC } from './ipc';
-import { getDb, closeDb } from './db';
-import logger from './logger';
-import { loadWindowState, saveWindowState } from './window-state';
+import { app, BrowserWindow } from "electron";
+import { join } from "path";
+import { setupIPC } from "./ipc";
+import { getDb, closeDb } from "./db";
+import logger from "./logger";
+import { loadWindowState, saveWindowState } from "./window-state";
 
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
   const state = loadWindowState();
-  logger.info('[Main] Restoring window state:', state);
+  logger.info("[Main] Restoring window state:", state);
 
   mainWindow = new BrowserWindow({
     width: state.width,
@@ -18,9 +18,9 @@ function createWindow(): void {
     y: state.y,
     minWidth: 1024,
     minHeight: 768,
-    title: 'BMAD Board',
+    title: "BMAD Board",
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -30,7 +30,7 @@ function createWindow(): void {
     mainWindow.maximize();
   }
 
-  logger.info('[Main] Window created');
+  logger.info("[Main] Window created");
 
   const win = mainWindow;
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -39,48 +39,51 @@ function createWindow(): void {
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
       saveWindowState(w);
-      logger.info('[Main] Window bounds saved');
+      logger.info("[Main] Window bounds saved");
     }, 500);
   }
 
-  win.on('resize', () => debouncedSave(win));
-  win.on('move', () => debouncedSave(win));
+  win.on("resize", () => debouncedSave(win));
+  win.on("move", () => debouncedSave(win));
 
-  win.on('close', () => {
+  win.on("close", () => {
     if (saveTimeout) clearTimeout(saveTimeout);
     saveWindowState(win);
-    logger.info('[Main] Window closed, state saved');
+    logger.info("[Main] Window closed, state saved");
   });
 
-  win.on('closed', () => {
+  win.on("closed", () => {
     mainWindow = null;
   });
 
   if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    win.loadFile(join(__dirname, '../renderer/index.html'));
+    win.loadFile(join(__dirname, "../renderer/index.html"));
   }
 }
 
-app.whenReady().then(() => {
-  logger.info('[Main] App ready, cwd:', process.cwd());
-  getDb();
-  setupIPC(() => mainWindow);
-  createWindow();
-}).catch((err: unknown) => {
-  logger.error('[Main] Fatal error during startup:', err);
-  app.quit();
-});
+app
+  .whenReady()
+  .then(() => {
+    logger.info("[Main] App ready, cwd:", process.cwd());
+    getDb();
+    setupIPC(() => mainWindow);
+    createWindow();
+  })
+  .catch((err: unknown) => {
+    logger.error("[Main] Fatal error during startup:", err);
+    app.quit();
+  });
 
-app.on('will-quit', () => {
+app.on("will-quit", () => {
   closeDb();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });

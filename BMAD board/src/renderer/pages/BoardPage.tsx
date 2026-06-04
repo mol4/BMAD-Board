@@ -31,7 +31,8 @@ export default function BoardPage() {
           const columnStories = getStoriesByStatus(status);
           return (
             <div key={status} className="bg-surface-elevated rounded-lg p-3 min-h-[200px]">
-              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-foreground-primary">
+                {t(`status.${status}`)}
                 <span className="text-foreground-tertiary">({columnStories.length})</span>
               </h3>
               <div className="space-y-2">

@@ -3,6 +3,7 @@ import { I18nProvider } from '@/lib/i18n';
 import { loadConfigFromIPC, getConfig } from '@/lib/config';
 import { initializeStore } from '@/lib/markdown-parser';
 import { useAppStore } from '@/lib/store';
+import { ToastProvider } from '@/components/Toast';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -36,5 +37,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <I18nProvider>{children}</I18nProvider>;
+  return (
+    <ToastProvider>
+      <I18nProvider>{children}</I18nProvider>
+    </ToastProvider>
+  );
 }

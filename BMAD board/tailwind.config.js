@@ -87,6 +87,24 @@ module.exports = {
         },
         destructive: 'var(--color-destructive)',
       },
+      transitionTimingFunction: {
+        'win11': 'cubic-bezier(0, 0, 0.58, 1)',
+        'modal': 'cubic-bezier(0.16, 1, 0.3, 1)',
+      },
+      keyframes: {
+        'toast-in': {
+          '0%':   { opacity: '0', transform: 'translateY(8px) scale(0.97)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'modal-in': {
+          '0%':   { opacity: '0', transform: 'translateY(6px) scale(0.98)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+      },
+      animation: {
+        'toast-in': 'toast-in 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'modal-in': 'modal-in 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards',
+      },
     },
   },
   plugins: [require('@tailwindcss/typography')],

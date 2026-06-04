@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
 import { FileText } from 'lucide-react';
 import MarkdownModal from '@/components/MarkdownModal';
+import { renderMarkdown, renderMarkdownInline } from '@/lib/markdown-render';
 import type { Story } from '@/lib/types';
 
 export default function StoryDetailPage() {
@@ -94,9 +95,21 @@ export default function StoryDetailPage() {
 
       <section className="mb-6">
         <h2 className="text-sm font-semibold text-foreground-secondary uppercase mb-2">{t('story.info')}</h2>
-        <p className="text-sm text-foreground-secondary">
-          {story.description || t('common.noDescription')}
-        </p>
+        <div
+          className="prose prose-sm max-w-none prose-invert
+            prose-headings:text-foreground-primary prose-headings:font-semibold
+            prose-p:text-foreground-secondary
+            prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+            prose-code:text-foreground-primary prose-code:bg-surface-sunken prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono
+            prose-pre:bg-surface-sunken prose-pre:border prose-pre:border-border-subtle
+            prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
+            prose-strong:text-foreground-primary
+            prose-li:text-foreground-secondary
+            prose-hr:border-border-subtle"
+          dangerouslySetInnerHTML={{
+            __html: renderMarkdown(story.description || t('common.noDescription')),
+          }}
+        />
       </section>
 
       {story.acceptanceCriteria.length > 0 && (
@@ -104,9 +117,12 @@ export default function StoryDetailPage() {
           <h2 className="text-sm font-semibold text-foreground-secondary uppercase mb-2">{t('story.acceptanceCriteria')}</h2>
           <ul className="space-y-1">
             {story.acceptanceCriteria.map((ac, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
+              <li
+                key={i}
+                className="flex items-start gap-2 text-sm text-foreground-secondary"
+              >
                 <span className="text-accent mt-1">&#10003;</span>
-                {ac}
+                <span dangerouslySetInnerHTML={{ __html: renderMarkdownInline(ac) }} />
               </li>
             ))}
           </ul>
