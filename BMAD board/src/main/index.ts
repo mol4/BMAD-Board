@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, dialog } from "electron";
 import { join } from "path";
 import { setupIPC } from "./ipc";
-import { getDb, closeDb } from "./db";
+import { closeStorage, getStorageMode } from "./services/storage";
 import logger from "./logger";
 import { loadWindowState, saveWindowState } from "./window-state";
 
@@ -67,7 +67,15 @@ app
   .whenReady()
   .then(() => {
     logger.info("[Main] App ready, cwd:", process.cwd());
-    getDb();
+    try {
+      const mode = getStorageMode();
+      logger.info(`[Main] Storage initialized in ${mode} mode`);
+    } catch (err) {
+      logger.error("[Main] Storage init failed:", err);
+      dialog.showErrorBox('Storage Error', 'Failed to initialize storage. The application will now exit.');
+      app.quit();
+      return;
+    }
     setupIPC(() => mainWindow);
     createWindow();
   })
@@ -77,7 +85,7 @@ app
   });
 
 app.on("will-quit", () => {
-  closeDb();
+  closeStorage();
 });
 
 app.on("window-all-closed", () => {

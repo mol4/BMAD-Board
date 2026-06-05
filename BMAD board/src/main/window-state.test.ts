@@ -4,6 +4,10 @@ import type { StateStore, WindowState } from './window-state';
 
 // Mock electron's screen module
 vi.mock('electron', () => ({
+    app: {
+        getPath: () => '/tmp/test-data',
+        isPackaged: false,
+    },
     screen: {
         getAllDisplays: () => [
             {

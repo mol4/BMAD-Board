@@ -2,52 +2,48 @@ import { ipcMain, BrowserWindow, shell, dialog } from 'electron';
 import { readFile, readdir, stat } from 'fs/promises';
 import { join, resolve } from 'path';
 import type { IPCChannels } from '../shared/ipc-channels';
-import { v4 as uuidv4 } from 'uuid';
 import logger from './logger';
+import * as storage from './services/storage';
 
 export function setupIPC(getWindow: () => BrowserWindow | null): void {
   const projectRoot = process.cwd();
 
   ipcMain.handle('config:read', async (): Promise<IPCChannels['config:read']['result']> => {
-    const result: IPCChannels['config:read']['result'] = {
-      epicsDir: join(projectRoot, '_bmad-output', 'planning-artifacts'),
-      storiesDir: join(projectRoot, '_bmad-output', 'implementation-artifacts'),
-      storiesMode: 'flat',
-      lastProjectId: null,
+    const prefs = storage.getAllPrefs();
+    return {
+      epicsDir: prefs.epicsDir ?? join(projectRoot, '_bmad-output', 'planning-artifacts'),
+      storiesDir: prefs.storiesDir ?? join(projectRoot, '_bmad-output', 'implementation-artifacts'),
+      storiesMode: (prefs.storiesMode === 'nested' || prefs.storiesMode === 'flat') ? prefs.storiesMode : 'flat',
+      lastProjectId: prefs.lastProjectId ?? null,
     };
-    return result;
   });
 
   ipcMain.handle('config:write', async (_event, params: IPCChannels['config:write']['params']): Promise<void> => {
-    logger.info('[IPC] config:write', params);
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined) storage.setPref(key, value === null ? '' : String(value));
+    }
   });
 
   ipcMain.handle('project:list', async (): Promise<IPCChannels['project:list']['result']> => {
-    return [];
+    return storage.getProjects();
   });
 
   ipcMain.handle('project:switch', async (_event, params: IPCChannels['project:switch']['params']): Promise<void> => {
-    logger.info('[IPC] project:switch', params.projectId);
+    const updated = storage.updateProject(params.projectId, { lastUsedAt: new Date().toISOString() });
+    if (updated) {
+      storage.setPref('lastProjectId', params.projectId);
+    }
   });
 
   ipcMain.handle('project:add', async (_event, params: IPCChannels['project:add']['params']): Promise<IPCChannels['project:add']['result']> => {
     if (!['nested', 'flat'].includes(params.storiesMode)) {
       throw new Error(`Invalid storiesMode: ${params.storiesMode}. Expected 'nested' or 'flat'.`);
     }
-    logger.info('[IPC] project:add', params);
-    return {
-      id: uuidv4(),
-      name: params.name,
-      epicsDir: params.epicsDir,
-      storiesDir: params.storiesDir,
-      storiesMode: params.storiesMode,
-      lastUsedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-    };
+    return storage.addProject(params);
   });
 
   ipcMain.handle('project:remove', async (_event, params: IPCChannels['project:remove']['params']): Promise<void> => {
-    logger.info('[IPC] project:remove', params.projectId);
+    storage.removeProject(params.projectId);
   });
 
   ipcMain.handle('file:read', async (_event, params: IPCChannels['file:read']['params']): Promise<IPCChannels['file:read']['result']> => {

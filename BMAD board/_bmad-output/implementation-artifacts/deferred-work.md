@@ -73,3 +73,12 @@
 ## Deferred from: code review of story 1-5 (2026-05-30)
 
 - Global `:focus-visible` rule in `src/renderer/index.css` does not account for forced-colors / high-contrast mode — approach (global rule, hardcoded jira-blue `#0052cc`) is spec-mandated; revisit during token/teal-accent migration in Epic 5a
+
+## Deferred from: code review of 2-1-implement-sqlite-json-fallback-storage (2026-06-05)
+
+- Removed IPC logging in config:write/project:* handlers — style preference, not required by AC
+- Corrupt JSON silently resets with no backup — enhancement; spec says return defaults on read failure
+- `isValidState` passes NaN coordinates in window-state.ts — pre-existing, not caused by this story
+- `addProject` missing storiesMode validation in storage layer — defense-in-depth; IPC validates already
+- `@types/better-sqlite3` 5 major versions behind runtime — pre-existing type definition mismatch
+- JsonFallbackStorage init could theoretically loop on failure — low risk, theoretical edge case

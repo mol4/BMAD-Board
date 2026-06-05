@@ -1,5 +1,5 @@
 import { screen, BrowserWindow } from 'electron';
-import { getPref, setPref } from './db';
+import { getPref, setPref } from './services/storage';
 
 export interface WindowState {
     width: number;
