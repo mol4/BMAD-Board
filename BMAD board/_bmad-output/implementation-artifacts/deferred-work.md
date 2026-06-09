@@ -86,3 +86,7 @@
 ## Deferred from: code review of 2-2-implement-storemanager-with-per-project-isolation (2026-06-09)
 
 - React Strict Mode вызывает двойной debounce в Providers.tsx — dev-only, debounce обрабатывает второй вызов; pre-existing
+
+## Deferred from: code review of 2-3-build-project-switcher-ui (2026-06-09)
+
+- `storeManager._doSwitch` can leave the Zustand store permanently empty when a newer switch supersedes an in-flight one — pre-existing issue in StoreManager's `_doSwitch` method; the `clear()` followed by early return on generation mismatch leaves the store blank with no recovery path

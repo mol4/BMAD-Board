@@ -24,6 +24,13 @@ const translations = {
     'sidebar.syncError': 'Ошибка синхронизации',
     'sidebar.configSaveError': 'Ошибка сохранения конфигурации',
 
+    'projectSwitcher.title': 'Проекты',
+    'projectSwitcher.ariaLabel': 'Переключатель проектов',
+    'projectSwitcher.switchProject': 'Сменить проект',
+    'projectSwitcher.currentProject': 'Текущий проект',
+    'projectSwitcher.noProjects': 'Нет проектов',
+    'projectSwitcher.switching': 'Переключение...',
+
     'nav.help': 'Справка',
 
     'welcome.title': 'Добро пожаловать в BMAD Board',
@@ -46,6 +53,8 @@ const translations = {
     'toast.configSaveError': 'Ошибка сохранения настроек',
     'toast.configReset': 'Настройки сброшены',
     'toast.configResetError': 'Ошибка сброса настроек',
+    'toast.projectSwitched': 'Проект переключён',
+    'toast.projectSwitchError': 'Не удалось переключить проект',
     'toast.syncStarted': 'Синхронизация запущена',
     'toast.syncError': 'Ошибка синхронизации. Проверьте пути к файлам.',
 
@@ -239,6 +248,13 @@ const translations = {
     'sidebar.syncError': 'Sync error',
     'sidebar.configSaveError': 'Config save error',
 
+    'projectSwitcher.title': 'Projects',
+    'projectSwitcher.ariaLabel': 'Project switcher',
+    'projectSwitcher.switchProject': 'Switch project',
+    'projectSwitcher.currentProject': 'Current project',
+    'projectSwitcher.noProjects': 'No projects',
+    'projectSwitcher.switching': 'Switching...',
+
     'nav.help': 'Help',
 
     'welcome.title': 'Welcome to BMAD Board',
@@ -426,6 +442,8 @@ const translations = {
     'diag.fileSource': 'File',
     'diag.inlineSource': 'Inline',
 
+    'toast.projectSwitched': 'Project switched',
+    'toast.projectSwitchError': 'Failed to switch project',
     'toast.configSaved': 'Settings saved',
     'toast.configSaveError': 'Error saving settings',
     'toast.configReset': 'Settings reset',

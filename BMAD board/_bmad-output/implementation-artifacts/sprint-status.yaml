@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-06-09
+last_updated: 2026-06-10
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -64,7 +64,7 @@ development_status:
   2-0-build-welcome-onboarding-screen: done
   2-1-implement-sqlite-json-fallback-storage: done
   2-2-implement-storemanager-with-per-project-isolation: done
-  2-3-build-project-switcher-ui: backlog
+  2-3-build-project-switcher-ui: done
   2-4-implement-add-remove-project-flow: backlog
   epic-2-retrospective: optional
 

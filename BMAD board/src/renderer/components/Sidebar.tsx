@@ -5,6 +5,7 @@ import type { AppConfig } from '../../shared/ipc-channels';
 import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
+import ProjectSwitcher from '@/components/ProjectSwitcher';
 
 const navItems = [
   {
@@ -94,27 +95,34 @@ export default function Sidebar() {
       className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-200 ease-win11 ${collapsed ? 'w-16' : 'w-64'
         }`}
     >
-      <div className="flex items-center justify-between p-4 border-b border-border-default">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent">
+      <div className="border-b border-border-default">
+        <div className={`flex ${collapsed ? 'flex-col items-center gap-1 py-3 px-1' : 'items-center justify-between gap-2 p-4 pb-2'}`}>
+          {!collapsed ? (
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent shrink-0">
+                BB
+              </div>
+              <h1 className="font-bold text-sm truncate">BMAD Board</h1>
+            </div>
+          ) : (
+            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent shrink-0">
               BB
             </div>
-            <div>
-              <h1 className="font-bold text-sm">BMAD Board</h1>
-              <p className="text-xs text-foreground-tertiary">{t('sidebar.localProject')}</p>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded hover:bg-accent-subtle transition-colors"
-        >
-          <ChevronLeft
-            size={16}
-            className={`shrink-0 transition-transform ${collapsed ? 'rotate-180' : ''}`}
-          />
-        </button>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded hover:bg-accent-subtle transition-colors shrink-0"
+            aria-label="Toggle sidebar"
+          >
+            <ChevronLeft
+              size={16}
+              className={`shrink-0 transition-transform ${collapsed ? 'rotate-180' : ''}`}
+            />
+          </button>
+        </div>
+        <div className={`pb-3 ${collapsed ? 'px-1' : 'px-4'}`}>
+          <ProjectSwitcher collapsed={collapsed} />
+        </div>
       </div>
 
       <nav className="flex-1 py-4">
