@@ -11,6 +11,10 @@ export function getSprintMeta() {
   return _lastSprintMeta;
 }
 
+export function resetSyncState(): void {
+  _syncInProgress = false;
+}
+
 async function ipcReadFile(path: string): Promise<string | null> {
   try {
     if (typeof window !== 'undefined' && window.electronAPI) {
@@ -596,6 +600,13 @@ function extractStoryRefFromContentOrFilename(content: string, filePath: string)
 
 // ─── Sprint status parsing ───────────────────────────
 
+interface SprintYamlRaw {
+  project?: unknown;
+  generated?: unknown;
+  last_updated?: unknown;
+  development_status?: Record<string, string>;
+}
+
 interface SprintYaml {
   project?: string;
   generated?: string;
@@ -613,7 +624,19 @@ async function parseSprintStatusAsync(storiesDir: string): Promise<SprintYaml | 
       const content = await ipcReadFile(filePath);
       if (content) {
         const yaml = await import('js-yaml');
-        return yaml.load(content) as SprintYaml;
+        const raw = yaml.load(content) as SprintYamlRaw;
+        if (!raw) return null;
+        const toStr = (v: unknown): string | undefined => {
+          if (v instanceof Date) return v.toISOString();
+          if (typeof v === 'string') return v;
+          return undefined;
+        };
+        return {
+          project: toStr(raw.project),
+          generated: toStr(raw.generated),
+          last_updated: toStr(raw.last_updated),
+          development_status: raw.development_status,
+        } as SprintYaml;
       }
     } catch (err) {
       console.error('[BMAD Sync] Error parsing sprint-status.yaml:', err);

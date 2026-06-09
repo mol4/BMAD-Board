@@ -82,3 +82,7 @@
 - `addProject` missing storiesMode validation in storage layer — defense-in-depth; IPC validates already
 - `@types/better-sqlite3` 5 major versions behind runtime — pre-existing type definition mismatch
 - JsonFallbackStorage init could theoretically loop on failure — low risk, theoretical edge case
+
+## Deferred from: code review of 2-2-implement-storemanager-with-per-project-isolation (2026-06-09)
+
+- React Strict Mode вызывает двойной debounce в Providers.tsx — dev-only, debounce обрабатывает второй вызов; pre-existing

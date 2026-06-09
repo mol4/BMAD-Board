@@ -2,12 +2,14 @@ export interface BmadConfig {
   epicsDir: string;
   storiesDir: string;
   storiesMode: 'nested' | 'flat';
+  lastProjectId: string | null;
 }
 
 const defaults: BmadConfig = {
   epicsDir: '_bmad-output/planning-artifacts',
   storiesDir: '_bmad-output/implementation-artifacts',
   storiesMode: 'flat',
+  lastProjectId: null,
 };
 
 let current: BmadConfig = { ...defaults };
@@ -56,6 +58,7 @@ export async function loadConfigFromIPC(): Promise<void> {
       epicsDir: appConfig.epicsDir,
       storiesDir: appConfig.storiesDir,
       storiesMode: appConfig.storiesMode,
+      lastProjectId: appConfig.lastProjectId ?? null,
     };
   } catch (err) {
     console.warn('[Config] IPC config read failed, using defaults:', err);
