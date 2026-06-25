@@ -17,7 +17,6 @@ interface ProjectRef {
   id: string;
   epicsDir: string;
   storiesDir: string;
-  storiesMode: 'nested' | 'flat';
 }
 
 interface PendingPromise {
@@ -100,7 +99,16 @@ export class StoreManager {
   }
 
   private async _doSwitch(projectId: string, generation: number): Promise<void> {
+    if (typeof window !== 'undefined' && window.electronAPI) {
+      try {
+        await window.electronAPI.projectSwitch({ projectId });
+      } catch (err) {
+        console.error('[StoreManager] Failed to update project switch metadata:', err);
+      }
+    }
+
     if (this.activeProjectId === projectId) {
+      if (this.switchGeneration !== generation) return;
       await this.loadProject(projectId);
       console.log(`[StoreManager] Refreshed project ${projectId} from markdown`);
       return;
@@ -121,6 +129,7 @@ export class StoreManager {
       console.log(`[StoreManager] Restored snapshot for project ${projectId}`);
     } else {
       try {
+        if (this.switchGeneration !== generation) return;
         await this.loadProject(projectId);
         console.log(`[StoreManager] Loaded project ${projectId} from markdown`);
       } catch (err) {
@@ -142,7 +151,6 @@ export class StoreManager {
     setConfig({
       epicsDir: project.epicsDir,
       storiesDir: project.storiesDir,
-      storiesMode: project.storiesMode,
     });
 
     resetSyncState();
@@ -178,7 +186,6 @@ export class StoreManager {
       id: project.id,
       epicsDir: project.epicsDir,
       storiesDir: project.storiesDir,
-      storiesMode: project.storiesMode,
     };
   }
 

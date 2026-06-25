@@ -11,7 +11,7 @@ function rowToProject(row: Record<string, unknown>): Project {
     name: row.name as string,
     epicsDir: row.epics_dir as string,
     storiesDir: row.stories_dir as string,
-    storiesMode: (row.stories_mode === 'nested' || row.stories_mode === 'flat') ? row.stories_mode : 'flat',
+
     lastUsedAt: row.last_used_at as string | null,
     createdAt: row.created_at as string,
   };
@@ -56,7 +56,6 @@ export class SqliteStorage {
         name TEXT NOT NULL,
         epics_dir TEXT NOT NULL,
         stories_dir TEXT NOT NULL,
-        stories_mode TEXT DEFAULT 'flat',
         last_used_at TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       );
@@ -80,14 +79,13 @@ export class SqliteStorage {
       getProjects: db.prepare('SELECT * FROM projects ORDER BY last_used_at DESC'),
       getProjectById: db.prepare('SELECT * FROM projects WHERE id = ?'),
       insertProject: db.prepare(
-        'INSERT INTO projects (id, name, epics_dir, stories_dir, stories_mode, last_used_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO projects (id, name, epics_dir, stories_dir, last_used_at, created_at) VALUES (?, ?, ?, ?, ?, ?)'
       ),
       deleteProject: db.prepare('DELETE FROM projects WHERE id = ?'),
       updateProjectLastUsed: db.prepare('UPDATE projects SET last_used_at = ? WHERE id = ?'),
       updateProjectName: db.prepare('UPDATE projects SET name = ? WHERE id = ?'),
       updateProjectEpicsDir: db.prepare('UPDATE projects SET epics_dir = ? WHERE id = ?'),
       updateProjectStoriesDir: db.prepare('UPDATE projects SET stories_dir = ? WHERE id = ?'),
-      updateProjectStoriesMode: db.prepare('UPDATE projects SET stories_mode = ? WHERE id = ?'),
       getPref: db.prepare('SELECT value FROM preferences WHERE key = ?'),
       setPref: db.prepare('INSERT OR REPLACE INTO preferences (key, value) VALUES (?, ?)'),
       getAllPrefs: db.prepare('SELECT key, value FROM preferences'),
@@ -125,7 +123,6 @@ export class SqliteStorage {
       project.name,
       project.epicsDir,
       project.storiesDir,
-      project.storiesMode,
       now,
       now
     );
@@ -134,7 +131,6 @@ export class SqliteStorage {
       name: project.name,
       epicsDir: project.epicsDir,
       storiesDir: project.storiesDir,
-      storiesMode: project.storiesMode,
       lastUsedAt: now,
       createdAt: now,
     };
@@ -153,9 +149,6 @@ export class SqliteStorage {
       }
       if (updates.storiesDir !== undefined) {
         this.stmts.updateProjectStoriesDir!.run(updates.storiesDir, id);
-      }
-      if (updates.storiesMode !== undefined) {
-        this.stmts.updateProjectStoriesMode!.run(updates.storiesMode, id);
       }
       if (updates.lastUsedAt !== undefined) {
         this.stmts.updateProjectLastUsed!.run(updates.lastUsedAt, id);

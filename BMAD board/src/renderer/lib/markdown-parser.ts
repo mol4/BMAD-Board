@@ -63,15 +63,9 @@ export async function syncMarkdownToStore(): Promise<{ epics: number; stories: n
     let epicCount = 0;
     let storyCount = 0;
 
-    if (config.storiesMode === 'flat') {
-      const result = await syncFlatMode(epicsDir, storiesDir);
-      epicCount = result.epics;
-      storyCount = result.stories;
-    } else {
-      const result = await syncNestedMode(epicsDir);
-      epicCount = result.epics;
-      storyCount = result.stories;
-    }
+    const result = await syncFlatMode(epicsDir, storiesDir);
+    epicCount = result.epics;
+    storyCount = result.stories;
 
     // Apply sprint-status.yaml overrides
     const sprintData = await parseSprintStatusAsync(storiesDir);
@@ -239,32 +233,6 @@ async function syncFlatMode(epicsDir: string, storiesDir: string): Promise<{ epi
   }
 
   console.log(`[BMAD Sync] Loaded ${epicCount} epics and ${storyCount} stories (${inlineCount} from epics.md inline)`);
-  return { epics: epicCount, stories: storyCount };
-}
-
-async function syncNestedMode(epicsDir: string): Promise<{ epics: number; stories: number }> {
-  let epicCount = 0;
-  let storyCount = 0;
-
-  const files = await ipcReadAllFiles(epicsDir);
-  for (const entry of files) {
-    const content = await ipcReadFile(entry.path);
-    if (!content) continue;
-
-    const epics = parseEpicsDocument(content);
-    for (const epic of epics) {
-      useAppStore.getState().insertEpic(epic);
-      epicCount++;
-
-      const inlineStories = getInlineStories(content);
-      for (const story of inlineStories) {
-        story.epicId = epic.id;
-        useAppStore.getState().insertStory(story);
-        storyCount++;
-      }
-    }
-  }
-
   return { epics: epicCount, stories: storyCount };
 }
 

@@ -242,7 +242,7 @@ CREATE TABLE projects (
   name TEXT NOT NULL,
   epics_dir TEXT NOT NULL,
   stories_dir TEXT NOT NULL,
-  stories_mode TEXT DEFAULT 'flat',
+
   last_used_at TEXT,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

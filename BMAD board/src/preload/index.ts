@@ -14,6 +14,8 @@ const electronAPI = {
     ipcRenderer.invoke('project:add', params),
   projectRemove: (params: IPCChannels['project:remove']['params']): Promise<void> =>
     ipcRenderer.invoke('project:remove', params),
+  projectUpdate: (params: IPCChannels['project:update']['params']): Promise<IPCChannels['project:update']['result']> =>
+    ipcRenderer.invoke('project:update', params),
   fileRead: (path: string): Promise<IPCChannels['file:read']['result']> =>
     ipcRenderer.invoke('file:read', { path }),
   fileReadDirectory: (path: string): Promise<IPCChannels['file:readDirectory']['result']> =>

@@ -90,3 +90,9 @@
 ## Deferred from: code review of 2-3-build-project-switcher-ui (2026-06-09)
 
 - `storeManager._doSwitch` can leave the Zustand store permanently empty when a newer switch supersedes an in-flight one — pre-existing issue in StoreManager's `_doSwitch` method; the `clear()` followed by early return on generation mismatch leaves the store blank with no recovery path
+
+## Deferred from: code review of 2-4-implement-add-remove-project-flow (2026-06-22)
+
+- Нет валидации уникальности имени проекта — pre-existing design choice, two projects can have same name with different dirs
+- `project:add` IPC не имеет входной валидации — pre-existing, no input sanitization for empty name/paths
+- SQLite не имеет миграции для legacy `stories_mode` column — pre-existing schema versioning gap, SCHEMA_VERSION=1 but no migration logic

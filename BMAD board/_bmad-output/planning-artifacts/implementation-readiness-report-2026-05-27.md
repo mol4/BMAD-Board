@@ -51,7 +51,7 @@ FR-2 — React UI Reuse: All existing React components (Sidebar, StatusBadge, Cr
 
 FR-3 — Native Window Management: The application supports standard desktop window behaviors (minimize, maximize, close, resize). Window state (size, position) is persisted and restored on relaunch. Close behavior: application quits on close.
 
-FR-4 — Project Configuration Storage: The application stores project configurations in a local SQLite database. Each project record contains: name, epics directory path, stories directory path, stories mode (flat/nested), and user preferences. Data persists across application restarts. Database file is stored in the platform-appropriate user app data directory.
+FR-4 — Project Configuration Storage: The application stores project configurations in a local SQLite database. Each project record contains: name, epics directory path, stories directory path, and user preferences. Data persists across application restarts. Database file is stored in the platform-appropriate user app data directory.
 
 FR-5 — Project Switcher: A UI element allows users to view all configured projects and switch between them. Project switcher is accessible from the sidebar or top bar. Switching projects reloads the store from the selected project's artifact directories. The last-used project is automatically loaded on launch.
 

@@ -107,7 +107,6 @@ export class JsonFallbackStorage {
       name: project.name,
       epicsDir: project.epicsDir,
       storiesDir: project.storiesDir,
-      storiesMode: project.storiesMode,
       lastUsedAt: now,
       createdAt: now,
     };

@@ -63,10 +63,6 @@ export default function DiagnosticsPage() {
               <div className="text-xs text-foreground-tertiary">{t('diag.storiesPathConfig')}</div>
               <div className="text-sm font-mono">{config.storiesDir}</div>
             </div>
-            <div>
-              <div className="text-xs text-foreground-tertiary">{t('diag.mode')}</div>
-              <div className="text-sm font-mono">{config.storiesMode}</div>
-            </div>
             {sprintMeta && (
               <div>
                 <div className="text-xs text-foreground-tertiary">Sprint Status</div>

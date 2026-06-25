@@ -10,7 +10,7 @@ date: 2026-06-04
 
 # Story 2.0: Build Welcome / Onboarding Screen
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

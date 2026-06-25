@@ -13,7 +13,7 @@ export function setupIPC(getWindow: () => BrowserWindow | null): void {
     return {
       epicsDir: prefs.epicsDir ?? join(projectRoot, '_bmad-output', 'planning-artifacts'),
       storiesDir: prefs.storiesDir ?? join(projectRoot, '_bmad-output', 'implementation-artifacts'),
-      storiesMode: (prefs.storiesMode === 'nested' || prefs.storiesMode === 'flat') ? prefs.storiesMode : 'flat',
+
       lastProjectId: prefs.lastProjectId ?? null,
     };
   });
@@ -36,14 +36,24 @@ export function setupIPC(getWindow: () => BrowserWindow | null): void {
   });
 
   ipcMain.handle('project:add', async (_event, params: IPCChannels['project:add']['params']): Promise<IPCChannels['project:add']['result']> => {
-    if (!['nested', 'flat'].includes(params.storiesMode)) {
-      throw new Error(`Invalid storiesMode: ${params.storiesMode}. Expected 'nested' or 'flat'.`);
-    }
     return storage.addProject(params);
   });
 
   ipcMain.handle('project:remove', async (_event, params: IPCChannels['project:remove']['params']): Promise<void> => {
-    storage.removeProject(params.projectId);
+    const lastProjectId = storage.getPref('lastProjectId');
+    if (lastProjectId === params.projectId) {
+      storage.setPref('lastProjectId', '');
+    }
+    const removed = storage.removeProject(params.projectId);
+    if (!removed) {
+      throw new Error(`Project not found: ${params.projectId}`);
+    }
+  });
+
+  ipcMain.handle('project:update', async (_event, params: IPCChannels['project:update']['params']): Promise<IPCChannels['project:update']['result']> => {
+    const { projectId, ...updates } = params;
+    const updated = storage.updateProject(projectId, updates);
+    return updated ?? null;
   });
 
   ipcMain.handle('file:read', async (_event, params: IPCChannels['file:read']['params']): Promise<IPCChannels['file:read']['result']> => {

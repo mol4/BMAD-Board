@@ -1,7 +1,6 @@
 export interface AppConfig {
   epicsDir: string;
   storiesDir: string;
-  storiesMode: 'nested' | 'flat';
   lastProjectId: string | null;
 }
 
@@ -10,7 +9,6 @@ export interface Project {
   name: string;
   epicsDir: string;
   storiesDir: string;
-  storiesMode: 'nested' | 'flat';
   lastUsedAt: string | null;
   createdAt: string;
 }
@@ -41,6 +39,10 @@ export interface IPCChannels {
   'project:remove': {
     params: { projectId: string };
     result: void;
+  };
+  'project:update': {
+    params: { projectId: string } & Partial<NewProject>;
+    result: Project | null;
   };
   'file:read': {
     params: { path: string };

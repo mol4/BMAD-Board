@@ -25,9 +25,8 @@ function makeStatementHandlers(sql: string) {
           name: args[1],
           epics_dir: args[2],
           stories_dir: args[3],
-          stories_mode: args[4],
-          last_used_at: args[5],
-          created_at: args[6],
+          last_used_at: args[4],
+          created_at: args[5],
         });
         return { changes: 1 };
       }),
@@ -113,17 +112,6 @@ function makeStatementHandlers(sql: string) {
       all: vi.fn(),
     };
   }
-  if (sql.includes('UPDATE projects SET stories_mode')) {
-    return {
-      run: vi.fn((value: string, id: string) => {
-        const record = mockDbData.find((r) => r.id === id);
-        if (record) record.stories_mode = value;
-        return { changes: record ? 1 : 0 };
-      }),
-      get: vi.fn(),
-      all: vi.fn(),
-    };
-  }
   if (sql.includes('SELECT value FROM preferences WHERE key')) {
     return {
       run: vi.fn(),
@@ -203,28 +191,26 @@ describe('SqliteStorage', () => {
         name: 'Test Project',
         epicsDir: '/epics',
         storiesDir: '/stories',
-        storiesMode: 'flat',
       });
 
       expect(project.id).toBeTruthy();
       expect(project.name).toBe('Test Project');
       expect(project.epicsDir).toBe('/epics');
       expect(project.storiesDir).toBe('/stories');
-      expect(project.storiesMode).toBe('flat');
       expect(project.lastUsedAt).toBeTruthy();
       expect(project.createdAt).toBeTruthy();
       expect(project.createdAt).toBe(project.lastUsedAt);
     });
 
     it('returns the number of projects added', () => {
-      storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa', storiesMode: 'flat' });
-      storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb', storiesMode: 'nested' });
+      storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa' });
+      storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb' });
       expect(storage.getProjects().length).toBe(2);
     });
 
     it('returns projects sorted with most recently used first after update', () => {
-      const p1 = storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa', storiesMode: 'flat' });
-      storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb', storiesMode: 'flat' });
+      const p1 = storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa' });
+      storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb' });
 
       storage.updateProject(p1.id, { lastUsedAt: new Date(Date.now() + 10000).toISOString() });
 
@@ -243,7 +229,6 @@ describe('SqliteStorage', () => {
         name: 'Find Me',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'nested',
       });
       const found = storage.getProjectById(created.id);
       expect(found).toEqual(created);
@@ -260,7 +245,6 @@ describe('SqliteStorage', () => {
         name: 'Original',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       const updated = storage.updateProject(project.id, { name: 'Renamed' });
       expect(updated?.name).toBe('Renamed');
@@ -272,19 +256,16 @@ describe('SqliteStorage', () => {
         name: 'Original',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       const updated = storage.updateProject(project.id, {
         name: 'New Name',
         epicsDir: '/new-epics',
         storiesDir: '/new-stories',
-        storiesMode: 'nested',
       });
       expect(updated).toMatchObject({
         name: 'New Name',
         epicsDir: '/new-epics',
         storiesDir: '/new-stories',
-        storiesMode: 'nested',
       });
     });
   });
@@ -299,7 +280,6 @@ describe('SqliteStorage', () => {
         name: 'To Delete',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       expect(storage.removeProject(project.id)).toBe(true);
       expect(storage.getProjectById(project.id)).toBeUndefined();

@@ -18,9 +18,9 @@ vi.mock('@/lib/store-manager', () => ({
 }));
 
 const sampleProjects: Project[] = [
-  { id: 'p1', name: 'Project Alpha', epicsDir: '/a/epics', storiesDir: '/a/stories', storiesMode: 'flat', lastUsedAt: new Date().toISOString(), createdAt: new Date(Date.now() - 86400000).toISOString() },
-  { id: 'p2', name: 'Project Beta', epicsDir: '/b/epics', storiesDir: '/b/stories', storiesMode: 'nested', lastUsedAt: new Date(Date.now() - 3600000).toISOString(), createdAt: new Date(Date.now() - 172800000).toISOString() },
-  { id: 'p3', name: 'Project Gamma', epicsDir: '/c/epics', storiesDir: '/c/stories', storiesMode: 'flat', lastUsedAt: null, createdAt: new Date(Date.now() - 259200000).toISOString() },
+  { id: 'p1', name: 'Project Alpha', epicsDir: '/a/epics', storiesDir: '/a/stories', lastUsedAt: new Date().toISOString(), createdAt: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'p2', name: 'Project Beta', epicsDir: '/b/epics', storiesDir: '/b/stories', lastUsedAt: new Date(Date.now() - 3600000).toISOString(), createdAt: new Date(Date.now() - 172800000).toISOString() },
+  { id: 'p3', name: 'Project Gamma', epicsDir: '/c/epics', storiesDir: '/c/stories', lastUsedAt: null, createdAt: new Date(Date.now() - 259200000).toISOString() },
 ];
 
 beforeEach(() => {
@@ -315,7 +315,7 @@ describe('ProjectSwitcher', () => {
       expect(button).toHaveAttribute('aria-label', 'Project switcher');
     });
 
-    it('sets role="option" on each project item', async () => {
+    it('sets role="option" on each project item and the add project action', async () => {
       createProjectListMock(sampleProjects);
       renderProjectSwitcher(false);
       const button = screen.getByRole('combobox');
@@ -323,7 +323,46 @@ describe('ProjectSwitcher', () => {
 
       await waitFor(() => {
         const options = screen.getAllByRole('option');
-        expect(options.length).toBe(3);
+        expect(options.length).toBe(4);
+      });
+    });
+  });
+
+  describe('add / remove project actions', () => {
+    it('opens AddProjectModal when Add project option is clicked', async () => {
+      createProjectListMock(sampleProjects);
+      renderProjectSwitcher(false);
+      const button = screen.getByRole('combobox');
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      const addOption = screen.getByRole('option', { name: /Add project/i });
+      fireEvent.click(addOption);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog', { name: /Add project/i })).toBeInTheDocument();
+      });
+    });
+
+    it('opens RemoveProjectDialog when Remove button is clicked', async () => {
+      createProjectListMock(sampleProjects);
+      renderProjectSwitcher(false, 'p1');
+      const button = screen.getByRole('combobox');
+      fireEvent.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+      });
+
+      const removeButtons = screen.getAllByLabelText('Remove project');
+      expect(removeButtons.length).toBe(2);
+      fireEvent.click(removeButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog', { name: /Remove project/i })).toBeInTheDocument();
       });
     });
   });

@@ -1,19 +1,36 @@
 export interface BmadConfig {
   epicsDir: string;
   storiesDir: string;
-  storiesMode: 'nested' | 'flat';
   lastProjectId: string | null;
 }
 
 const defaults: BmadConfig = {
   epicsDir: '_bmad-output/planning-artifacts',
   storiesDir: '_bmad-output/implementation-artifacts',
-  storiesMode: 'flat',
   lastProjectId: null,
 };
 
 let current: BmadConfig = { ...defaults };
 let _configLoaded = false;
+
+export type ConfigListener = (config: BmadConfig) => void;
+const listeners = new Set<ConfigListener>();
+
+export function subscribeConfig(listener: ConfigListener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function notifyListeners(): void {
+  const config = getConfig();
+  listeners.forEach((listener) => {
+    try {
+      listener(config);
+    } catch (err) {
+      console.error('[Config] Listener error:', err);
+    }
+  });
+}
 
 export function getConfig(): BmadConfig {
   return { ...current };
@@ -21,11 +38,13 @@ export function getConfig(): BmadConfig {
 
 export function setConfig(partial: Partial<BmadConfig>): BmadConfig {
   current = { ...current, ...partial };
+  notifyListeners();
   return getConfig();
 }
 
 export function resetConfig(): BmadConfig {
   current = { ...defaults };
+  notifyListeners();
   return getConfig();
 }
 
@@ -54,12 +73,11 @@ export async function loadConfigFromIPC(): Promise<void> {
   try {
     const appConfig = await (window as any).electronAPI.configRead();
     console.log('[Config] Loaded from IPC:', appConfig);
-    current = {
+    setConfig({
       epicsDir: appConfig.epicsDir,
       storiesDir: appConfig.storiesDir,
-      storiesMode: appConfig.storiesMode,
       lastProjectId: appConfig.lastProjectId ?? null,
-    };
+    });
   } catch (err) {
     console.warn('[Config] IPC config read failed, using defaults:', err);
   }

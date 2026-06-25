@@ -8,7 +8,6 @@ interface TestProject {
   name: string;
   epicsDir: string;
   storiesDir: string;
-  storiesMode: 'nested' | 'flat';
   lastUsedAt: string | null;
   createdAt: string;
 }
@@ -20,7 +19,7 @@ vi.mock('@/lib/markdown-parser', () => ({
 }));
 
 vi.mock('@/lib/config', () => {
-  const current: Record<string, unknown> = { epicsDir: '', storiesDir: '', storiesMode: 'flat', lastProjectId: null };
+  const current: Record<string, unknown> = { epicsDir: '', storiesDir: '', lastProjectId: null };
   return {
     setConfig: vi.fn((partial: Record<string, unknown>) => { Object.assign(current, partial); }),
     getConfig: vi.fn(() => ({ ...current })),
@@ -36,7 +35,6 @@ function makeProject(overrides: Partial<TestProject> = {}): TestProject {
     name: 'Test Project',
     epicsDir: '_bmad-output/planning-artifacts',
     storiesDir: '_bmad-output/implementation-artifacts',
-    storiesMode: 'flat',
     lastUsedAt: null,
     createdAt: new Date().toISOString(),
     ...overrides,
@@ -49,6 +47,7 @@ function setupElectronAPI() {
   (globalThis as Record<string, unknown>).window = {
     electronAPI: {
       projectList: vi.fn().mockImplementation(async () => Array.from(projectRegistry.values())),
+      projectSwitch: vi.fn().mockResolvedValue(undefined),
     },
   };
 }
@@ -233,7 +232,6 @@ describe('StoreManager', () => {
         id: 'proj-2',
         epicsDir: '/custom/epics',
         storiesDir: '/custom/stories',
-        storiesMode: 'nested',
       });
       registerProject(project);
 
@@ -242,7 +240,6 @@ describe('StoreManager', () => {
       expect(setConfig).toHaveBeenCalledWith({
         epicsDir: '/custom/epics',
         storiesDir: '/custom/stories',
-        storiesMode: 'nested',
       });
     });
 

@@ -50,22 +50,20 @@ describe('JsonFallbackStorage', () => {
         name: 'Test Project',
         epicsDir: '/epics',
         storiesDir: '/stories',
-        storiesMode: 'flat',
       });
 
       expect(project.id).toBeTruthy();
       expect(project.name).toBe('Test Project');
       expect(project.epicsDir).toBe('/epics');
       expect(project.storiesDir).toBe('/stories');
-      expect(project.storiesMode).toBe('flat');
       expect(project.lastUsedAt).toBeTruthy();
       expect(project.createdAt).toBeTruthy();
       expect(project.createdAt).toBe(project.lastUsedAt);
     });
 
     it('returns projects sorted by lastUsedAt DESC', () => {
-      const p1 = storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa', storiesMode: 'flat' });
-      const p2 = storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb', storiesMode: 'nested' });
+      const p1 = storage.addProject({ name: 'A', epicsDir: '/a', storiesDir: '/sa' });
+      const p2 = storage.addProject({ name: 'B', epicsDir: '/b', storiesDir: '/sb' });
 
       const projects = storage.getProjects();
       expect(projects.length).toBe(2);
@@ -86,7 +84,6 @@ describe('JsonFallbackStorage', () => {
         name: 'Find Me',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'nested',
       });
       const found = storage.getProjectById(created.id);
       expect(found).toEqual(created);
@@ -105,7 +102,6 @@ describe('JsonFallbackStorage', () => {
         name: 'Original',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       const updated = storage.updateProject(project.id, { name: 'Renamed' });
       expect(updated?.name).toBe('Renamed');
@@ -118,7 +114,6 @@ describe('JsonFallbackStorage', () => {
         name: 'Original',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       const newTime = new Date(Date.now() + 10000).toISOString();
       const updated = storage.updateProject(project.id, { lastUsedAt: newTime });
@@ -140,7 +135,6 @@ describe('JsonFallbackStorage', () => {
         name: 'To Delete',
         epicsDir: '/e',
         storiesDir: '/s',
-        storiesMode: 'flat',
       });
       expect(storage.removeProject(project.id)).toBe(true);
       expect(storage.getProjectById(project.id)).toBeUndefined();
@@ -173,7 +167,7 @@ describe('JsonFallbackStorage', () => {
     it('writes JSON file to disk', () => {
       const storage = new JsonFallbackStorage();
       storage.setPref('test', 'value');
-      storage.addProject({ name: 'P', epicsDir: '/e', storiesDir: '/s', storiesMode: 'flat' });
+      storage.addProject({ name: 'P', epicsDir: '/e', storiesDir: '/s' });
 
       const filePath = join(testDir, 'bmad-board.json');
       expect(existsSync(filePath)).toBe(true);
@@ -244,9 +238,9 @@ describe('JsonFallbackStorage', () => {
 
     it('maintains data integrity across multiple operation types', () => {
       const storage = new JsonFallbackStorage();
-      storage.addProject({ name: 'P1', epicsDir: '/e1', storiesDir: '/s1', storiesMode: 'flat' });
+      storage.addProject({ name: 'P1', epicsDir: '/e1', storiesDir: '/s1' });
       storage.setPref('theme', 'dark');
-      storage.addProject({ name: 'P2', epicsDir: '/e2', storiesDir: '/s2', storiesMode: 'nested' });
+      storage.addProject({ name: 'P2', epicsDir: '/e2', storiesDir: '/s2' });
       storage.setPref('theme', 'light');
 
       const projects = storage.getProjects();

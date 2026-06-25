@@ -1,7 +1,9 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
-import type { AppConfig } from '../../shared/ipc-channels';
+import { useAppStore } from '@/lib/store';
+import { storeManager } from '@/lib/store-manager';
+import { getConfig, setConfig as setGlobalConfig, subscribeConfig, type BmadConfig } from '@/lib/config';
 import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
@@ -45,48 +47,130 @@ export default function Sidebar() {
   const { t, locale, setLocale } = useI18n();
   const { showToast } = useToast();
   const { isDark, toggleTheme } = useTheme();
+  const activeProjectId = useAppStore((state) => state.activeProjectId);
   const [collapsed, setCollapsed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [config, setConfig] = useState<AppConfig>({
-    epicsDir: '',
-    storiesDir: '',
-    storiesMode: 'flat',
-    lastProjectId: null,
-  });
+  const [projectName, setProjectName] = useState('');
+  const [config, setConfig] = useState<BmadConfig>(getConfig());
   const [configLoaded, setConfigLoaded] = useState(false);
 
   const configLoadedRef = useRef(false);
 
   useEffect(() => {
-    let cancelled = false;
-    if (window.electronAPI) {
-      window.electronAPI.configRead().then((data) => {
-        if (!cancelled) {
-          setConfig(data);
-          setConfigLoaded(true);
-          configLoadedRef.current = true;
-        }
-      }).catch(() => {
-        if (!cancelled) {
-          setConfigLoaded(true);
-          configLoadedRef.current = true;
-        }
-      });
-    } else {
+    setConfig(getConfig());
+    return subscribeConfig((newConfig) => {
+      setConfig(newConfig);
       setConfigLoaded(true);
       configLoadedRef.current = true;
-    }
-    return () => { cancelled = true; };
+    });
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadActiveProjectConfig() {
+      if (!window.electronAPI || !activeProjectId) {
+        setProjectName('');
+        return;
+      }
+      try {
+        const projects = await window.electronAPI.projectList();
+        if (cancelled) return;
+        const project = projects.find((p) => p.id === activeProjectId);
+        if (project) {
+          setProjectName(project.name);
+          setConfig((prev) => ({
+            ...prev,
+            epicsDir: project.epicsDir,
+            storiesDir: project.storiesDir,
+          }));
+          setConfigLoaded(true);
+          configLoadedRef.current = true;
+        }
+      } catch (err) {
+        console.error('[Sidebar] Failed to load active project config:', err);
+      }
+    }
+    loadActiveProjectConfig();
+    return () => { cancelled = true; };
+  }, [activeProjectId]);
 
   const saveConfig = async () => {
     try {
-      if (window.electronAPI) {
+      if (!window.electronAPI) return;
+      if (activeProjectId) {
+        const trimmedName = projectName.trim();
+        if (!trimmedName) {
+          showToast(t('toast.projectNameRequired'), 'error');
+          return;
+        }
+        if (!config.epicsDir.trim()) {
+          showToast(t('toast.epicsPathRequired'), 'error');
+          return;
+        }
+        if (!config.storiesDir.trim()) {
+          showToast(t('toast.storiesPathRequired'), 'error');
+          return;
+        }
+        const epicsExists = await window.electronAPI.fileReadDirectory(config.epicsDir).then(() => true).catch(() => false);
+        if (!epicsExists) {
+          showToast(t('toast.epicsPathNotFound'), 'error');
+          return;
+        }
+        const storiesExists = await window.electronAPI.fileReadDirectory(config.storiesDir).then(() => true).catch(() => false);
+        if (!storiesExists) {
+          showToast(t('toast.storiesPathNotFound'), 'error');
+          return;
+        }
+        const updated = await window.electronAPI.projectUpdate({
+          projectId: activeProjectId,
+          name: trimmedName,
+          epicsDir: config.epicsDir,
+          storiesDir: config.storiesDir,
+        });
+        if (!updated) {
+          showToast(t('toast.projectUpdateError'), 'error');
+          return;
+        }
+        setGlobalConfig({
+          epicsDir: config.epicsDir,
+          storiesDir: config.storiesDir,
+        });
+        window.dispatchEvent(new CustomEvent('bmad:project-updated'));
+        await storeManager.switchProject(activeProjectId);
+        showToast(t('toast.configSaved'), 'success');
+      } else {
         await window.electronAPI.configWrite(config);
+        setGlobalConfig(config);
         showToast(t('toast.configSaved'), 'success');
       }
     } catch {
       showToast(t('toast.configSaveError'), 'error');
+    }
+  };
+
+  const resetConfig = async () => {
+    try {
+      if (!window.electronAPI) return;
+      if (activeProjectId) {
+        const projects = await window.electronAPI.projectList();
+        const project = projects.find((p) => p.id === activeProjectId);
+        if (project) {
+          setProjectName(project.name);
+          setConfig((prev) => ({
+            ...prev,
+            epicsDir: project.epicsDir,
+            storiesDir: project.storiesDir,
+          }));
+          showToast(t('toast.configReset'), 'success');
+        }
+      } else {
+        const data = await window.electronAPI.configRead();
+        setConfig(data);
+        setProjectName('');
+        showToast(t('toast.configReset'), 'success');
+      }
+    } catch {
+      showToast(t('toast.configResetError'), 'error');
     }
   };
 
@@ -169,14 +253,24 @@ export default function Sidebar() {
           onClick={() => !collapsed && setShowSettings(!showSettings)}
           className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''
             }`}
-          title={t('sidebar.pathSettings')}
+          title={t('sidebar.projectSettings')}
         >
           <Settings size={18} className="shrink-0" />
-          {!collapsed && <span>{t('sidebar.pathSettings')}</span>}
+          {!collapsed && <span>{t('sidebar.projectSettings')}</span>}
         </button>
 
         {showSettings && !collapsed && configLoaded && (
           <div className="p-3 bg-surface-sunken rounded-lg space-y-3">
+            <div>
+              <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.projectName')}</label>
+              <input
+                type="text"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                placeholder={t('sidebar.projectNamePlaceholder')}
+              />
+            </div>
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.epicsPath')}</label>
               <div className="flex gap-1">
@@ -235,23 +329,7 @@ export default function Sidebar() {
                 {t('sidebar.save')}
               </button>
               <button
-                onClick={async () => {
-                  try {
-                    const defaultConfig: AppConfig = {
-                      epicsDir: '../_bmad-output/planning-artifacts',
-                      storiesDir: '../_bmad-output/implementation-artifacts',
-                      storiesMode: 'flat',
-                      lastProjectId: null,
-                    };
-                    if (window.electronAPI) {
-                      await window.electronAPI.configWrite(defaultConfig);
-                    }
-                    setConfig(defaultConfig);
-                    showToast(t('toast.configReset'), 'success');
-                  } catch {
-                    showToast(t('toast.configResetError'), 'error');
-                  }
-                }}
+                onClick={resetConfig}
                 className="px-2 py-1.5 bg-surface-sunken text-foreground-secondary text-xs rounded hover:bg-border-default transition-colors"
               >
                 {t('sidebar.reset')}
