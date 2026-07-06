@@ -3,7 +3,7 @@ story_id: 2.4
 story_key: 2-4-implement-add-remove-project-flow
 epic: 2
 title: Implement Add / Remove Project Flow
-status: review
+status: done
 previous_story: 2-3-build-project-switcher-ui
 date: 2026-06-18
 baseline_commit: 7100cf6450c909d1cb8eff229f79b4f1464ab9a1
@@ -11,7 +11,7 @@ baseline_commit: 7100cf6450c909d1cb8eff229f79b4f1464ab9a1
 
 # Story 2.4: Implement Add / Remove Project Flow
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -451,3 +451,27 @@ Status: done
 - [x] [Review][Defer] Нет валидации уникальности имени проекта — deferred, pre-existing
 - [x] [Review][Defer] `project:add` IPC не имеет входной валидации — deferred, pre-existing
 - [x] [Review][Defer] SQLite не имеет миграции для legacy `stories_mode` column — deferred, pre-existing
+
+## Review Findings (Round 2 — 2026-07-06)
+
+**Decision-needed (dismissed — user chose to keep current behavior):**
+- [x] [Review][Decision] `checkDuplicate` не блокирует переиспользование одной директории — dismissed, user chose to keep AND logic
+- [x] [Review][Decision] `window.location.hash = '#/welcome'` обходит react-router — dismissed, user chose to keep hash-based navigation
+
+**Patches applied:**
+- [x] [Review][Patch] Stale closure on `isSubmitting` в keyboard handlers [`AddProjectModal.tsx:118`, `RemoveProjectDialog.tsx:109`]
+- [x] [Review][Patch] `onRemoved` вызывается до завершения async navigation [`RemoveProjectDialog.tsx:111-140`]
+- [x] [Review][Patch] Quote-style: двойные кавычки вместо одинарных [`ProjectSwitcher.tsx`]
+- [x] [Review][Patch] Missing newline at end of file [`deferred-work.md`]
+- [x] [Review][Patch] `Sidebar.saveConfig` lacks submit guard [`Sidebar.tsx:97`]
+- [x] [Review][Patch] `handleBrowse` state update after unmount [`AddProjectModal.tsx:134`]
+- [x] [Review][Patch] Stale `config` closure in Sidebar browse buttons [`Sidebar.tsx:285,310`]
+- [x] [Review][Patch] Backdrop click closes modal during submission [`AddProjectModal.tsx:240`]
+- [x] [Review][Patch] `isSubmitting` never reset on success path [`RemoveProjectDialog.tsx:111`]
+- [x] [Review][Patch] Hardcoded color `hover:bg-red-600` [`RemoveProjectDialog.tsx:203`]
+
+**Deferred:**
+- [x] [Review][Defer] Duplicated modal animation logic (~80 lines) — deferred, refactor opportunity
+- [x] [Review][Defer] `fetchProjects` TOCTOU race — deferred, low probability
+- [x] [Review][Defer] `fetchProjects` can hang if IPC stalls — deferred, pre-existing
+- [x] [Review][Defer] Spec file still references `storiesMode` — deferred, doc issue

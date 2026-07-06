@@ -53,6 +53,7 @@ export default function Sidebar() {
   const [projectName, setProjectName] = useState('');
   const [config, setConfig] = useState<BmadConfig>(getConfig());
   const [configLoaded, setConfigLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const configLoadedRef = useRef(false);
 
@@ -95,8 +96,10 @@ export default function Sidebar() {
   }, [activeProjectId]);
 
   const saveConfig = async () => {
+    if (isSaving) return;
     try {
       if (!window.electronAPI) return;
+      setIsSaving(true);
       if (activeProjectId) {
         const trimmedName = projectName.trim();
         if (!trimmedName) {
@@ -145,6 +148,8 @@ export default function Sidebar() {
       }
     } catch {
       showToast(t('toast.configSaveError'), 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -286,7 +291,7 @@ export default function Sidebar() {
                     if (!window.electronAPI) return;
                     const result = await window.electronAPI.dialogOpenDirectory();
                     if (!result.canceled && result.filePaths[0]) {
-                      setConfig({ ...config, epicsDir: result.filePaths[0] });
+                      setConfig((prev) => ({ ...prev, epicsDir: result.filePaths[0] }));
                     }
                   }}
                   className="px-2 py-1.5 bg-surface-elevated border border-border-default rounded hover:bg-accent-subtle transition-colors shrink-0"
@@ -311,7 +316,7 @@ export default function Sidebar() {
                     if (!window.electronAPI) return;
                     const result = await window.electronAPI.dialogOpenDirectory();
                     if (!result.canceled && result.filePaths[0]) {
-                      setConfig({ ...config, storiesDir: result.filePaths[0] });
+                      setConfig((prev) => ({ ...prev, storiesDir: result.filePaths[0] }));
                     }
                   }}
                   className="px-2 py-1.5 bg-surface-elevated border border-border-default rounded hover:bg-accent-subtle transition-colors shrink-0"
@@ -324,9 +329,10 @@ export default function Sidebar() {
             <div className="flex gap-2">
               <button
                 onClick={saveConfig}
-                className="flex-1 px-2 py-1.5 bg-accent text-foreground-on-accent text-xs rounded hover:bg-accent-hover transition-colors"
+                disabled={isSaving}
+                className="flex-1 px-2 py-1.5 bg-accent text-foreground-on-accent text-xs rounded hover:bg-accent-hover transition-colors disabled:opacity-50"
               >
-                {t('sidebar.save')}
+                {isSaving ? t('common.loading') : t('sidebar.save')}
               </button>
               <button
                 onClick={resetConfig}

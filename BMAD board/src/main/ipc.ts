@@ -1,12 +1,32 @@
 import { ipcMain, BrowserWindow, shell, dialog } from 'electron';
 import { readFile, readdir, stat } from 'fs/promises';
-import { join, resolve } from 'path';
-import type { IPCChannels } from '../shared/ipc-channels';
+import { join, resolve, isAbsolute } from 'path';
+import { FileWatcher } from './services/file-watcher';
+import type {
+  FileChangedPayload,
+  IPCChannels,
+  WatcherErrorPayload,
+} from '../shared/ipc-channels';
 import logger from './logger';
 import * as storage from './services/storage';
 
-export function setupIPC(getWindow: () => BrowserWindow | null): void {
+export function setupIPC(getWindow: () => BrowserWindow | null): { disposeWatchers: () => void } {
   const projectRoot = process.cwd();
+
+  const fileWatcher = new FileWatcher({
+    emit: {
+      fileChanged: (payload: FileChangedPayload) => {
+        const win = getWindow();
+        if (!win || win.isDestroyed()) return;
+        win.webContents.send('file:changed', payload);
+      },
+      watcherError: (payload: WatcherErrorPayload) => {
+        const win = getWindow();
+        if (!win || win.isDestroyed()) return;
+        win.webContents.send('watcher:error', payload);
+      },
+    },
+  });
 
   ipcMain.handle('config:read', async (): Promise<IPCChannels['config:read']['result']> => {
     const prefs = storage.getAllPrefs();
@@ -48,10 +68,22 @@ export function setupIPC(getWindow: () => BrowserWindow | null): void {
     if (!removed) {
       throw new Error(`Project not found: ${params.projectId}`);
     }
+    if (lastProjectId === params.projectId) {
+      fileWatcher.stop();
+    }
   });
 
   ipcMain.handle('project:update', async (_event, params: IPCChannels['project:update']['params']): Promise<IPCChannels['project:update']['result']> => {
     const { projectId, ...updates } = params;
+    if (!projectId) {
+      throw new Error('projectId is required');
+    }
+    if (updates.epicsDir && typeof updates.epicsDir !== 'string') {
+      throw new Error('epicsDir must be a string');
+    }
+    if (updates.storiesDir && typeof updates.storiesDir !== 'string') {
+      throw new Error('storiesDir must be a string');
+    }
     const updated = storage.updateProject(projectId, updates);
     return updated ?? null;
   });
@@ -105,4 +137,29 @@ export function setupIPC(getWindow: () => BrowserWindow | null): void {
     });
     return result;
   });
+
+  ipcMain.handle('watcher:watch', async (_event, params: IPCChannels['watcher:watch']['params']): Promise<void> => {
+    const dirs = (params?.dirs ?? []).filter((dir): dir is string => typeof dir === 'string').map((dir: string) =>
+      isAbsolute(dir) ? dir : resolve(projectRoot, dir),
+    );
+    if (dirs.length === 0) {
+      logger.warn('[IPC] watcher:watch called with no valid dirs');
+      return;
+    }
+    logger.info(`[IPC] watcher:watch dirs=${dirs.length}`);
+    fileWatcher.start(dirs);
+  });
+
+  ipcMain.handle('watcher:stop', async (): Promise<void> => {
+    logger.info('[IPC] watcher:stop');
+    fileWatcher.stop();
+  });
+
+  ipcMain.handle('watcher:status', (): IPCChannels['watcher:status']['result'] => {
+    return fileWatcher.getStatus();
+  });
+
+  return {
+    disposeWatchers: () => fileWatcher.stop(),
+  };
 }

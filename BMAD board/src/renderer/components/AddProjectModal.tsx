@@ -35,9 +35,11 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
 
   const modalRef = useRef<HTMLDivElement>(null);
   const innerRafRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
     if (isOpen) {
+      mountedRef.current = true;
       setMounted(true);
       const raf1 = requestAnimationFrame(() => {
         innerRafRef.current = requestAnimationFrame(() => setVisible(true));
@@ -50,6 +52,7 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
         }
       };
     } else {
+      mountedRef.current = false;
       setVisible(false);
       const timer = setTimeout(() => setMounted(false), 200);
       return () => clearTimeout(timer);
@@ -115,7 +118,7 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
       clearTimeout(timer);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [mounted, onClose, getTabbableElements]);
+  }, [mounted, onClose, getTabbableElements, isSubmitting]);
 
   const validateDirectory = useCallback(
     async (path: string): Promise<{ exists: boolean; mdCount: number }> => {
@@ -140,6 +143,7 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
     setErrors((prev) => ({ ...prev, [field]: undefined, general: undefined }));
     setWarning(null);
     const { exists, mdCount } = await validateDirectory(path);
+    if (!mountedRef.current) return;
     if (!exists) {
       setErrors((prev) => ({ ...prev, [field]: t('addProject.validation.dirNotFound') }));
     } else if (mdCount === 0) {
@@ -238,6 +242,7 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
         visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={(e) => {
+        if (isSubmitting) return;
         if (e.target === modalRef.current) {
           onClose();
         }

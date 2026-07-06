@@ -106,7 +106,7 @@ export default function RemoveProjectDialog({
       clearTimeout(timer);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [mounted, onClose, getTabbableElements]);
+  }, [mounted, onClose, getTabbableElements, isSubmitting]);
 
   const handleConfirm = async () => {
     if (!project || isSubmitting || !window.electronAPI) return;
@@ -115,7 +115,6 @@ export default function RemoveProjectDialog({
     try {
       await window.electronAPI.projectRemove({ projectId: project.id });
       showToast(t('toast.projectRemoved'), 'success');
-      onRemoved?.();
 
       const activeProjectId = storeManager.getActiveProjectId();
       if (activeProjectId === project.id) {
@@ -132,6 +131,8 @@ export default function RemoveProjectDialog({
         }
       }
 
+      onRemoved?.();
+      setIsSubmitting(false);
       onClose();
     } catch {
       showToast(t('toast.projectRemoveError'), 'error');
@@ -200,7 +201,7 @@ export default function RemoveProjectDialog({
               data-action="remove"
               onClick={handleConfirm}
               disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-destructive rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-white bg-destructive rounded-md hover:opacity-80 transition-colors disabled:opacity-50"
             >
               {isSubmitting ? t('common.loading') : t('removeProject.submit')}
             </button>

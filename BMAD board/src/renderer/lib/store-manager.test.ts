@@ -48,6 +48,9 @@ function setupElectronAPI() {
     electronAPI: {
       projectList: vi.fn().mockImplementation(async () => Array.from(projectRegistry.values())),
       projectSwitch: vi.fn().mockResolvedValue(undefined),
+      watcherWatch: vi.fn().mockResolvedValue(undefined),
+      watcherStop: vi.fn().mockResolvedValue(undefined),
+      watcherStatus: vi.fn().mockResolvedValue({ active: true, dirs: [], fallback: false, pendingCount: 0 }),
     },
   };
 }
@@ -74,6 +77,76 @@ describe('StoreSnapshot interface', () => {
 });
 
 describe('StoreManager', () => {
+  describe('watcher integration', () => {
+    it('loadProject starts the file watcher with project dirs', async () => {
+      const project = makeProject({
+        id: 'proj-watch',
+        epicsDir: '/custom/epics',
+        storiesDir: '/custom/stories',
+      });
+      registerProject(project);
+      const manager = new StoreManager();
+
+      await manager.loadProject('proj-watch');
+
+      const api = (globalThis as Record<string, unknown>).window as {
+        electronAPI: { watcherWatch: ReturnType<typeof vi.fn> };
+      };
+      expect(api.electronAPI.watcherWatch).toHaveBeenCalledWith(['/custom/epics', '/custom/stories']);
+    });
+
+    it('refreshActiveProject is a no-op when no active project', async () => {
+      const manager = new StoreManager();
+      await expect(manager.refreshActiveProject()).resolves.toBeUndefined();
+    });
+
+    it('refreshActiveProject reloads the active project', async () => {
+      const project = makeProject({ id: 'proj-refresh-2' });
+      registerProject(project);
+      const manager = new StoreManager();
+      await manager.loadProject('proj-refresh-2');
+
+      const { syncMarkdownToStore } = await import('@/lib/markdown-parser');
+      (syncMarkdownToStore as ReturnType<typeof vi.fn>).mockClear();
+
+      await manager.refreshActiveProject();
+
+      expect(syncMarkdownToStore).toHaveBeenCalled();
+      expect(manager.getActiveProjectId()).toBe('proj-refresh-2');
+    });
+
+    it('unload stops the file watcher when unloading active project', async () => {
+      const project = makeProject({ id: 'proj-unload' });
+      registerProject(project);
+      const manager = new StoreManager();
+      await manager.loadProject('proj-unload');
+
+      const api = (globalThis as Record<string, unknown>).window as {
+        electronAPI: { watcherStop: ReturnType<typeof vi.fn> };
+      };
+      api.electronAPI.watcherStop.mockClear();
+
+      manager.unload('proj-unload');
+
+      expect(api.electronAPI.watcherStop).toHaveBeenCalled();
+    });
+
+    it('unload does not stop the watcher when unloading an inactive project', async () => {
+      const project = makeProject({ id: 'proj-other' });
+      registerProject(project);
+      const manager = new StoreManager();
+      await manager.loadProject('proj-other');
+
+      const api = (globalThis as Record<string, unknown>).window as {
+        electronAPI: { watcherStop: ReturnType<typeof vi.fn> };
+      };
+      api.electronAPI.watcherStop.mockClear();
+
+      manager.unload('proj-not-active');
+
+      expect(api.electronAPI.watcherStop).not.toHaveBeenCalled();
+    });
+  });
   let manager: StoreManager;
 
   beforeEach(() => {

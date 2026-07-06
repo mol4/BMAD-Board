@@ -1,7 +1,9 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
+import { useFileWatcher } from '@/hooks/useFileWatcher';
 
 export default function Layout() {
+  useFileWatcher();
   return (
     <div className="flex h-screen bg-surface-base text-foreground-primary">
       <Sidebar />

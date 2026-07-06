@@ -63,6 +63,8 @@ function createWindow(): void {
   }
 }
 
+let ipcCleanup: { disposeWatchers: () => void } | null = null;
+
 app
   .whenReady()
   .then(() => {
@@ -76,7 +78,7 @@ app
       app.quit();
       return;
     }
-    setupIPC(() => mainWindow);
+    ipcCleanup = setupIPC(() => mainWindow);
     createWindow();
   })
   .catch((err: unknown) => {
@@ -85,6 +87,10 @@ app
   });
 
 app.on("will-quit", () => {
+  if (ipcCleanup) {
+    ipcCleanup.disposeWatchers();
+    ipcCleanup = null;
+  }
   closeStorage();
 });
 

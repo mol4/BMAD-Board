@@ -96,3 +96,23 @@
 - Нет валидации уникальности имени проекта — pre-existing design choice, two projects can have same name with different dirs
 - `project:add` IPC не имеет входной валидации — pre-existing, no input sanitization for empty name/paths
 - SQLite не имеет миграции для legacy `stories_mode` column — pre-existing schema versioning gap, SCHEMA_VERSION=1 but no migration logic
+
+## Deferred from: code review of 2-4-implement-add-remove-project-flow round 2 (2026-07-06)
+
+- Duplicated modal animation logic (~80 lines) across AddProjectModal and RemoveProjectDialog — refactor opportunity, extract into shared hook/component
+- `fetchProjects` TOCTOU race when `force=true` and pending request exists — low probability, pre-existing pattern
+- `fetchProjects` can hang indefinitely if IPC call stalls — pre-existing, no timeout mechanism
+- Spec file `2-4-implement-add-remove-project-flow.md` still references `storiesMode` in Task 1 — doc issue, not code
+
+## Deferred from: code review of 3-1-implement-filesystem-watcher-in-main-process (2026-07-06)
+
+- `fs.watch` callback discards native `eventType` — design choice, low priority
+- `scheduleChange` drops type change when mtime matches — edge case, low priority
+- Missing `console.log` from spec reference implementation — cosmetic
+- Test file extension `.tsx` vs `.ts` — cosmetic, .tsx correct for JSX
+
+## Deferred from: code review of 3-1-implement-filesystem-watcher-in-main-process round 2 (2026-07-06)
+
+- Path Traversal — renderer can watch arbitrary filesystem directories — pre-existing architectural decision, Electron app without sandbox
+- IPC handler leak — `disposeWatchers` only stops watcher, never removes handlers — pre-existing pattern, setupIPC called once
+- `ipcCleanup` typed as fragile coupling — cosmetic, inline type

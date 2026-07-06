@@ -167,7 +167,33 @@ export class StoreManager {
 
     setConfig({ lastProjectId: projectId });
     this.activeProjectId = projectId;
+
+    if (typeof window !== 'undefined' && window.electronAPI) {
+      try {
+        await window.electronAPI.watcherWatch([project.epicsDir, project.storiesDir]);
+      } catch (err) {
+        console.error('[StoreManager] Failed to start file watcher:', err);
+      }
+    }
+
     console.log(`[StoreManager] Project ${projectId} loaded and synced`);
+  }
+
+  async refreshActiveProject(): Promise<void> {
+    const activeProjectId = this.activeProjectId;
+    if (!activeProjectId) return;
+    const currentGeneration = this.switchGeneration;
+    try {
+      await this.loadProject(activeProjectId);
+      if (this.switchGeneration !== currentGeneration) {
+        console.log(`[StoreManager] Refresh cancelled — project switched during refresh`);
+        return;
+      }
+      console.log(`[StoreManager] Refreshed active project ${activeProjectId}`);
+    } catch (err) {
+      console.error('[StoreManager] Failed to refresh active project:', err);
+      throw err;
+    }
   }
 
   private async resolveProject(projectId: string): Promise<ProjectRef> {
@@ -198,6 +224,11 @@ export class StoreManager {
       promises.forEach((p) => p.resolve());
     }
     if (this.activeProjectId === projectId) {
+      if (typeof window !== 'undefined' && window.electronAPI) {
+        window.electronAPI.watcherStop().catch((err) => {
+          console.error('[StoreManager] Failed to stop file watcher on unload:', err);
+        });
+      }
       useAppStore.getState().clear();
       this.activeProjectId = null;
     }

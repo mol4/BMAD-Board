@@ -15,6 +15,38 @@ export interface Project {
 
 export type NewProject = Omit<Project, 'id' | 'lastUsedAt' | 'createdAt'>;
 
+export type WatcherChangeType = 'created' | 'modified' | 'deleted';
+
+export interface WatcherChange {
+  path: string;
+  type: WatcherChangeType;
+  mtimeMs: number;
+}
+
+export interface WatcherStatus {
+  active: boolean;
+  dirs: string[];
+  fallback: boolean;
+  pendingCount: number;
+}
+
+export type WatcherErrorCode = 'WATCH_DIR_LOST' | 'FILE_LOCKED' | 'WATCHER_ERROR';
+
+export interface WatcherErrorPayload {
+  code: WatcherErrorCode;
+  message: string;
+  path?: string;
+}
+
+export interface FileChangedPayload {
+  changes: WatcherChange[];
+}
+
+export interface IPCEventPayloads {
+  'file:changed': FileChangedPayload;
+  'watcher:error': WatcherErrorPayload;
+}
+
 export interface IPCChannels {
   'config:read': {
     params: void;
@@ -63,6 +95,18 @@ export interface IPCChannels {
   'dialog:openDirectory': {
     params: void;
     result: { canceled: boolean; filePaths: string[] };
+  };
+  'watcher:watch': {
+    params: { dirs: string[] };
+    result: void;
+  };
+  'watcher:stop': {
+    params: void;
+    result: void;
+  };
+  'watcher:status': {
+    params: void;
+    result: WatcherStatus;
   };
 }
 

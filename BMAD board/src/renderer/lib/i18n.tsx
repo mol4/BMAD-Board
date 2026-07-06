@@ -88,6 +88,10 @@ const translations = {
     'toast.projectRemoveError': 'Не удалось удалить проект',
     'toast.syncStarted': 'Синхронизация запущена',
     'toast.syncError': 'Ошибка синхронизации. Проверьте пути к файлам.',
+    'toast.syncTriggered': 'Синхронизация запущена',
+    'toast.watchDirLost': 'Директория наблюдения потеряна. Авто-синхронизация приостановлена.',
+    'toast.fileLocked': 'Файл заблокирован другим процессом. Повторная попытка не удалась.',
+    'toast.watcherError': 'Ошибка файлового наблюдателя',
 
     'common.save': 'Сохранить',
     'common.cancel': 'Отмена',
@@ -512,6 +516,10 @@ const translations = {
     'toast.configResetError': 'Error resetting settings',
     'toast.syncStarted': 'Sync started',
     'toast.syncError': 'Sync failed. Check file paths.',
+    'toast.syncTriggered': 'Sync triggered',
+    'toast.watchDirLost': 'Watched directory lost. Auto-sync paused.',
+    'toast.fileLocked': 'File locked by another process. Retry failed.',
+    'toast.watcherError': 'File watcher error',
   },
 } as const;
 

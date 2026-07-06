@@ -17,6 +17,7 @@
     "@fontsource/jetbrains-mono": "^5.2.8",
     "better-sqlite3": "^12.10.0",
     "buffer": "^6.0.3",
+    "chokidar": "^4.0.3",
     "electron-log": "^5.4.4",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.2.0",
