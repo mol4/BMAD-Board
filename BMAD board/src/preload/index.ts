@@ -20,6 +20,14 @@ const electronAPI = {
     ipcRenderer.invoke('file:read', { path }),
   fileReadDirectory: (path: string): Promise<IPCChannels['file:readDirectory']['result']> =>
     ipcRenderer.invoke('file:readDirectory', { path }),
+  fileWrite: (params: IPCChannels['file:write']['params']): Promise<IPCChannels['file:write']['result']> =>
+    ipcRenderer.invoke('file:write', params),
+  fileLock: (params: IPCChannels['file:lock']['params']): Promise<IPCChannels['file:lock']['result']> =>
+    ipcRenderer.invoke('file:lock', params),
+  fileUnlock: (params: IPCChannels['file:unlock']['params']): Promise<IPCChannels['file:unlock']['result']> =>
+    ipcRenderer.invoke('file:unlock', params),
+  fileLockStatus: (params: IPCChannels['file:lockStatus']['params']): Promise<IPCChannels['file:lockStatus']['result']> =>
+    ipcRenderer.invoke('file:lockStatus', params),
   windowGetState: (): Promise<IPCChannels['window:getState']['result']> =>
     ipcRenderer.invoke('window:getState'),
   shellOpenPath: (path: string): Promise<IPCChannels['shell:openPath']['result']> =>

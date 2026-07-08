@@ -66,7 +66,6 @@ export default function DashboardPage() {
       ) : (
         <div className="text-center py-8 text-foreground-tertiary">
           <p>{t('dashboard.noEpics')}</p>
-          <p className="text-sm mt-1">{t('dashboard.orCreateEpic')}</p>
         </div>
       )}
     </div>

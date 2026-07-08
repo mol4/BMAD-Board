@@ -84,6 +84,22 @@ export interface IPCChannels {
     params: { path: string };
     result: { name: string; path: string; isFile: boolean }[];
   };
+  'file:write': {
+    params: { path: string; content: string; lastMtimeMs?: number };
+    result: { mtimeMs: number };
+  };
+  'file:lock': {
+    params: { path: string; owner: 'ui' | 'agent' };
+    result: { acquired: boolean; owner?: 'ui' | 'agent' };
+  };
+  'file:unlock': {
+    params: { path: string };
+    result: void;
+  };
+  'file:lockStatus': {
+    params: { path: string };
+    result: { acquired: boolean; owner?: 'ui' | 'agent' };
+  };
   'window:getState': {
     params: void;
     result: { isMaximized: boolean };

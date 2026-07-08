@@ -75,10 +75,10 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Content Reading, Status Updates & Safeguards
-  epic-4: backlog
-  4-1-implement-file-lock-status-update-and-read-only-document-view: backlog
+  epic-4: in-progress
+  4-1-implement-file-lock-status-update-and-read-only-document-view: done
   4-2-implement-manual-edit-warning-and-markdown-editor: backlog
-  epic-4-retrospective: optional
+  4-3-sync-story-status-to-sprint-status-yaml: backlog
 
   # Epic 5b-i: Polished Navigation & Core UI
   epic-5b-i: backlog

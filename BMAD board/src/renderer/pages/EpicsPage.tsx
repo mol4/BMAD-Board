@@ -1,15 +1,11 @@
-import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
-import CreateModal from '@/components/CreateModal';
 
 export default function EpicsPage() {
   const { t } = useI18n();
   const initialized = useAppStore((s) => s.initialized);
   const epics = useAppStore((s) => s.epics);
-  const createEpic = useAppStore((s) => s.createEpic);
-  const [showCreate, setShowCreate] = useState(false);
 
   if (!initialized) {
     return (
@@ -19,14 +15,6 @@ export default function EpicsPage() {
     );
   }
 
-  const handleCreateEpic = (data: Record<string, string>) => {
-    createEpic({
-      title: data.title,
-      description: data.description || '',
-      priority: data.priority as 'critical' | 'high' | 'medium' | 'low' || 'medium',
-    });
-  };
-
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -34,12 +22,6 @@ export default function EpicsPage() {
           <h1 className="text-2xl font-bold">{t('epics.title')}</h1>
           <p className="text-sm text-foreground-secondary">{t('epics.subtitle')}</p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="px-4 py-2 bg-accent text-foreground-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors"
-        >
-          {t('epics.create')}
-        </button>
       </div>
 
       {epics.length === 0 ? (
@@ -75,26 +57,6 @@ export default function EpicsPage() {
           ))}
         </div>
       )}
-
-      <CreateModal
-        isOpen={showCreate}
-        onClose={() => setShowCreate(false)}
-        title={t('epics.createModal')}
-        onSubmit={handleCreateEpic}
-        fields={[
-          { name: 'title', label: t('epics.name'), type: 'text', required: true, placeholder: t('epics.namePlaceholder') },
-          { name: 'description', label: t('epics.description'), type: 'textarea', placeholder: t('epics.descriptionPlaceholder') },
-          {
-            name: 'priority', label: t('story.priority'), type: 'select',
-            options: [
-              { value: 'critical', label: t('priority.critical') },
-              { value: 'high', label: t('priority.high') },
-              { value: 'medium', label: t('priority.medium') },
-              { value: 'low', label: t('priority.low') },
-            ],
-          },
-        ]}
-      />
     </div>
   );
 }

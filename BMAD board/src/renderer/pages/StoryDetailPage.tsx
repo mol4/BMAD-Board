@@ -1,16 +1,21 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
-import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import { PriorityBadge } from '@/components/StatusBadge';
+import { useToast } from '@/components/Toast';
+import { writeStoryStatus } from '@/lib/file-writer';
 import { FileText } from 'lucide-react';
 import MarkdownModal from '@/components/MarkdownModal';
 import { renderMarkdown, renderMarkdownInline } from '@/lib/markdown-render';
-import type { Story } from '@/lib/types';
+import type { Story, StoryStatus } from '@/lib/types';
+
+const STATUSES: StoryStatus[] = ['backlog', 'todo', 'in-progress', 'in-review', 'done'];
 
 export default function StoryDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useI18n();
+  const { showToast } = useToast();
   const initialized = useAppStore((s) => s.initialized);
   const [story, setStory] = useState<Story | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -18,8 +23,14 @@ export default function StoryDetailPage() {
   const getStoryByKey = useAppStore((s) => s.getStoryByKey);
   const getEpic = useAppStore((s) => s.getEpic);
   const getTask = useAppStore((s) => s.getTask);
+  const updateStoryStatus = useAppStore((s) => s.updateStoryStatus);
   const [mdModalOpen, setMdModalOpen] = useState(false);
   const [mdContent, setMdContent] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const openMdModal = async (s: Story) => {
     let content = s.rawMarkdown ?? null;
@@ -31,6 +42,39 @@ export default function StoryDetailPage() {
     setMdModalOpen(true);
   };
 
+  const handleStatusChange = useCallback(async (newStatus: StoryStatus) => {
+    if (!story) return;
+    const previousStatus = story.status;
+
+    updateStoryStatus(story.id, newStatus);
+
+    const updatedStory = useAppStore.getState().getStory(story.id);
+    if (!updatedStory) {
+      updateStoryStatus(story.id, previousStatus);
+      return;
+    }
+    setStory(updatedStory);
+
+    const result = await writeStoryStatus(updatedStory, newStatus);
+    if (!result.ok && mountedRef.current) {
+      if (result.code === 'FILE_LOCKED') {
+        showToast(t('toast.fileLockedByAgent'), 'error');
+      } else if (result.code === 'FILE_CHANGED') {
+        showToast(t('toast.fileChanged'), 'error');
+      } else {
+        showToast(t('toast.statusUpdateFailed'), 'error');
+      }
+      updateStoryStatus(story.id, previousStatus);
+      setStory(useAppStore.getState().getStory(story.id) ?? updatedStory);
+      return;
+    }
+
+    if (mountedRef.current && result.ok) {
+      showToast(t('toast.statusUpdated'), 'success');
+      setStory(useAppStore.getState().getStory(story.id) ?? updatedStory);
+    }
+  }, [story, updateStoryStatus, showToast, t]);
+
   useEffect(() => {
     if (!initialized) return;
     const found = getStoryByKey(id || '') || getStory(id || '');
@@ -39,7 +83,7 @@ export default function StoryDetailPage() {
     } else {
       setNotFound(true);
     }
-  }, [id, initialized]);
+  }, [id, initialized, getStory, getStoryByKey]);
 
   if (!initialized) {
     return (
@@ -72,7 +116,16 @@ export default function StoryDetailPage() {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{story.title}</h1>
-          <StatusBadge status={story.status} />
+          <select
+            value={story.status}
+            onChange={(e) => handleStatusChange(e.target.value as StoryStatus)}
+            className="text-xs bg-surface-sunken border border-border-default rounded px-2 py-1 text-foreground-primary"
+            aria-label={t('story.changeStatus')}
+          >
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>{t(`status.${s}`)}</option>
+            ))}
+          </select>
           <PriorityBadge priority={story.priority} />
         </div>
         <div className="flex items-center gap-4 text-sm text-foreground-secondary">
@@ -142,7 +195,9 @@ export default function StoryDetailPage() {
               if (!task) return null;
               return (
                 <div key={task.id} className="flex items-center gap-3 p-2 bg-surface-elevated rounded">
-                  <StatusBadge status={task.status} />
+                  <span className="text-xs bg-surface-sunken border border-border-default rounded px-2 py-0.5 text-foreground-primary">
+                    {task.status}
+                  </span>
                   <span className="text-sm">{task.title}</span>
                 </div>
               );
