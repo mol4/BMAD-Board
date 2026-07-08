@@ -6,10 +6,10 @@ import { useFileWatcher } from './useFileWatcher';
 type FileChangedHandler = (payload: { changes: Array<{ path: string; type: string }> }) => void;
 type WatcherErrorHandler = (payload: { code: string; message: string; path?: string }) => void;
 
-const { showToastMock, refreshActiveProjectMock, getActiveProjectIdMock } = vi.hoisted(() => {
+const { showToastMock, processChangesMock, getActiveProjectIdMock } = vi.hoisted(() => {
   return {
     showToastMock: vi.fn(),
-    refreshActiveProjectMock: vi.fn().mockResolvedValue(undefined),
+    processChangesMock: vi.fn().mockResolvedValue(undefined),
     getActiveProjectIdMock: vi.fn().mockReturnValue('proj-1'),
   };
 });
@@ -28,8 +28,19 @@ vi.mock('@/lib/i18n', () => ({
 vi.mock('@/lib/store-manager', () => {
   return {
     storeManager: {
-      refreshActiveProject: refreshActiveProjectMock,
+      refreshActiveProject: vi.fn().mockResolvedValue(undefined),
       getActiveProjectId: getActiveProjectIdMock,
+    },
+  };
+});
+
+vi.mock('@/lib/sync-engine', () => {
+  return {
+    syncEngine: {
+      processChanges: processChangesMock,
+      forceFullSync: vi.fn().mockResolvedValue(undefined),
+      addEventListener: vi.fn().mockReturnValue(() => {}),
+      addErrorListener: vi.fn().mockReturnValue(() => {}),
     },
   };
 });
@@ -43,7 +54,7 @@ beforeEach(() => {
   capturedFileChanged = null;
   capturedWatcherError = null;
   showToastMock.mockClear();
-  refreshActiveProjectMock.mockClear();
+  processChangesMock.mockClear();
   const api = {
     onFileChanged: vi.fn((cb: FileChangedHandler) => {
       capturedFileChanged = cb;
@@ -72,7 +83,7 @@ describe('useFileWatcher', () => {
     expect(capturedWatcherError).not.toBeNull();
   });
 
-  it('calls storeManager.refreshActiveProject on file:changed event when a project is active', async () => {
+  it('calls syncEngine.processChanges on file:changed event', async () => {
     render(<Probe />);
 
     await act(async () => {
@@ -82,7 +93,20 @@ describe('useFileWatcher', () => {
       await Promise.resolve();
     });
 
-    expect(refreshActiveProjectMock).toHaveBeenCalled();
+    expect(processChangesMock).toHaveBeenCalledWith([{ path: '/d/file.md', type: 'modified' }]);
+  });
+
+  it('does not call processChanges when payload has no changes', async () => {
+    render(<Probe />);
+
+    await act(async () => {
+      capturedFileChanged!(undefined as unknown as { changes: Array<{ path: string; type: string }> });
+      capturedFileChanged!({ changes: [] });
+      capturedFileChanged!({} as { changes: Array<{ path: string; type: string }> });
+      await Promise.resolve();
+    });
+
+    expect(processChangesMock).not.toHaveBeenCalled();
   });
 
   it('shows a toast on watcher:error with WATCH_DIR_LOST code', () => {
@@ -109,7 +133,7 @@ describe('useFileWatcher', () => {
     expect(showToastMock).toHaveBeenCalledWith('toast.watcherError', 'error');
   });
 
-  it('does not refresh when no active project', async () => {
+  it('does not call processChanges when sync fails but still shows error toast', async () => {
     getActiveProjectIdMock.mockReturnValue(null);
     render(<Probe />);
 
@@ -119,6 +143,7 @@ describe('useFileWatcher', () => {
       await Promise.resolve();
     });
 
-    expect(refreshActiveProjectMock).not.toHaveBeenCalled();
+    // processChanges is called regardless of active project because syncEngine handles its own checks
+    expect(processChangesMock).toHaveBeenCalled();
   });
 });

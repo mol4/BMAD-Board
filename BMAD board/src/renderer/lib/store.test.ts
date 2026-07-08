@@ -91,4 +91,128 @@ describe('useAppStore', () => {
     useAppStore.getState().setError(null);
     expect(useAppStore.getState().error).toBeNull();
   });
+
+  it('upsertEpic adds new epic', () => {
+    const epic: Epic = {
+      id: 'epic-1',
+      key: 'EPIC-1',
+      title: 'Upserted Epic',
+      description: '',
+      status: 'draft',
+      priority: 'medium',
+      stories: [],
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    useAppStore.getState().upsertEpic(epic);
+    expect(useAppStore.getState().epics).toHaveLength(1);
+    expect(useAppStore.getState().epics[0].title).toBe('Upserted Epic');
+  });
+
+  it('upsertEpic updates existing epic by id', () => {
+    const epic: Epic = {
+      id: 'epic-1',
+      key: 'EPIC-1',
+      title: 'Original',
+      description: '',
+      status: 'draft',
+      priority: 'medium',
+      stories: [],
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    useAppStore.getState().upsertEpic(epic);
+    const updated: Epic = { ...epic, title: 'Updated' };
+    useAppStore.getState().upsertEpic(updated);
+    expect(useAppStore.getState().epics).toHaveLength(1);
+    expect(useAppStore.getState().epics[0].title).toBe('Updated');
+  });
+
+  it('removeEpic deletes epic by id', () => {
+    const epic: Epic = {
+      id: 'epic-1',
+      key: 'EPIC-1',
+      title: 'To Remove',
+      description: '',
+      status: 'draft',
+      priority: 'medium',
+      stories: [],
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    useAppStore.getState().upsertEpic(epic);
+    useAppStore.getState().removeEpic('epic-1');
+    expect(useAppStore.getState().epics).toHaveLength(0);
+  });
+
+  it('upsertStory adds new story', () => {
+    const story: Story = {
+      id: 'story-1',
+      key: 'STORY-1.1',
+      epicId: 'epic-1',
+      title: 'Upserted Story',
+      description: '',
+      acceptanceCriteria: [],
+      status: 'backlog',
+      priority: 'medium',
+      tasks: [],
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    useAppStore.getState().upsertStory(story);
+    expect(useAppStore.getState().stories).toHaveLength(1);
+    expect(useAppStore.getState().stories[0].title).toBe('Upserted Story');
+  });
+
+  it('upsertStory updates existing story by id', () => {
+    const story: Story = {
+      id: 'story-1',
+      key: 'STORY-1.1',
+      epicId: 'epic-1',
+      title: 'Original',
+      description: '',
+      acceptanceCriteria: [],
+      status: 'backlog',
+      priority: 'medium',
+      tasks: [],
+      labels: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    useAppStore.getState().upsertStory(story);
+    const updated: Story = { ...story, title: 'Updated' };
+    useAppStore.getState().upsertStory(updated);
+    expect(useAppStore.getState().stories).toHaveLength(1);
+    expect(useAppStore.getState().stories[0].title).toBe('Updated');
+  });
+
+  it('upsertStory removes stale reference when moving story to a different epic', () => {
+    const epic1 = useAppStore.getState().createEpic({ title: 'Epic 1', description: '' });
+    const epic2 = useAppStore.getState().createEpic({ title: 'Epic 2', description: '' });
+    const story = useAppStore.getState().createStory({ epicId: epic1.id, title: 'Movable Story', description: '' });
+
+    useAppStore.getState().upsertStory({ ...story, epicId: epic2.id });
+
+    const updatedEpic1 = useAppStore.getState().getEpic(epic1.id);
+    const updatedEpic2 = useAppStore.getState().getEpic(epic2.id);
+    expect(updatedEpic1?.stories).not.toContain(story.id);
+    expect(updatedEpic2?.stories).toContain(story.id);
+    expect(useAppStore.getState().stories[0].epicId).toBe(epic2.id);
+  });
+
+  it('removeStory deletes story by id and recalculates epic status', () => {
+    const epic = useAppStore.getState().createEpic({ title: 'Parent Epic', description: '' });
+    const story = useAppStore.getState().createStory({ epicId: epic.id, title: 'To Remove', description: '' });
+    useAppStore.getState().updateStoryStatus(story.id, 'in-progress');
+
+    useAppStore.getState().removeStory(story.id);
+    expect(useAppStore.getState().stories).toHaveLength(0);
+    const updatedEpic = useAppStore.getState().getEpic(epic.id);
+    expect(updatedEpic?.status).toBe('draft');
+    expect(updatedEpic?.stories).not.toContain(story.id);
+  });
 });

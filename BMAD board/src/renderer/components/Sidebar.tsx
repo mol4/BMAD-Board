@@ -8,6 +8,7 @@ import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, Chev
 import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
 import ProjectSwitcher from '@/components/ProjectSwitcher';
+import { syncEngine } from '@/lib/sync-engine';
 
 const navItems = [
   {
@@ -54,8 +55,17 @@ export default function Sidebar() {
   const [config, setConfig] = useState<BmadConfig>(getConfig());
   const [configLoaded, setConfigLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const configLoadedRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     setConfig(getConfig());
@@ -344,17 +354,34 @@ export default function Sidebar() {
           </div>
         )}
 
-        <button
-          onClick={() => {
-            window.location.reload();
-          }}
-          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''
-            }`}
-          title={t('sidebar.syncWithMd')}
-        >
-          <RefreshCw size={18} className="shrink-0" />
-          {!collapsed && <span>{t('sidebar.syncMd')}</span>}
-        </button>
+        {activeProjectId && (
+          <button
+            onClick={async () => {
+              if (isSyncing || syncEngine.syncing) return;
+              setIsSyncing(true);
+              try {
+                await syncEngine.forceFullSync();
+                if (!mountedRef.current) return;
+                showToast(t('toast.syncComplete'), 'success');
+              } catch {
+                if (!mountedRef.current) return;
+                showToast(t('toast.syncFailed'), 'error');
+              } finally {
+                if (mountedRef.current) {
+                  setIsSyncing(false);
+                }
+              }
+            }}
+            disabled={isSyncing || syncEngine.syncing}
+            aria-busy={isSyncing || syncEngine.syncing}
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors disabled:opacity-50 ${collapsed ? 'justify-center' : ''
+              }`}
+            title={t('sidebar.syncTooltip')}
+          >
+            <RefreshCw size={18} className={`shrink-0 ${isSyncing ? 'animate-spin' : ''}`} />
+            {!collapsed && <span>{t('sidebar.sync')}</span>}
+          </button>
+        )}
 
         <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-1'}`}>
           <button

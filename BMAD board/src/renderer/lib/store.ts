@@ -65,6 +65,10 @@ interface AppState {
   getActiveSprint: () => Sprint | undefined;
   getAllSprints: () => Sprint[];
   createSprint: (name: string, goal?: string) => Sprint;
+  upsertEpic: (epic: Epic) => void;
+  removeEpic: (id: string) => void;
+  upsertStory: (story: Story) => void;
+  removeStory: (id: string) => void;
   recalculateAllEpicStatuses: () => void;
   getStats: () => {
     totalEpics: number;
@@ -353,6 +357,79 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
     return created!;
   },
+
+  upsertEpic: (epic) => set((state) => {
+    const existing = state.epics.find((e) => e.id === epic.id);
+    const epics = existing
+      ? state.epics.map((e) => (e.id === epic.id ? { ...epic, updatedAt: new Date().toISOString() } : e))
+      : [...state.epics, epic];
+    const epicNum = parseInt(epic.key.replace('EPIC-', ''), 10);
+    const counters = !existing && epicNum > state.counters.epic
+      ? { ...state.counters, epic: epicNum }
+      : state.counters;
+    return { epics, counters };
+  }),
+
+  removeEpic: (id) => set((state) => {
+    const epic = state.epics.find((e) => e.id === id);
+    if (!epic) return state;
+    const removedStoryIds = epic.stories;
+    return {
+      epics: state.epics.filter((e) => e.id !== id),
+      stories: state.stories.filter((s) => !removedStoryIds.includes(s.id)),
+      tasks: state.tasks.filter((t) => !removedStoryIds.some((sid) =>
+        state.stories.find((s) => s.id === sid)?.tasks.includes(t.id)
+      )),
+    };
+  }),
+
+  upsertStory: (story) => set((state) => {
+    const existing = state.stories.find((s) => s.id === story.id);
+    const stories = existing
+      ? state.stories.map((s) => (s.id === story.id ? { ...story, updatedAt: new Date().toISOString() } : s))
+      : [...state.stories, story];
+    const oldEpicId = existing?.epicId;
+    const epicChanged = oldEpicId !== undefined && oldEpicId !== story.epicId;
+    const epics = state.epics.map((e) => {
+      if (epicChanged && e.id === oldEpicId) {
+        return {
+          ...e,
+          stories: e.stories.filter((sid) => sid !== story.id),
+          status: recalculateEpicStatus(e, stories),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      if (e.id !== story.epicId) return e;
+      const alreadyLinked = e.stories.includes(story.id);
+      return {
+        ...e,
+        stories: alreadyLinked ? e.stories : [...e.stories, story.id],
+        status: recalculateEpicStatus(e, stories),
+        updatedAt: new Date().toISOString(),
+      };
+    });
+    const storyNum = parseFloat(story.key.replace('STORY-', ''));
+    const counters = !existing && storyNum > state.counters.story
+      ? { ...state.counters, story: storyNum }
+      : state.counters;
+    return { stories, epics, counters };
+  }),
+
+  removeStory: (id) => set((state) => {
+    const story = state.stories.find((s) => s.id === id);
+    const stories = state.stories.filter((s) => s.id !== id);
+    const tasks = story
+      ? state.tasks.filter((t) => !story.tasks.includes(t.id))
+      : state.tasks;
+    const epics = story
+      ? state.epics.map((e) =>
+          e.id === story.epicId
+            ? { ...e, stories: e.stories.filter((sid) => sid !== id), status: recalculateEpicStatus(e, stories), updatedAt: new Date().toISOString() }
+            : e
+        )
+      : state.epics;
+    return { stories, tasks, epics };
+  }),
 
   recalculateAllEpicStatuses: () => set((state) => {
     const { stories } = state;

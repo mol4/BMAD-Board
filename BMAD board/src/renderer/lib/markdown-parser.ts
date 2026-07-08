@@ -290,7 +290,7 @@ export function parseEpicsDocument(raw: string, filePath?: string): Epic[] {
   return Array.from(deduped.values()).sort((a, b) => a.key.localeCompare(b.key));
 }
 
-export function parseEpicFile(raw: string, _filePath: string, fallbackNum: number): Epic | null {
+export function parseEpicFile(raw: string, _filePath: string, fallbackNum: number, existingId?: string): Epic | null {
   try {
     const { data, content } = matter(raw);
 
@@ -304,7 +304,7 @@ export function parseEpicFile(raw: string, _filePath: string, fallbackNum: numbe
       : fallbackNum;
 
     const epic: Epic = {
-      id: uuidv4(),
+      id: existingId ?? uuidv4(),
       key: `EPIC-${epicNum}`,
       title,
       description: extractDescription(content),
@@ -325,9 +325,9 @@ export function parseEpicFile(raw: string, _filePath: string, fallbackNum: numbe
   }
 }
 
-export function parseStoryFile(raw: string, epicId: string, _filePath: string, fallbackNum: number): Story | null {
+export function parseStoryFile(raw: string, epicId: string, _filePath: string, fallbackNum: number, existingId?: string, preParse?: { data: Record<string, unknown>; content: string }): Story | null {
   try {
-    const { data, content } = matter(raw);
+    const { data, content } = preParse ?? matter(raw);
 
     const hasStoryHeading = /^#\s+Story\s+\d+[\.\d]*:/im.test(content);
     const hasStatusLine = /^Status:/im.test(content);
@@ -347,7 +347,7 @@ export function parseStoryFile(raw: string, epicId: string, _filePath: string, f
     const rawStatus = statusLine ? statusLine[1].trim() : (data.status as string);
 
     const story: Story = {
-      id: uuidv4(),
+      id: existingId ?? uuidv4(),
       key: `STORY-${storyRef}`,
       epicId,
       title,

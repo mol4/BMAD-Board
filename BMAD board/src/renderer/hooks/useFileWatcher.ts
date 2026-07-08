@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useToast } from '@/components/Toast';
 import { useI18n } from '@/lib/i18n';
-import { storeManager } from '@/lib/store-manager';
+import { syncEngine } from '@/lib/sync-engine';
 
 export function useFileWatcher(): void {
   const { showToast } = useToast();
@@ -20,17 +20,16 @@ export function useFileWatcher(): void {
     mountedRef.current = true;
 
     const unsubChanged = window.electronAPI.onFileChanged((payload) => {
-      const activeProjectId = storeManager.getActiveProjectId();
-      if (!activeProjectId) return;
-      storeManager
-        .refreshActiveProject()
+      if (!payload?.changes?.length) return;
+      syncEngine
+        .processChanges(payload.changes)
         .then(() => {
           if (mountedRef.current) {
             showToastRef.current(tRef.current('toast.syncTriggered'), 'success');
           }
         })
         .catch((err) => {
-          console.error('[Watcher] Refresh failed:', err);
+          console.error('[Watcher] Sync failed:', err);
           if (mountedRef.current) {
             showToastRef.current(tRef.current('toast.syncError'), 'error');
           }
