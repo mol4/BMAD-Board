@@ -78,7 +78,8 @@ development_status:
   epic-4: in-progress
   4-1-implement-file-lock-status-update-and-read-only-document-view: done
   4-2-implement-manual-edit-warning-and-markdown-editor: backlog
-  4-3-sync-story-status-to-sprint-status-yaml: backlog
+  4-3-sync-story-status-to-sprint-status-yaml: done
+  epic-4-retrospective: optional
 
   # Epic 5b-i: Polished Navigation & Core UI
   epic-5b-i: backlog

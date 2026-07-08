@@ -1,6 +1,7 @@
 import matter from 'gray-matter';
 import type { Story, Epic, StoryStatus, EpicStatus } from '@/lib/types';
 import { syncEngine } from '@/lib/sync-engine';
+import { updateSprintStatus } from './sprint-status-sync';
 
 export interface WriteResult {
   ok: true;
@@ -39,20 +40,43 @@ function setCurrentMtimeMs(story: Story, mtimeMs: number): void {
   mtimeCache.set(key, mtimeMs);
 }
 
+function sourceFileToSprintKey(sourceFile: string): string {
+  return sourceFile.replace(/^.*[\\/]/, '').replace(/\.md$/, '');
+}
+
+function storyKeyToSprintPrefix(storyKey: string): string | null {
+  const m = storyKey.match(/^STORY-(\d+)\.(\d+)/);
+  if (!m) return null;
+  return `${m[1]}-${m[2]}-`;
+}
+
 export async function writeStoryStatus(
   story: Story,
   newStatus: StoryStatus,
 ): Promise<WriteOutcome> {
   const sourceFile = story.sourceFile;
+
+  // Inline story (no source file): skip frontmatter write, go straight to sprint-status.yaml
   if (!sourceFile) {
-    return { ok: false, code: 'FILE_WRITE_ERROR', message: 'Story has no source file' };
+    const sprintPrefix = storyKeyToSprintPrefix(story.key);
+    if (!sprintPrefix) {
+      return { ok: false, code: 'FILE_WRITE_ERROR', message: 'Story has no source file and key is unparseable' };
+    }
+    try {
+      await updateSprintStatus(sprintPrefix, newStatus);
+    } catch (err) {
+      console.warn('[file-writer] Sprint status sync failed (non-blocking):', err);
+    }
+    try {
+      await syncEngine.forceFullSync();
+    } catch (syncErr) {
+      console.warn('[file-writer] Sync after write failed:', syncErr);
+    }
+    return { ok: true, mtimeMs: 0 };
   }
 
   let rawMarkdown = story.rawMarkdown;
   if (!rawMarkdown && typeof window !== 'undefined' && window.electronAPI) {
-    // NOTE: This reads from disk without acquiring a lock. The read is safe
-    // because it only fetches content for the UI to prepare a write; the actual
-    // write path (ipcFileWrite) acquires the lock before persisting.
     const result = await window.electronAPI.fileRead(sourceFile);
     if (result.exists) {
       rawMarkdown = result.content;
@@ -63,9 +87,35 @@ export async function writeStoryStatus(
     return { ok: false, code: 'FILE_WRITE_ERROR', message: 'Cannot read source file' };
   }
 
-  return writeStatusToMarkdown(sourceFile, rawMarkdown, newStatus, getCurrentMtimeMs(story), (mtimeMs) => {
-    setCurrentMtimeMs(story, mtimeMs);
-  });
+  const result = await writeStatusToMarkdown(
+    sourceFile,
+    rawMarkdown,
+    newStatus,
+    getCurrentMtimeMs(story),
+    (mtimeMs) => {
+      setCurrentMtimeMs(story, mtimeMs);
+    },
+  );
+
+if (result.ok) {
+    const sprintKey = sourceFileToSprintKey(sourceFile);
+    try {
+      const sprintOk = await updateSprintStatus(sprintKey, newStatus);
+      if (!sprintOk) {
+        console.warn('[file-writer] Sprint status sync returned false (non-blocking)');
+      }
+    } catch (err) {
+      console.warn('[file-writer] Sprint status sync failed (non-blocking):', err);
+    }
+
+    try {
+      await syncEngine.forceFullSync();
+    } catch (syncErr) {
+      console.warn('[file-writer] Sync after write failed:', syncErr);
+    }
+  }
+
+  return result;
 }
 
 export async function writeEpicStatus(
@@ -122,12 +172,6 @@ async function writeStatusToMarkdown(
 
     if (onSuccess) {
       onSuccess(result.mtimeMs);
-    }
-
-    try {
-      await syncEngine.forceFullSync();
-    } catch (syncErr) {
-      console.warn('[file-writer] Sync after write failed:', syncErr);
     }
 
     return { ok: true, mtimeMs: result.mtimeMs };

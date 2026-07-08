@@ -2,15 +2,20 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { writeStoryStatus, writeEpicStatus } from './file-writer';
 import type { Story, Epic } from '@/lib/types';
 
-const { fileReadMock, fileWriteMock } = vi.hoisted(() => ({
+const { fileReadMock, fileWriteMock, updateSprintStatusMock } = vi.hoisted(() => ({
   fileReadMock: vi.fn(),
   fileWriteMock: vi.fn(),
+  updateSprintStatusMock: vi.fn(),
 }));
 
 vi.mock('@/lib/sync-engine', () => ({
   syncEngine: {
     forceFullSync: vi.fn().mockResolvedValue(undefined),
   },
+}));
+
+vi.mock('./sprint-status-sync', () => ({
+  updateSprintStatus: updateSprintStatusMock,
 }));
 
 function setupWindowMock() {
@@ -68,6 +73,8 @@ describe('file-writer', () => {
   beforeEach(() => {
     fileReadMock.mockClear();
     fileWriteMock.mockClear();
+    updateSprintStatusMock.mockClear();
+    updateSprintStatusMock.mockResolvedValue(true);
     setupWindowMock();
   });
 
@@ -135,8 +142,29 @@ describe('file-writer', () => {
       }
     });
 
-    it('returns error when story has no source file', async () => {
-      const story = makeStory({ sourceFile: undefined, rawMarkdown: undefined });
+    it('syncs sprint-status.yaml for inline story (no sourceFile) using story.key prefix', async () => {
+      updateSprintStatusMock.mockResolvedValue(true);
+
+      const story = makeStory({
+        key: 'STORY-4.2',
+        sourceFile: undefined,
+        rawMarkdown: undefined,
+      });
+      const result = await writeStoryStatus(story, 'done');
+
+      expect(result.ok).toBe(true);
+      await vi.waitFor(() =>
+        expect(updateSprintStatusMock).toHaveBeenCalledWith('4-2-', 'done'),
+      );
+      expect(fileWriteMock).not.toHaveBeenCalled();
+    });
+
+    it('returns error when sourceFile is missing and story.key is unparseable', async () => {
+      const story = makeStory({
+        key: 'UNPARSEABLE',
+        sourceFile: undefined,
+        rawMarkdown: undefined,
+      });
       const result = await writeStoryStatus(story, 'done');
 
       expect(result.ok).toBe(false);
@@ -173,6 +201,55 @@ describe('file-writer', () => {
       const writeCall = fileWriteMock.mock.calls[0][0];
       expect(writeCall.content).toContain('updatedAt:');
       expect(writeCall.content).toContain('status: todo');
+    });
+
+    it('calls updateSprintStatus with source file basename, not story key', async () => {
+      fileWriteMock.mockResolvedValue({ mtimeMs: 1234567890 });
+      updateSprintStatusMock.mockResolvedValue(true);
+
+      const story = makeStory({
+        key: 'STORY-4.2',
+        sourceFile: '/test/stories/4-2-implement-manual-edit-warning-and-markdown-editor.md',
+      });
+      const result = await writeStoryStatus(story, 'done');
+
+      expect(result.ok).toBe(true);
+      await vi.waitFor(() =>
+        expect(updateSprintStatusMock).toHaveBeenCalledWith(
+          '4-2-implement-manual-edit-warning-and-markdown-editor',
+          'done',
+        ),
+      );
+    });
+
+    it('does not call updateSprintStatus when write fails', async () => {
+      const err = new Error('Locked') as Error & { code: string };
+      err.code = 'FILE_LOCKED';
+      fileWriteMock.mockRejectedValue(err);
+
+      const story = makeStory();
+      const result = await writeStoryStatus(story, 'in-progress');
+
+      expect(result.ok).toBe(false);
+      expect(updateSprintStatusMock).not.toHaveBeenCalled();
+    });
+
+    it('logs warning when updateSprintStatus returns false', async () => {
+      fileWriteMock.mockResolvedValue({ mtimeMs: 1234567890 });
+      updateSprintStatusMock.mockResolvedValue(false);
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const story = makeStory();
+      const result = await writeStoryStatus(story, 'in-progress');
+
+      expect(result.ok).toBe(true);
+      await vi.waitFor(() =>
+        expect(warnSpy).toHaveBeenCalledWith(
+          '[file-writer] Sprint status sync returned false (non-blocking)',
+        ),
+      );
+
+      warnSpy.mockRestore();
     });
   });
 

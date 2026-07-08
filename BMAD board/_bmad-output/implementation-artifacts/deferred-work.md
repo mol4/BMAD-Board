@@ -116,3 +116,9 @@
 - Path Traversal — renderer can watch arbitrary filesystem directories — pre-existing architectural decision, Electron app without sandbox
 - IPC handler leak — `disposeWatchers` only stops watcher, never removes handlers — pre-existing pattern, setupIPC called once
 - `ipcCleanup` typed as fragile coupling — cosmetic, inline type
+
+## Deferred from: code review of 4-3-sync-story-status-to-sprint-status-yaml (2026-07-08)
+
+- `updateStatusLine` false-positive match inside YAML block scalars — unlikely given predictable YAML structure, but regex should ideally anchor to `^  {key}:` pattern
+- `updateLastUpdated` silently no-ops when `last_updated` field absent — file structure is predictable per spec; would only matter if someone manually removes the field
+- External modification of sprint-status.yaml causes silent sync failure — by design per AC5; YAML sync is non-blocking and failures are logged but don't block primary operation
