@@ -1,7 +1,6 @@
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
-import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
-import Card from '@/components/Card';
+import EpicCard from '@/components/EpicCard';
 
 export default function EpicsPage() {
   const { t } = useI18n();
@@ -31,30 +30,9 @@ export default function EpicsPage() {
           <p className="text-sm mt-2">{t('epics.noEpicsHint')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-4">
           {epics.map((epic) => (
-            <Card key={epic.id} className="p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold">{epic.title}</h3>
-                    <span className="text-xs text-foreground-tertiary">{epic.key}</span>
-                  </div>
-                  <p className="text-sm text-foreground-secondary">
-                    {epic.description || t('common.noDescription')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <StatusBadge status={epic.status} />
-                  <PriorityBadge priority={epic.priority} />
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-foreground-tertiary mt-3 pt-3 border-t border-border-default">
-                <span>{epic.stories.length} {t('epic.storiesCount')}</span>
-                <span>{t('epic.created')}: {new Date(epic.createdAt).toLocaleDateString()}</span>
-                {epic.sourceFile && <span>{epic.sourceFile}</span>}
-              </div>
-            </Card>
+            <EpicCard key={epic.id} epic={epic} />
           ))}
         </div>
       )}

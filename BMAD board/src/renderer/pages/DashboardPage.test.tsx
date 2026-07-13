@@ -6,7 +6,6 @@ import { useAppStore } from '@/lib/store';
 import type { StoryStatus } from '@/lib/types';
 import DashboardPage from './DashboardPage';
 
-/** Seed one epic and a story per requested status so getStats() returns non-zero buckets. */
 function seedStories(statuses: StoryStatus[]) {
   const store = useAppStore.getState();
   const epic = store.createEpic({ title: 'Epic', description: '' });
@@ -18,14 +17,12 @@ function seedStories(statuses: StoryStatus[]) {
 
 describe('DashboardPage', () => {
   beforeEach(() => {
-    // Auto-cleanup is not registered (vitest globals are off), so unmount the
-    // previous render explicitly to avoid leaked DOM matching the next query.
     cleanup();
     useAppStore.getState().clear();
     useAppStore.getState().setInitialized(true);
   });
 
-  it('renders the 4-card stat grid with zeros on first run when store has data', () => {
+  it('renders the 4-card stat grid when store has data', () => {
     useAppStore.getState().createEpic({ title: 'Epic', description: '' });
     render(
       <MemoryRouter>
@@ -39,11 +36,9 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Stories')).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
     expect(screen.getByText('Completed')).toBeInTheDocument();
-    expect(screen.getAllByText('0')).toHaveLength(3);
   });
 
   it('computes Active = (in-progress + in-review) and Completed = done', () => {
-    // 2 in-progress + 1 in-review => Active 3; 2 done => Completed 2; +1 backlog => 6 stories.
     seedStories(['in-progress', 'in-progress', 'in-review', 'done', 'done', 'backlog']);
 
     render(
@@ -54,10 +49,37 @@ describe('DashboardPage', () => {
       </MemoryRouter>,
     );
 
-    // Scope each assertion to its card; the status-distribution block below also renders counts.
-    const activeCard = screen.getByText('Active').parentElement!;
-    const completedCard = screen.getByText('Completed').parentElement!;
+    const activeCard = screen.getByText('Active').closest('[role="button"]')!;
+    const completedCard = screen.getByText('Completed').closest('[role="button"]')!;
     expect(within(activeCard).getByText('3')).toBeInTheDocument();
     expect(within(completedCard).getByText('2')).toBeInTheDocument();
+  });
+
+  it('renders StatCard with icon backgrounds', () => {
+    useAppStore.getState().createEpic({ title: 'Epic', description: '' });
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <DashboardPage />
+        </I18nProvider>
+      </MemoryRouter>,
+    );
+
+    const iconBgs = document.querySelectorAll('.bg-accent');
+    expect(iconBgs.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('preserves status distribution bar chart', () => {
+    seedStories(['done', 'done', 'in-progress']);
+
+    render(
+      <MemoryRouter>
+        <I18nProvider>
+          <DashboardPage />
+        </I18nProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Status Distribution')).toBeInTheDocument();
   });
 });

@@ -25,10 +25,12 @@ vi.mock('marked', () => ({
     default: {
         setOptions: vi.fn(),
         parse: vi.fn().mockReturnValue('<p>content</p>'),
+        parseInline: vi.fn().mockReturnValue('content'),
     },
     marked: {
         setOptions: vi.fn(),
         parse: vi.fn().mockReturnValue('<p>content</p>'),
+        parseInline: vi.fn().mockReturnValue('content'),
     },
 }));
 
@@ -107,5 +109,58 @@ describe('StoryDetailPage', () => {
         await waitFor(() => {
             expect(screen.getByText(/Has file|Есть файл/i)).toBeInTheDocument();
         });
+    });
+
+    it('renders Info and Markdown tabs', async () => {
+        const store = useAppStore.getState();
+        store.setInitialized(true);
+        const epic = store.createEpic({ title: 'Test Epic', description: '' });
+        const story = store.createStory({ epicId: epic.id, title: 'Test Story', description: 'Some description' });
+
+        setupWindowMock();
+        fileReadMock.mockResolvedValue({ content: '', exists: true });
+        fileWriteMock.mockResolvedValue({ mtimeMs: 0 });
+
+        render(
+            <MemoryRouter initialEntries={[`/stories/${story.id}`]}>
+                <Routes>
+                    <Route path="stories/:id" element={<StoryDetailPage />} />
+                </Routes>
+            </MemoryRouter>,
+            { wrapper: Wrapper },
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Info')).toBeInTheDocument();
+            expect(screen.getByText('Markdown')).toBeInTheDocument();
+        });
+    });
+
+    it('switches to Markdown tab on click', async () => {
+        const store = useAppStore.getState();
+        store.setInitialized(true);
+        const epic = store.createEpic({ title: 'Test Epic', description: '' });
+        const story = store.createStory({ epicId: epic.id, title: 'Test Story', description: '' });
+
+        setupWindowMock();
+        fileReadMock.mockResolvedValue({ content: '# Hello', exists: true });
+        fileWriteMock.mockResolvedValue({ mtimeMs: 0 });
+
+        render(
+            <MemoryRouter initialEntries={[`/stories/${story.id}`]}>
+                <Routes>
+                    <Route path="stories/:id" element={<StoryDetailPage />} />
+                </Routes>
+            </MemoryRouter>,
+            { wrapper: Wrapper },
+        );
+
+        await waitFor(() => {
+            expect(screen.getByText('Test Story')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText('Markdown'));
+        expect(screen.getByText('Rendered')).toBeInTheDocument();
+        expect(screen.getByText('Raw')).toBeInTheDocument();
     });
 });

@@ -1,7 +1,8 @@
 import { Navigate } from 'react-router-dom';
+import { Box, BookOpen, Target, CheckSquare } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
-import Card from '@/components/Card';
+import StatCard from '@/components/StatCard';
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -30,22 +31,35 @@ export default function DashboardPage() {
       <p className="text-foreground-secondary mb-6">{t('dashboard.subtitle')}</p>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <Card className="p-4">
-          <div className="text-3xl font-bold text-accent">{stats.totalEpics}</div>
-          <div className="text-sm text-foreground-tertiary">{t('dashboard.epics')}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-3xl font-bold text-status-done-fg">{stats.totalStories}</div>
-          <div className="text-sm text-foreground-tertiary">{t('dashboard.stories')}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-3xl font-bold text-status-in-progress-fg">{active}</div>
-          <div className="text-sm text-foreground-tertiary">{t('dashboard.active')}</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-3xl font-bold text-status-done-fg">{completed}</div>
-          <div className="text-sm text-foreground-tertiary">{t('dashboard.completedCard')}</div>
-        </Card>
+        <StatCard
+          icon={<Box size={24} className="text-white" />}
+          iconBg="bg-accent"
+          label={t('dashboard.epics')}
+          value={stats.totalEpics}
+          navigateTo="/epics"
+        />
+        <StatCard
+          icon={<BookOpen size={24} className="text-status-done-fg" />}
+          iconBg="bg-status-done-bg"
+          label={t('dashboard.stories')}
+          value={stats.totalStories}
+          navigateTo="/backlog"
+        />
+        <StatCard
+          icon={<Target size={24} className="text-status-in-progress-fg" />}
+          iconBg="bg-status-in-progress-bg"
+          label={t('dashboard.active')}
+          value={active}
+          subtitle={t('dashboard.activeSubtitle')}
+          navigateTo="/board"
+        />
+        <StatCard
+          icon={<CheckSquare size={24} className="text-status-done-fg" />}
+          iconBg="bg-status-done-bg"
+          label={t('dashboard.completedCard')}
+          value={completed}
+          navigateTo="/board"
+        />
       </div>
 
       <h2 className="text-lg font-semibold mb-3">{t('dashboard.statusDistribution')}</h2>
