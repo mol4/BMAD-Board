@@ -4,7 +4,7 @@ import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { PriorityBadge } from '@/components/StatusBadge';
 import { useToast } from '@/components/Toast';
-import { writeStoryStatus } from '@/lib/file-writer';
+import { writeStoryStatus, writeMarkdownFile } from '@/lib/file-writer';
 import { FileText } from 'lucide-react';
 import MarkdownModal from '@/components/MarkdownModal';
 import { renderMarkdown, renderMarkdownInline } from '@/lib/markdown-render';
@@ -74,6 +74,24 @@ export default function StoryDetailPage() {
       setStory(useAppStore.getState().getStory(story.id) ?? updatedStory);
     }
   }, [story, updateStoryStatus, showToast, t]);
+
+  const handleSaveMarkdown = useCallback(async (content: string) => {
+    if (!story?.sourceFile) return;
+    const result = await writeMarkdownFile(story.sourceFile, content);
+    if (!result.ok && mountedRef.current) {
+      if (result.code === 'FILE_LOCKED') {
+        showToast(t('toast.fileLockedByAgent'), 'error');
+      } else if (result.code === 'FILE_CHANGED') {
+        showToast(t('toast.fileChanged'), 'error');
+      } else {
+        showToast(t('toast.editSaveFailed'), 'error');
+      }
+      return;
+    }
+    if (mountedRef.current && result.ok) {
+      setMdContent(content);
+    }
+  }, [story, showToast, t]);
 
   useEffect(() => {
     if (!initialized) return;
@@ -225,6 +243,8 @@ export default function StoryDetailPage() {
         title={story.title}
         markdownContent={mdContent}
         filePath={story.sourceFile}
+        editable={!!story.sourceFile}
+        onSave={handleSaveMarkdown}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { writeStoryStatus, writeEpicStatus } from './file-writer';
+import { writeStoryStatus, writeEpicStatus, writeMarkdownFile } from './file-writer';
 import type { Story, Epic } from '@/lib/types';
 
 const { fileReadMock, fileWriteMock, updateSprintStatusMock } = vi.hoisted(() => ({
@@ -264,6 +264,114 @@ describe('file-writer', () => {
       const writeCall = fileWriteMock.mock.calls[0][0];
       expect(writeCall.content).toContain('status: in-progress');
       expect(writeCall.content).toContain('# Epic 4');
+    });
+  });
+
+  describe('writeMarkdownFile', () => {
+    it('writes content to file and returns success', async () => {
+      fileWriteMock.mockResolvedValue({ mtimeMs: 9876543210 });
+
+      const result = await writeMarkdownFile(
+        '/test/doc.md',
+        '---\ntitle: Doc\n---\n\n# Content\n',
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.mtimeMs).toBe(9876543210);
+      }
+      expect(fileWriteMock).toHaveBeenCalledWith({
+        path: '/test/doc.md',
+        content: '---\ntitle: Doc\n---\n\n# Content\n',
+      });
+    });
+
+    it('returns error for invalid frontmatter', async () => {
+      const result = await writeMarkdownFile(
+        '/test/doc.md',
+        '---\nbroken: [\n---\n\n# Content\n',
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe('FILE_WRITE_ERROR');
+        expect(result.message).toContain('Invalid frontmatter');
+      }
+      expect(fileWriteMock).not.toHaveBeenCalled();
+    });
+
+    it('propagates FILE_LOCKED error code from IPC', async () => {
+      const err = new Error('Locked') as Error & { code: string };
+      err.code = 'FILE_LOCKED';
+      fileWriteMock.mockRejectedValue(err);
+
+      const result = await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe('FILE_LOCKED');
+      }
+    });
+
+    it('propagates FILE_CHANGED error code from IPC', async () => {
+      const err = new Error('Changed') as Error & { code: string };
+      err.code = 'FILE_CHANGED';
+      fileWriteMock.mockRejectedValue(err);
+
+      const result = await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe('FILE_CHANGED');
+      }
+    });
+
+    it('propagates FILE_WRITE_ERROR code from IPC', async () => {
+      const err = new Error('Write failed') as Error & { code: string };
+      err.code = 'FILE_WRITE_ERROR';
+      fileWriteMock.mockRejectedValue(err);
+
+      const result = await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe('FILE_WRITE_ERROR');
+      }
+    });
+
+    it('handles errors without code property', async () => {
+      fileWriteMock.mockRejectedValue(new Error('Unknown'));
+
+      const result = await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.code).toBe('FILE_WRITE_ERROR');
+      }
+    });
+
+    it('triggers syncEngine.forceFullSync on success', async () => {
+      fileWriteMock.mockResolvedValue({ mtimeMs: 1000 });
+      const { syncEngine } = await import('@/lib/sync-engine');
+      const callCountBefore = (syncEngine.forceFullSync as ReturnType<typeof vi.fn>).mock.calls.length;
+
+      const result = await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect(result.ok).toBe(true);
+      expect((syncEngine.forceFullSync as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callCountBefore + 1);
+    });
+
+    it('does not trigger sync on failure', async () => {
+      const { syncEngine } = await import('@/lib/sync-engine');
+      const callCountBefore = (syncEngine.forceFullSync as ReturnType<typeof vi.fn>).mock.calls.length;
+
+      const err = new Error('Locked') as Error & { code: string };
+      err.code = 'FILE_LOCKED';
+      fileWriteMock.mockRejectedValue(err);
+
+      await writeMarkdownFile('/test/doc.md', '---\ntitle: Ok\n---\n\nBody');
+
+      expect((syncEngine.forceFullSync as ReturnType<typeof vi.fn>).mock.calls.length).toBe(callCountBefore);
     });
   });
 });

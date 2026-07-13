@@ -271,6 +271,16 @@ const translations = {
     'diag.source': 'Источник',
     'diag.fileSource': 'Файл',
     'diag.inlineSource': 'Inline',
+
+    'manualEdit.warning': 'Вы собираетесь редактировать файл вручную. Это плохая практика. Используйте это только в исключительных случаях. Редактирование AI-агентом предпочтительнее.',
+    'manualEdit.confirm': 'Продолжить',
+    'manualEdit.dontShowAgain': 'Больше не показывать',
+    'editor.edit': 'Редактировать',
+    'editor.save': 'Сохранить',
+    'editor.cancel': 'Отмена',
+    'toast.editSaved': 'Изменения сохранены',
+    'toast.editSaveFailed': 'Не удалось сохранить изменения',
+    'toast.invalidFrontmatter': 'Некорректный frontmatter',
   },
   en: {
     'nav.dashboard': 'Dashboard',
@@ -507,6 +517,16 @@ const translations = {
     'diag.source': 'Source',
     'diag.fileSource': 'File',
     'diag.inlineSource': 'Inline',
+
+    'manualEdit.warning': 'You are about to edit a file manually. This is bad practice. Use this only in exceptional cases. AI Agent editing is preferred.',
+    'manualEdit.confirm': 'Continue',
+    'manualEdit.dontShowAgain': "Don't show again",
+    'editor.edit': 'Edit',
+    'editor.save': 'Save',
+    'editor.cancel': 'Cancel',
+    'toast.editSaved': 'Changes saved',
+    'toast.editSaveFailed': 'Failed to save changes',
+    'toast.invalidFrontmatter': 'Invalid frontmatter',
 
     'toast.projectSwitched': 'Project switched',
     'toast.projectSwitchError': 'Failed to switch project',

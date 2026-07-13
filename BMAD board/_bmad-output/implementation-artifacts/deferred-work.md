@@ -122,3 +122,8 @@
 - `updateStatusLine` false-positive match inside YAML block scalars — unlikely given predictable YAML structure, but regex should ideally anchor to `^  {key}:` pattern
 - `updateLastUpdated` silently no-ops when `last_updated` field absent — file structure is predictable per spec; would only matter if someone manually removes the field
 - External modification of sprint-status.yaml causes silent sync failure — by design per AC5; YAML sync is non-blocking and failures are logged but don't block primary operation
+
+## Deferred from: code review of 4-2-implement-manual-edit-warning-and-markdown-editor (2026-07-13)
+
+- **Focus trap in EditWarningDialog not verifiable** — component implementation not included in diff; defer verification until EditWarningDialog.tsx is reviewed
+- **AC9 (no Create/Delete buttons) regression guard** — pre-existing concern from Story 4.1, not caused by this change; verify separately

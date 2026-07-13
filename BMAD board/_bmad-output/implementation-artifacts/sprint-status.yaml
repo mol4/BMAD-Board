@@ -77,7 +77,7 @@ development_status:
   # Epic 4: Content Reading, Status Updates & Safeguards
   epic-4: in-progress
   4-1-implement-file-lock-status-update-and-read-only-document-view: done
-  4-2-implement-manual-edit-warning-and-markdown-editor: backlog
+  4-2-implement-manual-edit-warning-and-markdown-editor: done
   4-3-sync-story-status-to-sprint-status-yaml: done
   epic-4-retrospective: optional
 

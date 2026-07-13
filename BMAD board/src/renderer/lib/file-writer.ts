@@ -118,6 +118,37 @@ if (result.ok) {
   return result;
 }
 
+export async function writeMarkdownFile(
+  path: string,
+  content: string,
+  lastMtimeMs?: number,
+): Promise<WriteOutcome> {
+  try {
+    matter(content);
+  } catch {
+    return { ok: false, code: 'FILE_WRITE_ERROR', message: 'Invalid frontmatter' };
+  }
+
+  try {
+    const result = await ipcFileWrite({ path, content, lastMtimeMs });
+    mtimeCache.set(path, result.mtimeMs);
+
+    try {
+      await syncEngine.forceFullSync();
+    } catch (syncErr) {
+      console.warn('[file-writer] Sync after writeMarkdownFile failed:', syncErr);
+    }
+
+    return { ok: true, mtimeMs: result.mtimeMs };
+  } catch (err: unknown) {
+    const e = err as Error & { code?: string };
+    const code = (e.code === 'FILE_LOCKED' || e.code === 'FILE_CHANGED' || e.code === 'FILE_WRITE_ERROR')
+      ? e.code
+      : 'FILE_WRITE_ERROR';
+    return { ok: false, code, message: e.message || 'Unknown write error' };
+  }
+}
+
 export async function writeEpicStatus(
   epic: Epic,
   newStatus: EpicStatus,

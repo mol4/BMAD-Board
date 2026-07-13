@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { useToast } from '@/components/Toast';
+import { writeMarkdownFile } from '@/lib/file-writer';
 import MarkdownModal from '@/components/MarkdownModal';
 import { FileText } from 'lucide-react';
 
@@ -31,11 +33,18 @@ async function scanDirectory(
 
 export default function DocsPage() {
   const { t } = useI18n();
+  const { showToast } = useToast();
   const [docs, setDocs] = useState<DocItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [mdModalOpen, setMdModalOpen] = useState(false);
   const [mdContent, setMdContent] = useState<string | null>(null);
   const [mdTitle, setMdTitle] = useState('');
+  const [mdPath, setMdPath] = useState('');
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   useEffect(() => {
     const loadDocs = async () => {
@@ -60,7 +69,26 @@ export default function DocsPage() {
     if (result.exists) {
       setMdContent(result.content);
       setMdTitle(path.split(/[\\/]/).pop() || path);
+      setMdPath(path);
       setMdModalOpen(true);
+    }
+  };
+
+  const handleSaveMarkdown = async (content: string) => {
+    if (!mdPath) return;
+    const result = await writeMarkdownFile(mdPath, content);
+    if (!result.ok && mountedRef.current) {
+      if (result.code === 'FILE_LOCKED') {
+        showToast(t('toast.fileLockedByAgent'), 'error');
+      } else if (result.code === 'FILE_CHANGED') {
+        showToast(t('toast.fileChanged'), 'error');
+      } else {
+        showToast(t('toast.editSaveFailed'), 'error');
+      }
+      return;
+    }
+    if (mountedRef.current && result.ok) {
+      setMdContent(content);
     }
   };
 
@@ -119,6 +147,9 @@ export default function DocsPage() {
         onClose={() => setMdModalOpen(false)}
         title={mdTitle}
         markdownContent={mdContent}
+        filePath={mdPath}
+        editable={!!mdPath}
+        onSave={handleSaveMarkdown}
       />
     </div>
   );
