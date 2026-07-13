@@ -60,6 +60,11 @@
   --color-code-block-bg: #1e1e2e;
   --color-code-block-fg: #cdd6f4;
 
+  /* Shadows */
+  --shadow-card-1: rgba(0, 0, 0, 0.08);
+  --shadow-card-2: rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: rgba(0, 0, 0, 0.1);
+
   /* Destructive */
   --color-destructive: #ef4444;
 }
@@ -114,6 +119,11 @@
   --color-code-inline-fg: #2dd4bf;
   --color-code-block-bg: #0a0c12;
   --color-code-block-fg: #cdd6f4;
+
+  /* Shadows */
+  --shadow-card-1: rgba(255, 255, 255, 0.05);
+  --shadow-card-2: rgba(255, 255, 255, 0.03);
+  --shadow-card-hover: rgba(255, 255, 255, 0.08);
 
   /* Destructive */
   --color-destructive: #f87171;

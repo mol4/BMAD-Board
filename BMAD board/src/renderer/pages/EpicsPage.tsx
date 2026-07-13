@@ -1,6 +1,7 @@
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import Card from '@/components/Card';
 
 export default function EpicsPage() {
   const { t } = useI18n();
@@ -32,7 +33,7 @@ export default function EpicsPage() {
       ) : (
         <div className="space-y-4">
           {epics.map((epic) => (
-            <div key={epic.id} className="p-4 bg-surface-elevated rounded-lg">
+            <Card key={epic.id} className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -53,7 +54,7 @@ export default function EpicsPage() {
                 <span>{t('epic.created')}: {new Date(epic.createdAt).toLocaleDateString()}</span>
                 {epic.sourceFile && <span>{epic.sourceFile}</span>}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

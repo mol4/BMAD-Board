@@ -101,6 +101,8 @@ const translations = {
     'aria.syncing': 'Синхронизация изменений файлов',
     'sidebar.sync': 'Синхронизировать',
     'sidebar.syncTooltip': 'Принудительно синхронизировать все файлы проекта',
+    'sidebar.collapse': 'Свернуть',
+    'sidebar.expand': 'Развернуть',
 
     'common.save': 'Сохранить',
     'common.cancel': 'Отмена',
@@ -560,6 +562,8 @@ const translations = {
     'aria.syncing': 'Syncing file changes',
     'sidebar.sync': 'Sync',
     'sidebar.syncTooltip': 'Force re-sync all project files',
+    'sidebar.collapse': 'Collapse',
+    'sidebar.expand': 'Expand',
   },
 } as const;
 

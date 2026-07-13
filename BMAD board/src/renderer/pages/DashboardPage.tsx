@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
+import Card from '@/components/Card';
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -29,22 +30,22 @@ export default function DashboardPage() {
       <p className="text-foreground-secondary mb-6">{t('dashboard.subtitle')}</p>
 
       <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-surface-elevated rounded-lg p-4">
+        <Card className="p-4">
           <div className="text-3xl font-bold text-accent">{stats.totalEpics}</div>
           <div className="text-sm text-foreground-tertiary">{t('dashboard.epics')}</div>
-        </div>
-        <div className="bg-surface-elevated rounded-lg p-4">
+        </Card>
+        <Card className="p-4">
           <div className="text-3xl font-bold text-status-done-fg">{stats.totalStories}</div>
           <div className="text-sm text-foreground-tertiary">{t('dashboard.stories')}</div>
-        </div>
-        <div className="bg-surface-elevated rounded-lg p-4">
+        </Card>
+        <Card className="p-4">
           <div className="text-3xl font-bold text-status-in-progress-fg">{active}</div>
           <div className="text-sm text-foreground-tertiary">{t('dashboard.active')}</div>
-        </div>
-        <div className="bg-surface-elevated rounded-lg p-4">
+        </Card>
+        <Card className="p-4">
           <div className="text-3xl font-bold text-status-done-fg">{completed}</div>
           <div className="text-sm text-foreground-tertiary">{t('dashboard.completedCard')}</div>
-        </div>
+        </Card>
       </div>
 
       <h2 className="text-lg font-semibold mb-3">{t('dashboard.statusDistribution')}</h2>

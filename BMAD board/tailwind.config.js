@@ -87,6 +87,19 @@ module.exports = {
         },
         destructive: 'var(--color-destructive)',
       },
+      borderRadius: {
+        sm: '6px',
+        md: '10px',
+        lg: '14px',
+        xl: '20px',
+      },
+      boxShadow: {
+        card: '0 1px 3px var(--shadow-card-1), 0 1px 2px var(--shadow-card-2)',
+        'card-hover': '0 4px 12px var(--shadow-card-hover)',
+      },
+      transitionDuration: {
+        80: '80ms',
+      },
       transitionTimingFunction: {
         'win11': 'cubic-bezier(0, 0, 0.58, 1)',
         'modal': 'cubic-bezier(0.16, 1, 0.3, 1)',

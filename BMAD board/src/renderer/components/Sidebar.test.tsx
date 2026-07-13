@@ -3,7 +3,6 @@ import { render, screen, cleanup, act, fireEvent, waitFor } from '@testing-libra
 import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from '@/lib/i18n';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { ThemeProvider } from '@/components/ThemeProvider';
 import { ToastProvider } from '@/components/Toast';
 import { useAppStore } from '@/lib/store';
 import Sidebar from './Sidebar';
@@ -64,6 +63,7 @@ function renderSidebar(route = '/') {
 describe('Sidebar sync button', () => {
   beforeEach(() => {
     cleanup();
+    localStorage.clear();
     useAppStore.getState().clear();
     useAppStore.getState().setInitialized(true);
     forceFullSyncMock.mockClear();
@@ -139,6 +139,52 @@ describe('Sidebar sync button', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Sync failed. Check file paths.')).toBeInTheDocument();
+    });
+  });
+});
+
+describe('Sidebar collapse', () => {
+  beforeEach(() => {
+    cleanup();
+    localStorage.clear();
+    useAppStore.getState().clear();
+    useAppStore.getState().setInitialized(true);
+    setupWindowMock();
+  });
+
+  afterEach(() => {
+    cleanupWindowMock();
+  });
+
+  it('starts expanded by default', () => {
+    renderSidebar();
+    const aside = document.querySelector('aside')!;
+    expect(aside.className).toContain('w-[260px]');
+  });
+
+  it('starts collapsed when localStorage has bmad-sidebar-collapsed=true', () => {
+    localStorage.setItem('bmad-sidebar-collapsed', 'true');
+    renderSidebar();
+    const aside = document.querySelector('aside')!;
+    expect(aside.className).toContain('w-16');
+  });
+
+  it('persists collapsed state to localStorage on toggle', async () => {
+    renderSidebar();
+    const toggle = screen.getByTitle('Collapse');
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(localStorage.getItem('bmad-sidebar-collapsed')).toBe('true');
+    });
+  });
+
+  it('persists expanded state to localStorage when expanding', async () => {
+    localStorage.setItem('bmad-sidebar-collapsed', 'true');
+    renderSidebar();
+    const toggle = screen.getByTitle('Expand');
+    fireEvent.click(toggle);
+    await waitFor(() => {
+      expect(localStorage.getItem('bmad-sidebar-collapsed')).toBe('false');
     });
   });
 });

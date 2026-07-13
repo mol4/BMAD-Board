@@ -1,13 +1,14 @@
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { storeManager } from '@/lib/store-manager';
 import { getConfig, setConfig as setGlobalConfig, subscribeConfig, type BmadConfig } from '@/lib/config';
-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp } from 'lucide-react';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
 import ProjectSwitcher from '@/components/ProjectSwitcher';
+import Button from '@/components/Button';
 import { syncEngine } from '@/lib/sync-engine';
 
 const navItems = [
@@ -49,7 +50,14 @@ export default function Sidebar() {
   const { showToast } = useToast();
   const { isDark, toggleTheme } = useTheme();
   const activeProjectId = useAppStore((state) => state.activeProjectId);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bmad-sidebar-collapsed');
+      return saved ? JSON.parse(saved) === true : false;
+    } catch {
+      return false;
+    }
+  });
   const [showSettings, setShowSettings] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [config, setConfig] = useState<BmadConfig>(getConfig());
@@ -59,6 +67,14 @@ export default function Sidebar() {
 
   const configLoadedRef = useRef(false);
   const mountedRef = useRef(true);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bmad-sidebar-collapsed', JSON.stringify(collapsed));
+    } catch {
+      // localStorage unavailable (private browsing, quota exceeded)
+    }
+  }, [collapsed]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -191,11 +207,11 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-200 ease-win11 ${collapsed ? 'w-16' : 'w-64'
+      className={`bg-surface-elevated text-foreground-primary flex flex-col transition-all duration-200 ease-out ${collapsed ? 'w-16' : 'w-[260px]'
         }`}
     >
       <div className="border-b border-border-default">
-        <div className={`flex ${collapsed ? 'flex-col items-center gap-1 py-3 px-1' : 'items-center justify-between gap-2 p-4 pb-2'}`}>
+        <div className={`flex ${collapsed ? 'flex-col items-center gap-1 py-3 px-1' : 'items-center gap-2 p-4 pb-2'}`}>
           {!collapsed ? (
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent shrink-0">
@@ -208,16 +224,6 @@ export default function Sidebar() {
               BB
             </div>
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded hover:bg-accent-subtle transition-colors shrink-0"
-            aria-label="Toggle sidebar"
-          >
-            <ChevronLeft
-              size={16}
-              className={`shrink-0 transition-transform ${collapsed ? 'rotate-180' : ''}`}
-            />
-          </button>
         </div>
         <div className={`pb-3 ${collapsed ? 'px-1' : 'px-4'}`}>
           <ProjectSwitcher collapsed={collapsed} />
@@ -337,19 +343,21 @@ export default function Sidebar() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="primary"
                 onClick={saveConfig}
                 disabled={isSaving}
-                className="flex-1 px-2 py-1.5 bg-accent text-foreground-on-accent text-xs rounded hover:bg-accent-hover transition-colors disabled:opacity-50"
+                className="flex-1 text-xs"
               >
                 {isSaving ? t('common.loading') : t('sidebar.save')}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={resetConfig}
-                className="px-2 py-1.5 bg-surface-sunken text-foreground-secondary text-xs rounded hover:bg-border-default transition-colors"
+                className="text-xs"
               >
                 {t('sidebar.reset')}
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -413,6 +421,18 @@ export default function Sidebar() {
         >
           {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
           {!collapsed && <span>{isDark ? t('theme.light') : t('theme.dark')}</span>}
+        </button>
+      </div>
+
+      <div className="px-2 py-3 border-t border-border-default">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''}`}
+          aria-label={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}
+          title={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}
+        >
+          {collapsed ? <ChevronsRight size={18} className="shrink-0" /> : <ChevronsLeft size={18} className="shrink-0" />}
+          {!collapsed && <span>{t('sidebar.collapse')}</span>}
         </button>
       </div>
     </aside>
