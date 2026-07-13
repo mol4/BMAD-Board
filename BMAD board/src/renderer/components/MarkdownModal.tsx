@@ -5,6 +5,7 @@ import { X, Pencil } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/Toast';
 import EditWarningDialog, { isEditWarningDismissedForSession, dismissEditWarningForSession } from './EditWarningDialog';
+import Textarea from '@/components/Textarea';
 import matter from 'gray-matter';
 
 interface MarkdownModalProps {
@@ -192,10 +193,11 @@ export default function MarkdownModal({ isOpen, onClose, title, markdownContent,
 
                     {/* Body */}
                     {isEditing ? (
-                        <textarea
+                        <Textarea
+                            sunken
                             value={draftContent}
                             onChange={(e) => setDraftContent(e.target.value)}
-                            className="w-full flex-1 bg-surface-sunken border border-border-default rounded text-foreground-primary font-mono text-sm p-3 resize-vertical min-h-[300px] focus:outline-none focus:ring-2 focus:ring-accent"
+                            className="flex-1 font-mono text-sm min-h-[50vh]"
                             aria-label={t('editor.edit')}
                         />
                     ) : (
