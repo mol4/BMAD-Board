@@ -179,13 +179,7 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal }: S
               {story.sourceFile && (
                 <div>
                   <div className="text-caption text-foreground-tertiary mb-1">{t('story.mdFile')}</div>
-                  <button
-                    onClick={handleEditClick}
-                    className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline cursor-pointer text-left"
-                  >
-                    <Pencil size={14} />
-                    {story.sourceFile}
-                  </button>
+                  <div className="text-sm text-foreground-primary truncate">{story.sourceFile}</div>
                 </div>
               )}
             </aside>
@@ -218,10 +212,11 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal }: S
               {story.sourceFile && (
                 <button
                   onClick={handleEditClick}
-                  className="ml-auto p-1.5 rounded hover:bg-surface-sunken text-foreground-tertiary hover:text-foreground-primary transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 text-sm rounded bg-status-done-bg text-status-done-fg hover:bg-status-done-bg/80 transition-colors cursor-pointer"
                   title={t('editor.edit')}
                 >
-                  <Pencil size={16} />
+                  <Pencil size={14} />
+                  {t('editor.edit')}
                 </button>
               )}
             </div>
