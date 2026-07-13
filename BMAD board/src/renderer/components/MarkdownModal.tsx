@@ -197,7 +197,7 @@ export default function MarkdownModal({ isOpen, onClose, title, markdownContent,
                             sunken
                             value={draftContent}
                             onChange={(e) => setDraftContent(e.target.value)}
-                            className="flex-1 font-mono text-sm min-h-[50vh]"
+                            className="flex-1 font-mono text-sm !min-h-[50vh]"
                             aria-label={t('editor.edit')}
                         />
                     ) : (
