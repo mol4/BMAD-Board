@@ -188,3 +188,45 @@ describe('Sidebar collapse', () => {
     });
   });
 });
+
+describe('Sidebar ThemeToggle', () => {
+  const originalMatchMedia = window.matchMedia;
+
+  beforeEach(() => {
+    cleanup();
+    localStorage.clear();
+    document.documentElement.classList.remove('dark');
+    useAppStore.getState().clear();
+    useAppStore.getState().setInitialized(true);
+    setupWindowMock();
+    window.matchMedia = vi.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+  });
+
+  afterEach(() => {
+    cleanupWindowMock();
+    window.matchMedia = originalMatchMedia;
+  });
+
+  it('renders ThemeToggle inside sidebar', () => {
+    renderSidebar();
+    const themeBtn = screen.getByTitle('Dark theme');
+    expect(themeBtn).toBeInTheDocument();
+    expect(themeBtn).toHaveAttribute('aria-pressed');
+  });
+
+  it('ThemeToggle reflects collapsed state', () => {
+    localStorage.setItem('bmad-sidebar-collapsed', 'true');
+    renderSidebar();
+    const themeBtn = screen.getByTitle('Dark theme');
+    expect(themeBtn.className).toContain('justify-center');
+  });
+});

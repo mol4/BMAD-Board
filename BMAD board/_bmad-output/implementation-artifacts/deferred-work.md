@@ -133,3 +133,10 @@
 - Global `:focus-visible` outline may not follow `border-radius` — pre-existing CSS design decision; outline radius depends on OS/browser
 - Select options `.map()` recreates array every render — minor optimization; arrays are small (5 items max), low impact
 - No test for `className` override resolution — low priority enhancement; text-body/text-xs conflict doesn't manifest in Vite build order
+
+## Deferred from: code review of story 5b-i-3-build-toast-and-theme-toggle-polish (2026-07-13)
+
+- Redundant theme initialization — inline script and ThemeProvider both read `localStorage` + `matchMedia`. Kept as-is per developer decision: redundant but consistent, no functional conflict
+- ThemeToggle tests assert literal i18n strings (`'Light theme'`, `'Dark theme'`) instead of verifying through translation keys — tests will break if default locale changes; i18n keys confirmed present in `i18n.tsx`, low risk in current scope
+- Progress bar CSS custom properties (`var(--color-accent)`, `var(--color-destructive)`) lack fallback colors — bar renders transparent if CSS vars undefined; theme system guarantees these vars are always defined
+- ARIA `aria-live="polite"` attribute not explicitly tested in `Toast.test.tsx` — attribute is present in code (AC#4), manual verification sufficient

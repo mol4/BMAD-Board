@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-07-13T14:06:00
+last_updated: 2026-07-13T18:00:00
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -75,22 +75,22 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Content Reading, Status Updates & Safeguards
-  epic-4: in-progress
+  epic-4: done
   4-1-implement-file-lock-status-update-and-read-only-document-view: done
   4-2-implement-manual-edit-warning-and-markdown-editor: done
   4-3-sync-story-status-to-sprint-status-yaml: done
   epic-4-retrospective: optional
 
   # Epic 5b-i: Polished Navigation & Core UI
-  epic-5b-i: in-progress
+  epic-5b-i: done
   5b-i-1-build-sidebar-card-and-button-components: done
   5b-i-2-build-input-status-badge-and-priority-badge: done
-  5b-i-3-build-toast-and-theme-toggle-polish: backlog
+  5b-i-3-build-toast-and-theme-toggle-polish: done
   epic-5b-i-retrospective: optional
 
   # Epic 5b-ii: Rich Components & Content Rendering
-  epic-5b-ii: backlog
-  5b-ii-1-build-kanban-board-with-status-only-drag-and-drop: backlog
+  epic-5b-ii: in-progress
+  5b-ii-1-build-kanban-board-with-status-only-drag-and-drop: ready-for-dev
   5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs: backlog
   5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: backlog
   epic-5b-ii-retrospective: optional

@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script>
       (function() {
-        var stored = null;
-        try { stored = localStorage.getItem('bmad-theme'); } catch {}
-        var systemDark = false;
         try {
-          systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        } catch {}
-        var isDark = stored ? stored === 'dark' : systemDark;
-        if (isDark) {
+          var stored = localStorage.getItem('bmad-theme');
+          var isDark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) document.documentElement.classList.add('dark');
+          else document.documentElement.classList.remove('dark');
+        } catch(e) {
           document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
         }
       })();
     </script>

@@ -15,21 +15,23 @@ export function useTheme(): ThemeContextValue {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof document !== 'undefined') {
-      return document.documentElement.classList.contains('dark');
+    try {
+      const stored = localStorage.getItem('bmad-theme');
+      if (stored) return stored === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return true;
     }
-    return false;
   });
 
   const toggleTheme = useCallback(() => {
-    const currentlyDark = document.documentElement.classList.contains('dark');
-    const newIsDark = !currentlyDark;
+    const newIsDark = !isDark;
     document.documentElement.classList.toggle('dark', newIsDark);
     try {
       localStorage.setItem('bmad-theme', newIsDark ? 'dark' : 'light');
     } catch { /* ignore */ }
     setIsDark(newIsDark);
-  }, []);
+  }, [isDark]);
 
   const value = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme]);
 

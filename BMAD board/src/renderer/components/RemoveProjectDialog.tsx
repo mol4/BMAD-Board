@@ -145,7 +145,7 @@ export default function RemoveProjectDialog({
   return (
     <div
       ref={modalRef}
-      className={`fixed inset-0 bg-surface-overlay flex items-center justify-center z-50 transition-opacity duration-200 ease-win11 ${
+      className={`fixed inset-0 bg-surface-overlay flex items-center justify-center z-50 transition-opacity duration-200 ease-modal ${
         visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       onClick={(e) => {

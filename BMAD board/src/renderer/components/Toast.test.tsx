@@ -134,4 +134,50 @@ describe('Toast system', () => {
         expect(screen.getByText('Saved!')).toBeInTheDocument();
         expect(screen.getByText('Failed!')).toBeInTheDocument();
     });
+
+    it('renders a progress bar inside each toast', async () => {
+        render(
+            <ToastProvider>
+                <ToastConsumer />
+            </ToastProvider>,
+        );
+        await act(async () => {
+            screen.getByText('show-success').click();
+        });
+        const toast = screen.getByRole('status');
+        const progressBar = toast.querySelector('span[style*="toast-progress"]');
+        expect(progressBar).toBeInTheDocument();
+    });
+
+    it('success progress bar uses accent color and 4s duration', async () => {
+        render(
+            <ToastProvider>
+                <ToastConsumer />
+            </ToastProvider>,
+        );
+        await act(async () => {
+            screen.getByText('show-success').click();
+        });
+        const toast = screen.getByRole('status');
+        const progressBar = toast.querySelector('span[style*="toast-progress"]') as HTMLElement;
+        expect(progressBar).toBeTruthy();
+        expect(progressBar.style.backgroundColor).toBe('var(--color-accent)');
+        expect(progressBar.style.animation).toContain('4s');
+    });
+
+    it('error progress bar uses destructive color and 8s duration', async () => {
+        render(
+            <ToastProvider>
+                <ToastConsumer />
+            </ToastProvider>,
+        );
+        await act(async () => {
+            screen.getByText('show-error').click();
+        });
+        const toast = screen.getByRole('status');
+        const progressBar = toast.querySelector('span[style*="toast-progress"]') as HTMLElement;
+        expect(progressBar).toBeTruthy();
+        expect(progressBar.style.backgroundColor).toBe('var(--color-destructive)');
+        expect(progressBar.style.animation).toContain('8s');
+    });
 });

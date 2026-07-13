@@ -61,7 +61,7 @@ export default function CreateModal({ isOpen, onClose, title, onSubmit, fields }
   };
 
   return (
-    <div className={`fixed inset-0 bg-surface-overlay flex items-center justify-center z-50 transition-opacity duration-200 ease-win11 ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div className={`fixed inset-0 bg-surface-overlay flex items-center justify-center z-50 transition-opacity duration-200 ease-modal ${visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <div className={`bg-surface-elevated rounded-lg shadow-xl w-full max-w-lg mx-4 transition-all duration-200 ease-modal ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-[0.98]'}`}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-default">
           <h2 className="text-lg font-semibold text-foreground-primary">{title}</h2>

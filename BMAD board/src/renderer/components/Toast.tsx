@@ -62,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                         key={toast.id}
                         role="status"
                         aria-live="polite"
-                        className="flex items-center gap-3 px-4 py-3 bg-surface-elevated border border-border-default rounded-md shadow-lg text-sm text-foreground-primary max-w-xs animate-toast-in pointer-events-auto"
+                        className="relative flex items-center gap-3 px-4 py-3 bg-surface-elevated border border-border-default rounded-md shadow-lg text-sm text-foreground-primary max-w-xs animate-toast-in pointer-events-auto overflow-hidden"
                     >
                         {toast.variant === 'success' ? (
                             <CheckCircle2 size={16} className="text-status-done-fg shrink-0" />
@@ -72,11 +72,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                         <span className="flex-1">{toast.message}</span>
                         <button
                             onClick={() => dismiss(toast.id)}
-                            className="p-0.5 rounded hover:bg-accent-subtle transition-colors duration-100 ease-win11 ml-1 shrink-0"
+                            className="p-0.5 rounded hover:bg-accent-subtle transition-colors duration-100 ease-out ml-1 shrink-0"
                             aria-label="Dismiss notification"
                         >
                             <X size={14} className="text-foreground-tertiary" />
                         </button>
+                        <span
+                            className="absolute bottom-0 left-0 h-0.5 rounded-b-md"
+                            style={{
+                                animation: `toast-progress ${toast.variant === 'error' ? 8 : 4}s linear forwards`,
+                                backgroundColor: toast.variant === 'success' ? 'var(--color-accent)' : 'var(--color-destructive)',
+                            }}
+                        />
                     </div>
                 ))}
             </div>

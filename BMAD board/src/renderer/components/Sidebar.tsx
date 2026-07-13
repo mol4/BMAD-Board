@@ -4,9 +4,9 @@ import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { storeManager } from '@/lib/store-manager';
 import { getConfig, setConfig as setGlobalConfig, subscribeConfig, type BmadConfig } from '@/lib/config';
-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, Settings, RefreshCw, Folder, Sun, Moon, CircleHelp, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, Settings, RefreshCw, Folder, CircleHelp, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useToast } from '@/components/Toast';
-import { useTheme } from '@/components/ThemeProvider';
+import ThemeToggle from '@/components/ThemeToggle';
 import ProjectSwitcher from '@/components/ProjectSwitcher';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
@@ -49,7 +49,6 @@ export default function Sidebar() {
   const location = useLocation();
   const { t, locale, setLocale } = useI18n();
   const { showToast } = useToast();
-  const { isDark, toggleTheme } = useTheme();
   const activeProjectId = useAppStore((state) => state.activeProjectId);
   const [collapsed, setCollapsed] = useState(() => {
     try {
@@ -413,16 +412,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <button
-          type="button"
-          aria-pressed={isDark}
-          onClick={toggleTheme}
-          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''}`}
-          title={isDark ? t('theme.light') : t('theme.dark')}
-        >
-          {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
-          {!collapsed && <span>{isDark ? t('theme.light') : t('theme.dark')}</span>}
-        </button>
+        <ThemeToggle collapsed={collapsed} />
       </div>
 
       <div className="px-2 py-3 border-t border-border-default">
