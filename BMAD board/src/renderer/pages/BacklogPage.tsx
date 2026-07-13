@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store';
 import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
 import { useToast } from '@/components/Toast';
 import { writeStoryStatus } from '@/lib/file-writer';
+import Select from '@/components/Select';
 import type { StoryStatus } from '@/lib/types';
 
 const STATUSES: StoryStatus[] = ['backlog', 'todo', 'in-progress', 'in-review', 'done'];
@@ -110,16 +111,14 @@ export default function BacklogPage() {
                           <div className="font-medium text-sm">{story.title}</div>
                           <div className="text-xs text-foreground-tertiary mt-0.5">{story.key}</div>
                         </Link>
-                        <select
+                        <Select
+                          sunken
                           value={story.status}
                           onChange={(e) => handleStatusChange(story.id, e.target.value as StoryStatus)}
-                          className="text-xs bg-surface-sunken border border-border-default rounded px-2 py-1 text-foreground-primary"
+                          options={STATUSES.map((s) => ({ value: s, label: t(`status.${s}`) }))}
+                          className="text-xs"
                           aria-label={t('story.changeStatus')}
-                        >
-                          {STATUSES.map((s) => (
-                            <option key={s} value={s}>{t(`status.${s}`)}</option>
-                          ))}
-                        </select>
+                        />
                         <PriorityBadge priority={story.priority} />
                       </div>
                     ))}

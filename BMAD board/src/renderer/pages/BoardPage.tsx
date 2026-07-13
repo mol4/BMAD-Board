@@ -4,6 +4,7 @@ import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { writeStoryStatus } from '@/lib/file-writer';
+import Select from '@/components/Select';
 import type { StoryStatus } from '@/lib/types';
 
 const COLUMNS: StoryStatus[] = ['backlog', 'todo', 'in-progress', 'in-review', 'done'];
@@ -88,16 +89,13 @@ export default function BoardPage() {
                       <div className="font-medium text-foreground-primary">{story.title}</div>
                       <div className="text-xs text-foreground-tertiary mt-1">{story.key}</div>
                     </Link>
-                    <select
+                    <Select
                       value={story.status}
                       onChange={(e) => handleStatusChange(story.id, e.target.value as StoryStatus)}
-                      className="mt-2 text-xs bg-surface-elevated border border-border-default rounded px-1.5 py-0.5 text-foreground-primary w-full"
+                      options={COLUMNS.map((s) => ({ value: s, label: t(`status.${s}`) }))}
+                      className="mt-2 text-xs"
                       aria-label={t('story.changeStatus')}
-                    >
-                      {COLUMNS.map((s) => (
-                        <option key={s} value={s}>{t(`status.${s}`)}</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                 ))}
                 {columnStories.length === 0 && (

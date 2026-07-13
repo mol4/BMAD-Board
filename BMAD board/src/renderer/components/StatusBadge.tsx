@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { AlertOctagon, ArrowUp, Minus, ArrowDown, Zap, BookOpen, CheckSquare, Bug } from 'lucide-react';
+import { Zap, BookOpen, CheckSquare, Bug } from 'lucide-react';
 import { StoryStatus, Priority, EpicStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n';
 
@@ -13,11 +13,11 @@ const statusStyles: Record<string, { bg: string; text: string }> = {
   ready: { bg: 'bg-status-ready-bg', text: 'text-status-ready-fg' },
 };
 
-const priorityStyles: Record<Priority, { color: string; icon: ReactNode }> = {
-  critical: { color: 'text-priority-critical', icon: <AlertOctagon size={14} /> },
-  high: { color: 'text-priority-high', icon: <ArrowUp size={14} /> },
-  medium: { color: 'text-priority-medium', icon: <Minus size={14} /> },
-  low: { color: 'text-priority-low', icon: <ArrowDown size={14} /> },
+const priorityStyles: Record<Priority, { color: string }> = {
+  critical: { color: 'text-priority-critical' },
+  high: { color: 'text-priority-high' },
+  medium: { color: 'text-priority-medium' },
+  low: { color: 'text-priority-low' },
 };
 
 export function StatusBadge({ status }: { status: StoryStatus | EpicStatus }) {
@@ -25,7 +25,7 @@ export function StatusBadge({ status }: { status: StoryStatus | EpicStatus }) {
   const style = statusStyles[status] || { bg: 'bg-status-backlog-bg', text: 'text-status-backlog-fg' };
   const label = t(`status.${status}`) || status;
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-caption ${style.bg} ${style.text}`}>
       {label}
     </span>
   );
@@ -33,11 +33,11 @@ export function StatusBadge({ status }: { status: StoryStatus | EpicStatus }) {
 
 export function PriorityBadge({ priority }: { priority: Priority }) {
   const { t } = useI18n();
-  const style = priorityStyles[priority];
-  const label = t(`priority.${priority}`);
+  const style = priorityStyles[priority] || { color: 'text-foreground-tertiary' };
+  const label = t(`priority.${priority}`) || priority;
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium ${style.color}`}>
-      {style.icon}
+    <span className={`inline-flex items-center gap-1.5 rounded-md text-caption ${style.color}`}>
+      <span className="w-2 h-2 rounded-full bg-current" aria-hidden="true" />
       {label}
     </span>
   );

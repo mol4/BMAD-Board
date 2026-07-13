@@ -5,6 +5,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/Toast';
 import { storeManager } from '@/lib/store-manager';
 import { X } from 'lucide-react';
+import Input from '@/components/Input';
 import type { Project, NewProject } from '../../shared/ipc-channels';
 
 interface AddProjectModalProps {
@@ -280,7 +281,8 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
               {t('addProject.name')}
               <span className="text-destructive ml-1">*</span>
             </label>
-            <input
+            <Input
+              sunken
               id="add-project-name"
               type="text"
               value={name}
@@ -288,7 +290,6 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
                 setName(e.target.value);
                 setErrors((prev) => ({ ...prev, name: undefined }));
               }}
-              className="w-full px-3 py-2 border border-border-default rounded-md focus:ring-2 focus:ring-accent focus:border-transparent text-sm bg-surface-sunken text-foreground-primary"
             />
             {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name}</p>}
           </div>
@@ -299,12 +300,13 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
               <span className="text-destructive ml-1">*</span>
             </label>
             <div className="flex gap-2">
-              <input
+              <Input
+                sunken
                 id="add-project-epics-dir"
                 type="text"
                 value={epicsDir}
                 readOnly
-                className="flex-1 px-3 py-2 border border-border-default rounded-md bg-surface-sunken text-sm text-foreground-primary"
+                className="flex-1"
               />
               <button
                 type="button"
@@ -323,12 +325,13 @@ export default function AddProjectModal({ isOpen, onClose, onAdded }: AddProject
               <span className="text-destructive ml-1">*</span>
             </label>
             <div className="flex gap-2">
-              <input
+              <Input
+                sunken
                 id="add-project-stories-dir"
                 type="text"
                 value={storiesDir}
                 readOnly
-                className="flex-1 px-3 py-2 border border-border-default rounded-md bg-surface-sunken text-sm text-foreground-primary"
+                className="flex-1"
               />
               <button
                 type="button"

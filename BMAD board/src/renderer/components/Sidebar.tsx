@@ -9,6 +9,7 @@ import { useToast } from '@/components/Toast';
 import { useTheme } from '@/components/ThemeProvider';
 import ProjectSwitcher from '@/components/ProjectSwitcher';
 import Button from '@/components/Button';
+import Input from '@/components/Input';
 import { syncEngine } from '@/lib/sync-engine';
 
 const navItems = [
@@ -284,22 +285,22 @@ export default function Sidebar() {
           <div className="p-3 bg-surface-sunken rounded-lg space-y-3">
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.projectName')}</label>
-              <input
+              <Input
                 type="text"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                className="w-full px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                className="text-xs"
                 placeholder={t('sidebar.projectNamePlaceholder')}
               />
             </div>
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.epicsPath')}</label>
               <div className="flex gap-1">
-                <input
+                <Input
                   type="text"
                   value={config.epicsDir}
                   onChange={(e) => setConfig({ ...config, epicsDir: e.target.value })}
-                  className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                  className="flex-1 min-w-0 text-xs"
                   placeholder="_bmad-output/planning-artifacts/epics"
                 />
                 <button
@@ -320,11 +321,11 @@ export default function Sidebar() {
             <div>
               <label className="block text-xs text-foreground-tertiary mb-1">{t('sidebar.storiesPath')}</label>
               <div className="flex gap-1">
-                <input
+                <Input
                   type="text"
                   value={config.storiesDir}
                   onChange={(e) => setConfig({ ...config, storiesDir: e.target.value })}
-                  className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                  className="flex-1 min-w-0 text-xs"
                   placeholder="_bmad-output/planning-artifacts/stories"
                 />
                 <button

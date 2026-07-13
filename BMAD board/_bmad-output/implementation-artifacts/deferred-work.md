@@ -127,3 +127,9 @@
 
 - **Focus trap in EditWarningDialog not verifiable** — component implementation not included in diff; defer verification until EditWarningDialog.tsx is reviewed
 - **AC9 (no Create/Delete buttons) regression guard** — pre-existing concern from Story 4.1, not caused by this change; verify separately
+
+## Deferred from: code review of 5b-i-2-build-input-status-badge-and-priority-badge (2026-07-13)
+
+- Global `:focus-visible` outline may not follow `border-radius` — pre-existing CSS design decision; outline radius depends on OS/browser
+- Select options `.map()` recreates array every render — minor optimization; arrays are small (5 items max), low impact
+- No test for `className` override resolution — low priority enhancement; text-body/text-xs conflict doesn't manifest in Vite build order

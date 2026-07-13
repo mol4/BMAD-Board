@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { setConfig, getConfig } from '@/lib/config';
 import { Sparkles, FolderOpen, LayoutDashboard, Folder } from 'lucide-react';
+import Input from '@/components/Input';
 
 const steps = [
   {
@@ -101,12 +102,12 @@ export default function WelcomePage() {
               {t('welcome.epicsDir')}
             </label>
             <div className="flex gap-1">
-              <input
+              <Input
                 id="welcome-epics-dir"
                 type="text"
                 value={epicsDir}
                 onChange={(e) => setEpicsDir(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                className="flex-1 min-w-0 text-xs"
                 placeholder="_bmad-output/planning-artifacts"
               />
               <button
@@ -127,12 +128,12 @@ export default function WelcomePage() {
               {t('welcome.storiesDir')}
             </label>
             <div className="flex gap-1">
-              <input
+              <Input
                 id="welcome-stories-dir"
                 type="text"
                 value={storiesDir}
                 onChange={(e) => setStoriesDir(e.target.value)}
-                className="flex-1 min-w-0 px-2 py-1.5 bg-surface-elevated border border-border-default rounded text-xs text-foreground-primary placeholder-foreground-tertiary focus:border-accent focus:outline-none"
+                className="flex-1 min-w-0 text-xs"
                 placeholder="_bmad-output/implementation-artifacts"
               />
               <button

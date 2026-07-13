@@ -11,7 +11,7 @@ baseline_commit: '9fec275'
 
 # Story 4.2: Implement Manual Edit Warning and Markdown Editor
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { writeStoryStatus, writeMarkdownFile } from '@/lib/file-writer';
 import { FileText } from 'lucide-react';
 import MarkdownModal from '@/components/MarkdownModal';
+import Select from '@/components/Select';
 import { renderMarkdown, renderMarkdownInline } from '@/lib/markdown-render';
 import type { Story, StoryStatus } from '@/lib/types';
 
@@ -134,16 +135,14 @@ export default function StoryDetailPage() {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{story.title}</h1>
-          <select
+          <Select
+            sunken
             value={story.status}
             onChange={(e) => handleStatusChange(e.target.value as StoryStatus)}
-            className="text-xs bg-surface-sunken border border-border-default rounded px-2 py-1 text-foreground-primary"
+            options={STATUSES.map((s) => ({ value: s, label: t(`status.${s}`) }))}
+            className="text-xs"
             aria-label={t('story.changeStatus')}
-          >
-            {STATUSES.map((s) => (
-              <option key={s} value={s}>{t(`status.${s}`)}</option>
-            ))}
-          </select>
+          />
           <PriorityBadge priority={story.priority} />
         </div>
         <div className="flex items-center gap-4 text-sm text-foreground-secondary">

@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-07-13T13:00:00
+last_updated: 2026-07-13T14:06:00
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -84,7 +84,7 @@ development_status:
   # Epic 5b-i: Polished Navigation & Core UI
   epic-5b-i: in-progress
   5b-i-1-build-sidebar-card-and-button-components: done
-  5b-i-2-build-input-status-badge-and-priority-badge: backlog
+  5b-i-2-build-input-status-badge-and-priority-badge: done
   5b-i-3-build-toast-and-theme-toggle-polish: backlog
   epic-5b-i-retrospective: optional
 
