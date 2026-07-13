@@ -91,7 +91,7 @@ development_status:
   # Epic 5b-ii: Rich Components & Content Rendering
   epic-5b-ii: in-progress
   5b-ii-1-build-kanban-board-with-status-only-drag-and-drop: done
-  5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs: review
+  5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs: done
   5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: backlog
   epic-5b-ii-retrospective: optional
 

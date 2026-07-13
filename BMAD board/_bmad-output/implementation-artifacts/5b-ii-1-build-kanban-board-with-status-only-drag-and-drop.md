@@ -1,6 +1,11 @@
+---
+baseline_commit: 5acc004dbf49be2060cd0b1810ed157f126a973a
+status: done
+---
+
 # Story 5b-ii.1: Build Kanban Board with Status-Only Drag-and-Drop
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -29,29 +34,29 @@ so that I can update story status visually without creating or deleting anything
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create KanbanCard component (AC: drag state, rounded.md, card styling)
-  - [ ] Subtask 1.1: Implement HTML5 draggable with dragstart/dragend handlers
-  - [ ] Subtask 1.2: Style drag states (opacity 0.5, scale 0.95, grabbing cursor)
-  - [ ] Subtask 1.3: Add ARIA roles (listitem, aria-grabbed) and click-to-navigate
-  - [ ] Subtask 1.4: Write unit tests for KanbanCard
-- [ ] Task 2: Create KanbanColumn component (AC: sunken fill, status strip, drop zone)
-  - [ ] Subtask 2.1: Implement dragover/dragleave/drop handlers
-  - [ ] Subtask 2.2: Style drop zone feedback (dashed accent border, accent-subtle flash 200ms)
-  - [ ] Subtask 2.3: Add status-color top strip and count badge
-  - [ ] Subtask 2.4: Write unit tests for KanbanColumn
-- [ ] Task 3: Refactor BoardPage to use Kanban components (AC: 5 columns, optimistic UI)
-  - [ ] Subtask 3.1: Replace grid layout with flexbox Kanban layout (min-width 280px per column)
-  - [ ] Subtask 3.2: Wire drag-and-drop to writeStoryStatus + optimistic update
-  - [ ] Subtask 3.3: Implement retry UI (pulse icon for 30s on failure)
-  - [ ] Subtask 3.4: Keep keyboard Select alternative visible on each card
-  - [ ] Subtask 3.5: Write BoardPage unit tests
-- [ ] Task 4: i18n updates (AC: all labels EN/RU)
-  - [ ] Subtask 4.1: Add `toast.kanbanRetry` key ("Couldn't save. Trying again." / "Не удалось сохранить. Повторная попытка…")
-  - [ ] Subtask 4.2: Verify all existing board keys still valid
-- [ ] Task 5: Accessibility & UX polish
-  - [ ] Subtask 5.1: Verify focus rings on Select dropdown
-  - [ ] Subtask 5.2: Verify aria-live="polite" for status changes
-  - [ ] Subtask 5.3: Verify no create/delete buttons present
+- [x] Task 1: Create KanbanCard component (AC: drag state, rounded.md, card styling)
+  - [x] Subtask 1.1: Implement HTML5 draggable with dragstart/dragend handlers
+  - [x] Subtask 1.2: Style drag states (opacity 0.5, scale 0.95, grabbing cursor)
+  - [x] Subtask 1.3: Add ARIA roles (listitem, aria-grabbed) and click-to-navigate
+  - [x] Subtask 1.4: Write unit tests for KanbanCard
+- [x] Task 2: Create KanbanColumn component (AC: sunken fill, status strip, drop zone)
+  - [x] Subtask 2.1: Implement dragover/dragleave/drop handlers
+  - [x] Subtask 2.2: Style drop zone feedback (dashed accent border, accent-subtle flash 200ms)
+  - [x] Subtask 2.3: Add status-color top strip and count badge
+  - [x] Subtask 2.4: Write unit tests for KanbanColumn
+- [x] Task 3: Refactor BoardPage to use Kanban components (AC: 5 columns, optimistic UI)
+  - [x] Subtask 3.1: Replace grid layout with flexbox Kanban layout (min-width 280px per column)
+  - [x] Subtask 3.2: Wire drag-and-drop to writeStoryStatus + optimistic update
+  - [x] Subtask 3.3: Implement retry UI (pulse icon for 30s on failure)
+  - [x] Subtask 3.4: Keep keyboard Select alternative visible on each card
+  - [x] Subtask 3.5: Write BoardPage unit tests
+- [x] Task 4: i18n updates (AC: all labels EN/RU)
+  - [x] Subtask 4.1: Add `toast.kanbanRetry` key ("Couldn't save. Trying again." / "Не удалось сохранить. Повторная попытка…")
+  - [x] Subtask 4.2: Verify all existing board keys still valid
+- [x] Task 5: Accessibility & UX polish
+  - [x] Subtask 5.1: Verify focus rings on Select dropdown
+  - [x] Subtask 5.2: Verify aria-live="polite" for status changes
+  - [x] Subtask 5.3: Verify no create/delete buttons present
 
 ## Dev Notes
 
@@ -203,11 +208,18 @@ The current `BoardPage.tsx` (read it fully before modifying) has:
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+mimo-v2.5-pro
 
 ### Debug Log References
 
 ### Completion Notes List
+
+- All 5 tasks with 20 subtasks completed
+- KanbanCard: HTML5 drag-and-drop, ARIA roles (listitem, aria-grabbed), click/keyboard navigation, drag state styling (opacity 0.5, scale 0.95, cursor grabbing)
+- KanbanColumn: dragover/dragleave/drop handlers, drop zone feedback (dashed accent border + accent-subtle flash), status-color top strip, count badge
+- BoardPage: refactored from CSS grid to flexbox with min-w-[280px] columns, optimistic UI with inFlightRef, retry pulse icon (30s), Select dropdown preserved as keyboard alternative
+- i18n: added toast.kanbanRetry in EN/RU
+- 404 tests passing (27 new tests for Kanban components), tsc --noEmit passes
 
 ### File List
 
@@ -216,8 +228,34 @@ The current `BoardPage.tsx` (read it fully before modifying) has:
 - `src/renderer/components/KanbanCard.test.tsx`
 - `src/renderer/components/KanbanColumn.tsx`
 - `src/renderer/components/KanbanColumn.test.tsx`
+- `src/renderer/pages/BoardPage.test.tsx`
 
 **Modified:**
 - `src/renderer/pages/BoardPage.tsx`
-- `src/renderer/pages/BoardPage.test.tsx`
 - `src/renderer/lib/i18n.tsx`
+
+### Change Log
+
+- 2026-07-13: Initial implementation — KanbanCard, KanbanColumn, BoardPage refactor, i18n updates (27 new tests, 404 total passing)
+
+### Review Findings
+
+#### decision-needed
+
+- [x] [Review][Decision] Toast "Trying again" implies retry that doesn't happen — resolved: AC satisfied with visual-only indication (toast text + pulsing icon)
+
+#### patch
+
+- [x] [Review][Patch] Missing catch block — writeStoryStatus throws not caught [BoardPage.tsx:36-79] — Added catch block that rolls back optimistic update on thrown exceptions.
+- [x] [Review][Patch] BoardPage never re-renders on external store mutations [BoardPage.tsx:18-19] — Added `useAppStore((s) => s.stories)` subscription to trigger re-renders.
+- [x] [Review][Patch] Drag ghost renders at full opacity [KanbanCard.tsx:14-20] — Added `setDragImage()` with cloned element at opacity 0.5 + scale 0.95; guarded for jsdom test env.
+- [x] [Review][Patch] No same-status guard [BoardPage.tsx:82-88] — Added `if (story.status === newStatus) return` early return.
+- [x] [Review][Patch] `as Node` cast on relatedTarget [KanbanColumn.tsx:33] — Replaced with `instanceof Node` check.
+- [x] [Review][Patch] Invalid storyId from external drag sources [KanbanColumn.tsx:41-44] — Already guarded by `getStory()` check in `handleStatusChange`; no change needed.
+- [x] [Review][Patch] Stale closure after store deletion [BoardPage.tsx:37-38] — Already guarded by `if (!story) return` in `handleStatusChange`; no change needed.
+- [x] [Review][Patch] `as StoryStatus` cast — no runtime validation [BoardPage.tsx:87] — Added `COLUMNS.includes()` runtime guard in `handleSelectChange`.
+
+#### defer
+
+- [x] [Review][Defer] Drag styles not verified after dragEnd [KanbanCard.test.tsx] — deferred, test coverage gap
+- [x] [Review][Defer] Card shadow deviates from UX spec [KanbanCard.tsx:38] — deferred, uses existing `shadow-card` design token

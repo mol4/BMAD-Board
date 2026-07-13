@@ -98,7 +98,6 @@ const translations = {
     'toast.fileChanged': 'Файл изменён другим процессом. Обновите и попробуйте снова.',
     'toast.statusUpdated': 'Статус обновлён',
     'toast.statusUpdateFailed': 'Не удалось обновить статус',
-    'toast.kanbanRetry': 'Не удалось сохранить. Повторная попытка…',
     'aria.syncing': 'Синхронизация изменений файлов',
     'sidebar.sync': 'Синхронизировать',
     'sidebar.syncTooltip': 'Принудительно синхронизировать все файлы проекта',
@@ -227,6 +226,7 @@ const translations = {
     'story.noMarkdown': 'Нет Markdown содержимого',
     'story.rendered': 'Просмотр',
     'story.raw': 'Исходник',
+    'story.progress': 'Прогресс',
 
     'task.createModal': 'Создать задачу',
     'task.name': 'Название',
@@ -479,6 +479,7 @@ const translations = {
     'story.noMarkdown': 'No markdown content',
     'story.rendered': 'Rendered',
     'story.raw': 'Raw',
+    'story.progress': 'Progress',
 
     'task.createModal': 'Create Task',
     'task.name': 'Name',
@@ -572,7 +573,6 @@ const translations = {
     'toast.fileChanged': 'File changed by another process. Refresh and try again.',
     'toast.statusUpdated': 'Status updated',
     'toast.statusUpdateFailed': 'Status update failed',
-    'toast.kanbanRetry': "Couldn't save. Trying again.",
     'aria.syncing': 'Syncing file changes',
     'sidebar.sync': 'Sync',
     'sidebar.syncTooltip': 'Force re-sync all project files',

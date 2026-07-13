@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '@/components/Card';
@@ -14,12 +15,24 @@ interface StatCardProps {
 export default function StatCard({ icon, iconBg, label, value, subtitle, navigateTo }: StatCardProps) {
   const navigate = useNavigate();
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigate(navigateTo);
+      }
+    },
+    [navigate, navigateTo],
+  );
+
   return (
     <Card
       role="button"
       aria-label={label}
+      tabIndex={0}
       className="p-4 cursor-pointer"
       onClick={() => navigate(navigateTo)}
+      onKeyDown={handleKeyDown}
     >
       <div className={`flex items-center justify-center w-12 h-12 rounded-full ${iconBg} mb-3`}>
         {icon}

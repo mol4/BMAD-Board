@@ -140,3 +140,16 @@
 - ThemeToggle tests assert literal i18n strings (`'Light theme'`, `'Dark theme'`) instead of verifying through translation keys — tests will break if default locale changes; i18n keys confirmed present in `i18n.tsx`, low risk in current scope
 - Progress bar CSS custom properties (`var(--color-accent)`, `var(--color-destructive)`) lack fallback colors — bar renders transparent if CSS vars undefined; theme system guarantees these vars are always defined
 - ARIA `aria-live="polite"` attribute not explicitly tested in `Toast.test.tsx` — attribute is present in code (AC#4), manual verification sufficient
+
+## Deferred from: code review of story 5b-ii-1 (2026-07-13)
+
+- Drag styles (opacity-50, scale-95, cursor-grabbing) not verified after dragEnd in KanbanCard tests — test coverage gap, no user impact
+- Card shadow uses `shadow-card` design token (dual-layered) instead of UX spec's single `0 1px 2px` — matches existing design system, intentional deviation
+
+## Deferred from: code review of story 5b-ii-2 (2026-07-13)
+
+- No responsive breakpoints on EpicsPage grid — `grid-cols-3` has no sm/md/lg variants; cramped on narrow viewports. Deferred: responsive layout not in AC scope.
+- Progress bar shows 0% for small done ratios — `Math.round(1/201*100)` = 0%. Use `Math.max(1, ...)` when doneCount > 0. Deferred: edge case UX polish.
+- Missing React.memo on card components — EpicCard/StatCard re-render on parent list changes regardless of prop changes. Deferred: performance optimization, not a bug.
+- Hardcoded magic strings — Route paths, localStorage keys, tab identifiers are inline literals. Deferred: pre-existing pattern in codebase.
+- StatCard.iconBg coupling through raw class strings — Every call site hardcodes Tailwind classes. Deferred: design preference for semantic variants would be a separate refactor.

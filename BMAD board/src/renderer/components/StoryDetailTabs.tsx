@@ -244,9 +244,12 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
                   dangerouslySetInnerHTML={{ __html: renderMarkdown(rawMarkdown) }}
                 />
               ) : (
-                <pre className="font-mono text-sm bg-surface-sunken rounded-lg p-4 overflow-auto whitespace-pre-wrap text-foreground-secondary">
-                  {rawMarkdown}
-                </pre>
+                <textarea
+                  readOnly
+                  className="font-mono text-sm bg-surface-sunken rounded-lg p-4 w-full min-h-[200px] resize-y text-foreground-secondary whitespace-pre-wrap"
+                  value={rawMarkdown}
+                  style={{ fontFamily: '"JetBrains Mono", monospace' }}
+                />
               )
             ) : (
               <p className="text-foreground-tertiary">{t('story.noMarkdown')}</p>

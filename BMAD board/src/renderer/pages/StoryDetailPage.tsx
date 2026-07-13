@@ -44,9 +44,13 @@ export default function StoryDetailPage() {
 
   const loadMarkdown = useCallback(async () => {
     if (!story?.sourceFile || mdContent !== null) return;
-    const result = await window.electronAPI?.fileRead(story.sourceFile);
-    if (result?.content && mountedRef.current) {
-      setMdContent(result.content);
+    try {
+      const result = await window.electronAPI?.fileRead(story.sourceFile);
+      if (result?.content && mountedRef.current) {
+        setMdContent(result.content);
+      }
+    } catch {
+      // file read failed — silently ignore, user sees "No markdown content"
     }
   }, [story, mdContent]);
 

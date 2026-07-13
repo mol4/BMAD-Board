@@ -1,11 +1,11 @@
 ---
 baseline_commit: 5acc004dbf49be2060cd0b1810ed157f126a973a
-status: review
+status: done
 ---
 
 # Story 5b-ii.2: Build Epic Card, Stat Card, and Story Detail Tabs
 
-Status: review
+Status: done
 
 ## Story
 
@@ -400,15 +400,32 @@ No issues encountered.
 
 #### decision-needed
 
+- [x] [Review][Decision] Epic sidebar: link vs plain text — Spec says "epic title with link", but plain text is intentional to keep navigation minimal in sidebar metadata area. Confirmed by user (2026-07-13).
+
 #### patch
 
+- [x] [Review][Patch] ARIA semantics missing on progress bar — Progress bar div has no `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`. Screen readers see an empty element. [EpicCard.tsx:82-87]
+- [x] [Review][Patch] No keyboard support on cards — EpicCard `role="article"` and StatCard `role="button"` lack `tabIndex`, `onKeyDown` (Enter/Space). Keyboard-only users cannot navigate. [EpicCard.tsx:57-61, StatCard.tsx:20-26]
+- [x] [Review][Patch] EpicCard over-subscribes to store — `useAppStore((s) => s.stories)` subscribes every card to all stories; any story change re-renders all EpicCards. Use a stable selector or memoize. [EpicCard.tsx:9-12]
+- [x] [Review][Patch] epic.labels null-safety — `epic.labels.length > 0` throws if labels is undefined/null. Use optional chaining: `epic.labels?.length > 0`. [EpicCard.tsx:44]
+- [x] [Review][Patch] loadMarkdown has no error handling — `fileRead` in StoryDetailPage has no try/catch; a failed read causes unhandled promise rejection or error object stored as mdContent. [StoryDetailPage.tsx:loadMarkdown]
+- [x] [Review][Patch] Missing i18n key `story.progress` — Spec mentions `'story.progress': 'Progress' / 'Прогресс'` but no such key was added to i18n. [i18n.tsx]
+- [x] [Review][Patch] toast.kanbanRetry leaks from kanban story — Translation key `toast.kanbanRetry` belongs to story 5b-ii.1, bleeds into this changeset. [i18n.tsx:98,1200]
+- [x] [Review][Patch] Raw markdown uses `<pre>` not `<textarea>` — Spec says "textarea with JetBrains Mono, bg-surface-sunken, rounded.lg, readOnly". Code uses `<pre className="font-mono...">`. [StoryDetailTabs.tsx:raw view]
+
 #### defer
+
+- [x] [Review][Defer] No responsive breakpoints on EpicsPage grid — `grid-cols-3` has no sm/md/lg variants; cramped on narrow viewports. Deferred: responsive layout not in AC scope. [EpicsPage.tsx:33]
+- [x] [Review][Defer] Progress bar shows 0% for small ratios — `Math.round(1/201*100)` = 0%. Use `Math.max(1, ...)` when doneCount > 0. Deferred: edge case UX polish. [EpicCard.tsx:15]
+- [x] [Review][Defer] Missing React.memo on card components — EpicCard/StatCard re-render on parent list changes regardless of prop changes. Deferred: performance optimization, not a bug. [EpicCard.tsx, StatCard.tsx]
+- [x] [Review][Defer] Hardcoded magic strings — Route paths, localStorage keys, tab identifiers are inline literals. Deferred: pre-existing pattern in codebase. [Multiple files]
+- [x] [Review][Defer] StatCard.iconBg coupling through raw class strings — Every call site hardcodes Tailwind classes. Deferred: design preference for semantic variants would be a separate refactor. [StatCard.tsx, DashboardPage.tsx]
 
 ---
 
 **Story ID:** 5b-ii.2
 **Story Key:** 5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs
 **Epic:** Epic 5b-ii — Rich Components & Content Rendering
-**Status:** ready-for-dev
+**Status:** done
 **Created:** 2026-07-13
 **Completion Note:** Ultimate context engine analysis completed — comprehensive developer guide created

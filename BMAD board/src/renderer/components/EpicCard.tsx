@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
@@ -9,20 +9,32 @@ import type { Epic } from '@/lib/types';
 export default function EpicCard({ epic }: { epic: Epic }) {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const stories = useAppStore((s) => s.stories);
-  const epicStories = useMemo(
-    () => stories.filter((s) => s.epicId === epic.id),
-    [stories, epic.id],
+  const doneCount = useAppStore((s) =>
+    s.stories.filter((st) => st.epicId === epic.id && st.status === 'done').length,
   );
-  const doneCount = epicStories.filter((s) => s.status === 'done').length;
-  const progress = epicStories.length > 0 ? Math.round((doneCount / epicStories.length) * 100) : 0;
+  const totalCount = useAppStore((s) =>
+    s.stories.filter((st) => st.epicId === epic.id).length,
+  );
+  const progress = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigate(`/epics/${epic.id}`);
+      }
+    },
+    [navigate, epic.id],
+  );
 
   return (
     <Card
       role="article"
       aria-label={epic.title}
+      tabIndex={0}
       className="p-4 cursor-pointer group"
       onClick={() => navigate(`/epics/${epic.id}`)}
+      onKeyDown={handleKeyDown}
     >
       <div className="flex items-center gap-2 mb-2">
         <span className="text-caption font-mono bg-accent/10 text-accent rounded-sm px-2 py-0.5">
@@ -45,12 +57,17 @@ export default function EpicCard({ epic }: { epic: Epic }) {
 
       <div className="w-full h-1 bg-surface-sunken rounded-full overflow-hidden mb-3">
         <div
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${t('common.progress')}: ${progress}%`}
           className="h-full bg-accent rounded-full transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      {epic.labels.length > 0 && (
+      {(epic.labels?.length ?? 0) > 0 && (
         <div className="flex flex-wrap gap-1">
           {epic.labels.map((label) => (
             <span
