@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, Pencil } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
@@ -15,9 +15,10 @@ interface StoryDetailTabsProps {
   story: Story;
   rawMarkdown: string | null;
   onOpenMdModal: () => void;
+  onLoadMarkdown: () => void;
 }
 
-export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal }: StoryDetailTabsProps) {
+export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onLoadMarkdown }: StoryDetailTabsProps) {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<Tab>('info');
   const [markdownView, setMarkdownView] = useState<'rendered' | 'raw'>('rendered');
@@ -28,6 +29,12 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal }: S
   const getEpic = useAppStore((s) => s.getEpic);
   const getTask = useAppStore((s) => s.getTask);
   const epic = getEpic(story.epicId);
+
+  useEffect(() => {
+    if (activeTab === 'markdown' && !rawMarkdown && story.sourceFile) {
+      onLoadMarkdown();
+    }
+  }, [activeTab, rawMarkdown, story.sourceFile, onLoadMarkdown]);
 
   const handleEditClick = () => {
     if (dontShowAgain) {

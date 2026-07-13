@@ -36,6 +36,7 @@ function renderTabs(props?: Partial<React.ComponentProps<typeof StoryDetailTabs>
     story,
     rawMarkdown: null as string | null,
     onOpenMdModal: vi.fn(),
+    onLoadMarkdown: vi.fn(),
     ...props,
   };
   return {

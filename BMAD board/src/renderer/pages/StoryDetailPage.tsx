@@ -42,6 +42,14 @@ export default function StoryDetailPage() {
     setMdModalOpen(true);
   };
 
+  const loadMarkdown = useCallback(async () => {
+    if (!story?.sourceFile || mdContent !== null) return;
+    const result = await window.electronAPI?.fileRead(story.sourceFile);
+    if (result?.content && mountedRef.current) {
+      setMdContent(result.content);
+    }
+  }, [story, mdContent]);
+
   const handleStatusChange = useCallback(async (newStatus: StoryStatus) => {
     if (!story) return;
     const previousStatus = story.status;
@@ -166,6 +174,7 @@ export default function StoryDetailPage() {
         story={story}
         rawMarkdown={mdContent}
         onOpenMdModal={() => openMdModal(story)}
+        onLoadMarkdown={loadMarkdown}
       />
 
       <MarkdownModal
