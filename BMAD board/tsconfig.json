@@ -1,23 +1,20 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowJs": false,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
-    "plugins": [{ "name": "next" }],
+    "noEmit": true,
+    "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/renderer/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/renderer/**/*.ts", "src/renderer/**/*.tsx", "src/renderer/env.d.ts", "src/shared/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/renderer/**/*.test.ts", "src/renderer/**/*.test.tsx", "src/renderer/setupTests.ts"]
 }

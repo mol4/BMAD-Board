@@ -35,7 +35,7 @@ This document provides the complete epic and story breakdown for BMAD Board, dec
 
 **FR-3 — Native Window Management:** The application supports standard desktop window behaviors (minimize, maximize, close, resize). Window state (size, position) is persisted and restored on relaunch. Close behavior: application quits on close (minimize to tray deferred to v2).
 
-**FR-4 — Project Configuration Storage:** The application stores project configurations in a local SQLite database. Each project record contains: name, epics directory path, stories directory path, stories mode (flat/nested), and user preferences. Data persists across application restarts. Database file is stored in the platform-appropriate user app data directory.
+**FR-4 — Project Configuration Storage:** The application stores project configurations in a local SQLite database. Each project record contains: name, epics directory path, stories directory path, and user preferences. Data persists across application restarts. Database file is stored in the platform-appropriate user app data directory.
 
 **FR-5 — Project Switcher:** A UI element allows users to view all configured projects and switch between them. Project switcher is accessible from the sidebar or top bar. Switching projects reloads the store from the selected project's artifact directories. The last-used project is automatically loaded on launch.
 
@@ -79,7 +79,7 @@ This document provides the complete epic and story breakdown for BMAD Board, dec
 - **Icon System:** Lucide replacing @heroicons/react and all emoji decorators. Zero emoji-as-icons rule.
 - **Code Highlighting:** Shiki with Catppuccin Mocha (dark) / Catppuccin Latte (light) themes.
 - **Mermaid Rendering:** Mermaid.js client-side SVG rendering with theme-aware colors and error fallback.
-- **SQLite Schema:** Projects table (id, name, epics_dir, stories_dir, stories_mode, last_used_at, created_at) + Preferences table (key, value).
+- **SQLite Schema:** Projects table (id, name, epics_dir, stories_dir, last_used_at, created_at) + Preferences table (key, value).
 - **Filesystem Watcher:** fs.watch + chokidar polling fallback at 30s interval in main process.
 - **API Client Pattern:** ipcRenderer.invoke wrapper mimicking fetch API for minimal component refactoring.
 - **React Router v6:** Replacing Next.js App Router with route components and useSearchParams.
@@ -478,7 +478,7 @@ So that the app works even if native SQLite fails to build.
 **Given** the application launches for the first time  
 **When** the storage layer initializes  
 **Then** SQLite database is created automatically in platform-appropriate user app data directory  
-**And** schema includes `projects` table (id, name, epics_dir, stories_dir, stories_mode, last_used_at, created_at)  
+**And** schema includes `projects` table (id, name, epics_dir, stories_dir, last_used_at, created_at)  
 **And** schema includes `preferences` table (key, value) for window state and theme  
 **And** if SQLite native module build fails, JSON file storage activates automatically as fallback  
 **And** JSON fallback uses atomic writes (write to temp → rename)  

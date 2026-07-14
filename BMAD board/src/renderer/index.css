@@ -1,0 +1,35 @@
+@import './styles/design-tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+}
+
+@layer utilities {
+  .prose :not(pre) > code {
+    background-color: var(--color-code-inline-bg) !important;
+    color: var(--color-code-inline-fg) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.125rem 0.375rem !important;
+    font-family: "JetBrains Mono", ui-monospace, monospace !important;
+    font-size: 0.875em !important;
+    font-weight: 400 !important;
+  }
+}
+
+@keyframes toast-progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}

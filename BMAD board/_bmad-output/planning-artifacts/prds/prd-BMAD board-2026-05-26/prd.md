@@ -74,7 +74,7 @@ BMAD Board is a companion tool for the BMAD Method ecosystem — a local Jira-li
 **Requirements:**
 
 - **FR-4 — Project Configuration Storage:** The application stores project configurations in a local SQLite database.
-  - Each project record contains: name, epics directory path, stories directory path, stories mode (flat/nested), and user preferences.
+  - Each project record contains: name, epics directory path, stories directory path, and user preferences.
   - Data persists across application restarts.
   - Database file is stored in the platform-appropriate user app data directory.
 

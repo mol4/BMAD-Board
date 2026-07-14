@@ -1,0 +1,274 @@
+﻿diff --git a/BMAD board/src/renderer/App.test.tsx b/BMAD board/src/renderer/App.test.tsx
+index 4a62998..7ad32c2 100644
+--- a/BMAD board/src/renderer/App.test.tsx	
++++ b/BMAD board/src/renderer/App.test.tsx	
+@@ -3,19 +3,22 @@ import { render, screen, waitFor } from '@testing-library/react';
+ import { MemoryRouter } from 'react-router-dom';
+ import { I18nProvider } from '@/lib/i18n';
+ import { ToastProvider } from '@/components/Toast';
++import { ThemeProvider } from '@/components/ThemeProvider';
+ import { useAppStore } from '@/lib/store';
+ import { AppRoutes } from './App';
+ 
+ function renderWithProviders(initialEntries: string[]) {
+   useAppStore.getState().setInitialized(true);
+   return render(
+-    <ToastProvider>
+-      <MemoryRouter initialEntries={initialEntries}>
+-        <I18nProvider>
+-          <AppRoutes />
+-        </I18nProvider>
+-      </MemoryRouter>
+-    </ToastProvider>,
++    <ThemeProvider>
++      <ToastProvider>
++        <MemoryRouter initialEntries={initialEntries}>
++          <I18nProvider>
++            <AppRoutes />
++          </I18nProvider>
++        </MemoryRouter>
++      </ToastProvider>
++    </ThemeProvider>,
+   );
+ }
+ 
+diff --git a/BMAD board/src/renderer/components/Providers.tsx b/BMAD board/src/renderer/components/Providers.tsx
+index 088fbbf..f0f6167 100644
+--- a/BMAD board/src/renderer/components/Providers.tsx	
++++ b/BMAD board/src/renderer/components/Providers.tsx	
+@@ -4,6 +4,7 @@ import { loadConfigFromIPC, getConfig } from '@/lib/config';
+ import { initializeStore } from '@/lib/markdown-parser';
+ import { useAppStore } from '@/lib/store';
+ import { ToastProvider } from '@/components/Toast';
++import { ThemeProvider } from '@/components/ThemeProvider';
+ 
+ export default function Providers({ children }: { children: React.ReactNode }) {
+   const [ready, setReady] = useState(false);
+@@ -38,8 +39,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
+   }
+ 
+   return (
+-    <ToastProvider>
+-      <I18nProvider>{children}</I18nProvider>
+-    </ToastProvider>
++    <ThemeProvider>
++      <ToastProvider>
++        <I18nProvider>{children}</I18nProvider>
++      </ToastProvider>
++    </ThemeProvider>
+   );
+ }
+diff --git a/BMAD board/src/renderer/components/Sidebar.tsx b/BMAD board/src/renderer/components/Sidebar.tsx
+index 17a04e5..8c96723 100644
+--- a/BMAD board/src/renderer/components/Sidebar.tsx	
++++ b/BMAD board/src/renderer/components/Sidebar.tsx	
+@@ -2,8 +2,9 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
+ import { useState, useEffect, useRef } from 'react';
+ import { useI18n } from '@/lib/i18n';
+ import type { AppConfig } from '../../shared/ipc-channels';
+-import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder } from 'lucide-react';
++import { LayoutDashboard, Columns2, AlignJustify, Zap, FileText, BarChart3, ChevronLeft, Settings, RefreshCw, Folder, Sun, Moon } from 'lucide-react';
+ import { useToast } from '@/components/Toast';
++import { useTheme } from '@/components/ThemeProvider';
+ 
+ const navItems = [
+   {
+@@ -42,6 +43,7 @@ export default function Sidebar() {
+   const location = useLocation();
+   const { t, locale, setLocale } = useI18n();
+   const { showToast } = useToast();
++  const { isDark, toggleTheme } = useTheme();
+   const [collapsed, setCollapsed] = useState(false);
+   const [showSettings, setShowSettings] = useState(false);
+   const [config, setConfig] = useState<AppConfig>({
+@@ -267,6 +269,15 @@ export default function Sidebar() {
+             EN
+           </button>
+         </div>
++
++        <button
++          onClick={toggleTheme}
++          className={`flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-foreground-secondary hover:bg-accent-subtle hover:text-foreground-primary transition-colors ${collapsed ? 'justify-center' : ''}`}
++          title={isDark ? t('theme.light') : t('theme.dark')}
++        >
++          {isDark ? <Sun size={18} className="shrink-0" /> : <Moon size={18} className="shrink-0" />}
++          {!collapsed && <span>{isDark ? t('theme.light') : t('theme.dark')}</span>}
++        </button>
+       </div>
+     </aside>
+   );
+diff --git a/BMAD board/src/renderer/index.html b/BMAD board/src/renderer/index.html
+index 676c456..cb055ca 100644
+--- a/BMAD board/src/renderer/index.html	
++++ b/BMAD board/src/renderer/index.html	
+@@ -1,8 +1,20 @@
+ <!DOCTYPE html>
+-<html lang="en" class="dark">
++<html lang="en">
+   <head>
+     <meta charset="UTF-8" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <script>
++      (function() {
++        const stored = localStorage.getItem('bmad-theme');
++        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
++        const isDark = stored ? stored === 'dark' : systemDark;
++        if (isDark) {
++          document.documentElement.classList.add('dark');
++        } else {
++          document.documentElement.classList.remove('dark');
++        }
++      })();
++    </script>
+     <title>BMAD Board</title>
+   </head>
+   <body>
+diff --git a/BMAD board/src/renderer/lib/i18n.tsx b/BMAD board/src/renderer/lib/i18n.tsx
+index cfe352c..11da65c 100644
+--- a/BMAD board/src/renderer/lib/i18n.tsx	
++++ b/BMAD board/src/renderer/lib/i18n.tsx	
+@@ -24,6 +24,9 @@ const translations = {
+     'sidebar.syncError': '╨Ю╤И╨╕╨▒╨║╨░ ╤Б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨░╤Ж╨╕╨╕',
+     'sidebar.configSaveError': '╨Ю╤И╨╕╨▒╨║╨░ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╤П ╨║╨╛╨╜╤Д╨╕╨│╤Г╤А╨░╤Ж╨╕╨╕',
+ 
++    'theme.dark': '╨в╤С╨╝╨╜╨░╤П ╤В╨╡╨╝╨░',
++    'theme.light': '╨б╨▓╨╡╤В╨╗╨░╤П ╤В╨╡╨╝╨░',
++
+     'toast.configSaved': '╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л',
+     'toast.configSaveError': '╨Ю╤И╨╕╨▒╨║╨░ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╕╤П ╨╜╨░╤Б╤В╤А╨╛╨╡╨║',
+     'toast.configReset': '╨Э╨░╤Б╤В╤А╨╛╨╣╨║╨╕ ╤Б╨▒╤А╨╛╤И╨╡╨╜╤Л',
+@@ -221,6 +224,9 @@ const translations = {
+     'sidebar.syncError': 'Sync error',
+     'sidebar.configSaveError': 'Config save error',
+ 
++    'theme.dark': 'Dark theme',
++    'theme.light': 'Light theme',
++
+     'common.save': 'Save',
+     'common.cancel': 'Cancel',
+     'common.create': 'Create',
+
+
+
+diff --git a/src/renderer/components/ThemeProvider.tsx b/src/renderer/components/ThemeProvider.tsx
+new file mode 100644
+index 0000000..3833caa
+--- /dev/null
++++ b/src/renderer/components/ThemeProvider.tsx
+@@ -0,0 +1,43 @@
++import { createContext, useContext, useState, useCallback, useMemo } from 'react';
++
++export interface ThemeContextValue {
++  isDark: boolean;
++  toggleTheme: () => void;
++}
++
++const ThemeContext = createContext<ThemeContextValue | null>(null);
++
++export function useTheme(): ThemeContextValue {
++  const ctx = useContext(ThemeContext);
++  if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
++  return ctx;
++}
++
++export function ThemeProvider({ children }: { children: React.ReactNode }) {
++  const [isDark, setIsDark] = useState<boolean>(() => {
++    if (typeof document !== 'undefined') {
++      return document.documentElement.classList.contains('dark');
++    }
++    return false;
++  });
++
++  const toggleTheme = useCallback(() => {
++    const currentlyDark = document.documentElement.classList.contains('dark');
++    const newIsDark = !currentlyDark;
++    if (newIsDark) {
++      document.documentElement.classList.add('dark');
++    } else {
++      document.documentElement.classList.remove('dark');
++    }
++    localStorage.setItem('bmad-theme', newIsDark ? 'dark' : 'light');
++    setIsDark(newIsDark);
++  }, []);
++
++  const value = useMemo(() => ({ isDark, toggleTheme }), [isDark, toggleTheme]);
++
++  return (
++    <ThemeContext.Provider value={value}>
++      {children}
++    </ThemeContext.Provider>
++  );
++}
+
+
+
+diff --git a/src/renderer/components/ThemeToggle.test.tsx b/src/renderer/components/ThemeToggle.test.tsx
+new file mode 100644
+index 0000000..6582a90
+--- /dev/null
++++ b/src/renderer/components/ThemeToggle.test.tsx
+@@ -0,0 +1,64 @@
++import { render, screen, act, cleanup } from '@testing-library/react';
++import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
++import { ThemeProvider, useTheme } from './ThemeProvider';
++
++function ThemeConsumer() {
++  const { isDark, toggleTheme } = useTheme();
++  return <button onClick={toggleTheme}>{isDark ? 'dark' : 'light'}</button>;
++}
++
++describe('ThemeToggle', () => {
++  beforeEach(() => {
++    localStorage.clear();
++    document.documentElement.className = '';
++  });
++
++  afterEach(() => {
++    cleanup();
++    localStorage.clear();
++    document.documentElement.className = '';
++  });
++
++  it('renders with correct initial icon based on class', () => {
++    document.documentElement.classList.add('dark');
++    render(
++      <ThemeProvider>
++        <ThemeConsumer />
++      </ThemeProvider>,
++    );
++    expect(screen.getByRole('button').textContent).toBe('dark');
++  });
++
++  it('toggleTheme switches class and localStorage', async () => {
++    document.documentElement.classList.add('dark');
++    render(
++      <ThemeProvider>
++        <ThemeConsumer />
++      </ThemeProvider>,
++    );
++    const btn = screen.getByRole('button');
++    expect(btn.textContent).toBe('dark');
++
++    await act(async () => {
++      btn.click();
++    });
++
++    expect(btn.textContent).toBe('light');
++    expect(localStorage.getItem('bmad-theme')).toBe('light');
++    expect(document.documentElement.classList.contains('dark')).toBe(false);
++
++    await act(async () => {
++      btn.click();
++    });
++
++    expect(btn.textContent).toBe('dark');
++    expect(localStorage.getItem('bmad-theme')).toBe('dark');
++    expect(document.documentElement.classList.contains('dark')).toBe(true);
++  });
++
++  it('useTheme throws outside provider', () => {
++    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
++    expect(() => render(<ThemeConsumer />)).toThrow('useTheme must be used within ThemeProvider');
++    spy.mockRestore();
++  });
++});

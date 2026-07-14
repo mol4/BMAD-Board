@@ -1,0 +1,130 @@
+/**
+ * Design Tokens — single source of truth for theme-aware colors.
+ *
+ * Light values live in :root, dark values override in :root.dark using the
+ * IDENTICAL variable names. Toggling the `dark` class on <html> flips every
+ * token at once. Do NOT add `--color-*-dark` duplicate variables.
+ *
+ * Authoritative value set: DESIGN.md frontmatter `colors:`.
+ * Consumed via tailwind.config.js color mappings (e.g. bg-surface-elevated).
+ */
+
+:root {
+  /* Surface hierarchy */
+  --color-surface-base: #f8f9fb;
+  --color-surface-elevated: #ffffff;
+  --color-surface-sunken: #f0f1f5;
+  --color-surface-overlay: rgba(0, 0, 0, 0.45);
+
+  /* Foreground levels */
+  --color-foreground-primary: #1a1d23;
+  --color-foreground-secondary: #5a5f6b;
+  --color-foreground-tertiary: #8b8fa3;
+  --color-foreground-on-accent: #0f1117;
+
+  /* Accent (teal) */
+  --color-accent: #0d9488;
+  --color-accent-hover: #0f766e;
+  --color-accent-light: #ccfbf1;
+  --color-accent-subtle: #f0fdfa;
+
+  /* Borders */
+  --color-border-default: #e2e4ea;
+  --color-border-strong: #c9cdd6;
+
+  /* Status palette (bg/fg pairs) */
+  --color-status-backlog-bg: #f1f1f4;
+  --color-status-backlog-fg: #6b7280;
+  --color-status-todo-bg: #dbeafe;
+  --color-status-todo-fg: #1e40af;
+  --color-status-in-progress-bg: #fef3c7;
+  --color-status-in-progress-fg: #92400e;
+  --color-status-in-review-bg: #ede9fe;
+  --color-status-in-review-fg: #6d28d9;
+  --color-status-done-bg: #d1fae5;
+  --color-status-done-fg: #065f46;
+  --color-status-draft-bg: #f3f4f6;
+  --color-status-draft-fg: #4b5563;
+  --color-status-ready-bg: #ccfbf1;
+  --color-status-ready-fg: #0f766e;
+
+  /* Priority palette */
+  --color-priority-critical: #dc2626;
+  --color-priority-high: #ea580c;
+  --color-priority-medium: #d97706;
+  --color-priority-low: #2563eb;
+
+  /* Code blocks */
+  --color-code-inline-bg: #f1f5f9;
+  --color-code-inline-fg: #0f766e;
+  --color-code-block-bg: #1e1e2e;
+  --color-code-block-fg: #cdd6f4;
+
+  /* Shadows */
+  --shadow-card-1: rgba(0, 0, 0, 0.08);
+  --shadow-card-2: rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: rgba(0, 0, 0, 0.1);
+
+  /* Destructive */
+  --color-destructive: #ef4444;
+}
+
+:root.dark {
+  /* Surface hierarchy */
+  --color-surface-base: #0f1117;
+  --color-surface-elevated: #181b23;
+  --color-surface-sunken: #0a0c12;
+  --color-surface-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Foreground levels */
+  --color-foreground-primary: #e8eaed;
+  --color-foreground-secondary: #9ba1b0;
+  --color-foreground-tertiary: #7c8294;
+  --color-foreground-on-accent: #0f1117;
+
+  /* Accent (teal) */
+  --color-accent: #2dd4bf;
+  --color-accent-hover: #14b8a6;
+  --color-accent-light: #134e4a;
+  --color-accent-subtle: #1a2e2c;
+
+  /* Borders */
+  --color-border-default: #2a2d3a;
+  --color-border-strong: #3d4150;
+
+  /* Status palette (bg/fg pairs) */
+  --color-status-backlog-bg: #1e1f26;
+  --color-status-backlog-fg: #9ca3af;
+  --color-status-todo-bg: #1e2d45;
+  --color-status-todo-fg: #93c5fd;
+  --color-status-in-progress-bg: #2d2406;
+  --color-status-in-progress-fg: #fcd34d;
+  --color-status-in-review-bg: #2e1f5e;
+  --color-status-in-review-fg: #c4b5fd;
+  --color-status-done-bg: #0d2818;
+  --color-status-done-fg: #6ee7b7;
+  --color-status-draft-bg: #1e1f26;
+  --color-status-draft-fg: #9ca3af;
+  --color-status-ready-bg: #1a2e2c;
+  --color-status-ready-fg: #2dd4bf;
+
+  /* Priority palette */
+  --color-priority-critical: #f87171;
+  --color-priority-high: #fb923c;
+  --color-priority-medium: #fbbf24;
+  --color-priority-low: #60a5fa;
+
+  /* Code blocks */
+  --color-code-inline-bg: #232738;
+  --color-code-inline-fg: #2dd4bf;
+  --color-code-block-bg: #0a0c12;
+  --color-code-block-fg: #cdd6f4;
+
+  /* Shadows */
+  --shadow-card-1: rgba(255, 255, 255, 0.05);
+  --shadow-card-2: rgba(255, 255, 255, 0.03);
+  --shadow-card-hover: rgba(255, 255, 255, 0.08);
+
+  /* Destructive */
+  --color-destructive: #f87171;
+}

@@ -1,6 +1,6 @@
 # BMAD Board
 
-> A local Jira-like project management UI that reads directly from [BMAD Method](https://github.com/bmadcode/BMAD-METHOD) markdown artifacts.
+> A desktop project management application that reads directly from [BMAD Method](https://github.com/bmadcode/BMAD-METHOD) markdown artifacts.
 
 ## What is BMAD?
 
@@ -43,7 +43,7 @@ _bmad-output/
     └── sprint-status.yaml         # Sprint progress tracker
 ```
 
-**BMAD Board** is a companion tool that turns these flat files into an interactive project management UI — so you don't have to read raw markdown to track your project.
+**BMAD Board** is a companion desktop app that turns these flat files into an interactive project management experience — so you don't have to read raw markdown to track your projects.
 
 ---
 
@@ -51,6 +51,7 @@ _bmad-output/
 
 | Page             | Description                                                                          |
 | ---------------- | ------------------------------------------------------------------------------------ |
+| **Welcome**      | Project launcher — add, switch, and manage multiple projects                         |
 | **Dashboard**    | Overview of epics, stories, progress bars, and story points                          |
 | **Sprint Board** | Kanban columns (Backlog → To Do → In Progress → In Review → Done) with drag-and-drop |
 | **Backlog**      | Full story list with filtering by epic, status, and priority                         |
@@ -61,9 +62,12 @@ _bmad-output/
 
 Additional capabilities:
 
-- **Markdown Editing** — edit any document, epic, or story in the browser; changes persist to disk
+- **Multi-Project Support** — manage any number of BMAD projects from a single app instance; each project has its own artifact directories and independent state
+- **Real-Time Sync** — file system watcher automatically detects changes to epics, stories, and documents; edits in the app are written back to disk instantly
+- **File Locking** — prevents edit conflicts between the UI and external agents; lock status is visible and enforced
+- **Markdown Editing** — edit any document, epic, or story inline with live preview; changes persist to disk and trigger cross-project sync
 - **i18n** — English and Russian UI with a language switcher
-- **Configuration API** — runtime-configurable paths to artifacts directories
+- **Offline-First** — all data lives in local files and SQLite; no server or cloud required
 
 ---
 
@@ -112,20 +116,37 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3333](http://localhost:3333) in your browser.
+The app opens as a **desktop window** powered by Electron.
 
 ### Production Build
 
 ```bash
 npm run build
-npm run start
 ```
 
-The app runs on **port 3333** by default.
+The packaged app is built into the `dist/` directory. You can also create an installer with:
+
+```bash
+npx electron-builder
+```
 
 ---
 
 ## Usage
+
+### Adding a Project
+
+On first launch, the **Welcome** screen prompts you to add a project. You can also add projects at any time via the project switcher in the sidebar.
+
+Each project needs:
+
+| Field        | Description                                              |
+| ------------ | -------------------------------------------------------- |
+| **Name**     | Display name for the project                             |
+| **Epics Dir**| Path to `planning-artifacts/` (where `epics.md` lives)   |
+| **Stories Dir**| Path to `implementation-artifacts/` (where stories live) |
+
+The app remembers all added projects in a local SQLite database and restores them on restart.
 
 ### Expected Folder Structure
 
@@ -142,19 +163,9 @@ your-project/
 │       ├── 1-2-another-story.md
 │       ├── sprint-status.yaml
 │       └── ...
-└── BMAD board/                   ← this app (sibling folder)
-    └── ...
 ```
 
-BMAD Board expects to live **next to** `_bmad-output/` (one level up). Default paths:
-
-| Setting       | Default                                    |
-| ------------- | ------------------------------------------ |
-| `epicsDir`    | `../_bmad-output/planning-artifacts`       |
-| `storiesDir`  | `../_bmad-output/implementation-artifacts` |
-| `storiesMode` | `flat` (auto-detected)                     |
-
-These can be changed at runtime via `PATCH /api/config`.
+BMAD Board can read from **any path** on your file system — the app is not tied to a specific location.
 
 ### Stories Mode
 
@@ -163,35 +174,64 @@ These can be changed at runtime via `PATCH /api/config`.
 | **flat**   | All stories in a single folder. Linked to epics by filename pattern (`1-2-story-name.md` → EPIC-1, STORY-1.2) or frontmatter `epicId`. |
 | **nested** | Stories in subdirectories matching epic filenames (`epic-1/story-1.md`).                                                               |
 
-The mode is auto-detected and can be overridden via the config API.
+The mode is auto-detected per project and can be overridden in settings.
+
+### File Synchronization
+
+BMAD Board watches your project's artifact directories in real time:
+
+- **External changes** — editing a `.md` file in your IDE triggers an immediate sync into the app
+- **In-app changes** — editing in BMAD Board writes directly to disk and updates the file system
+- **File locking** — when you start editing a document, the app acquires a lock so external agents know not to modify it concurrently
+
+You can also trigger a manual re-sync at any time from the Diagnostics page.
 
 ---
 
-## API Endpoints
+## IPC API
 
-| Method  | Endpoint                     | Description               |
-| ------- | ---------------------------- | ------------------------- |
-| GET     | `/api/epics`                 | List all epics            |
-| GET     | `/api/stories`               | List all stories          |
-| GET     | `/api/tasks`                 | List all tasks            |
-| GET     | `/api/docs`                  | List planning documents   |
-| GET     | `/api/docs/[id]`             | Get document content      |
-| PUT     | `/api/docs/[id]`             | Update document content   |
-| GET/PUT | `/api/epics/[id]/markdown`   | Get/update epic markdown  |
-| GET/PUT | `/api/stories/[id]/markdown` | Get/update story markdown |
-| GET     | `/api/config`                | Current configuration     |
-| PATCH   | `/api/config`                | Update configuration      |
-| DELETE  | `/api/config`                | Reset to defaults         |
-| POST    | `/api/sync`                  | Re-sync from filesystem   |
-| GET     | `/api/diagnostics`           | File system diagnostics   |
+The renderer process communicates with the main process over typed IPC channels:
+
+| Channel                | Direction | Description                            |
+| ---------------------- | --------- | -------------------------------------- |
+| `project:list`         | invoke    | List all registered projects           |
+| `project:add`          | invoke    | Register a new project                 |
+| `project:remove`       | invoke    | Remove a project from the app          |
+| `project:switch`       | invoke    | Update last-used metadata              |
+| `project:update`       | invoke    | Rename or change project paths         |
+| `config:read`          | invoke    | Read active project config             |
+| `config:write`         | invoke    | Update active project config           |
+| `file:read`            | invoke    | Read a file from disk                  |
+| `file:write`           | invoke    | Write a file to disk                   |
+| `file:lock`            | invoke    | Acquire a file lock                    |
+| `file:unlock`          | invoke    | Release a file lock                    |
+| `file:lockStatus`      | invoke    | Check lock status                      |
+| `file:readDirectory`   | invoke    | List directory contents                |
+| `watcher:watch`        | invoke    | Start watching project directories     |
+| `watcher:stop`         | invoke    | Stop file watcher                      |
+| `watcher:status`       | invoke    | Get watcher health status              |
+| `file:changed`         | on        | File system change event (→ renderer)  |
+| `watcher:error`        | on        | Watcher error event (→ renderer)       |
+| `dialog:openDirectory` | invoke    | Native directory picker dialog         |
+| `shell:openPath`       | invoke    | Open a path in the native file manager |
+| `window:getState`      | invoke    | Check if window is maximized           |
 
 ---
 
 ## Tech Stack
 
-- **Next.js 14** (App Router)
+- **Electron 33** — desktop shell
+- **Vite 5** + **electron-vite** — build tooling
 - **React 18** + TypeScript
+- **React Router 6** — client-side routing
+- **Zustand** — state management
 - **Tailwind CSS** + `@tailwindcss/typography`
+- **better-sqlite3** — local project metadata storage
 - **gray-matter** — frontmatter parsing
 - **marked** — markdown rendering
+- **mermaid** — diagram rendering
+- **shiki** — syntax highlighting
 - **js-yaml** — sprint-status.yaml parsing
+- **chokidar** — file system watching
+- **lucide-react** — icons
+- **Vitest** — unit testing
