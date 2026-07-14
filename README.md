@@ -75,27 +75,27 @@ Additional capabilities:
 
 ### Dashboard
 
-![Dashboard](docs/dashboard.png)
+![Dashboard](docs/dashboard.png?v=2)
 
 ### Sprint Board (Kanban)
 
-![Sprint Board](docs/board.png)
+![Sprint Board](docs/board.png?v=2)
 
 ### Backlog
 
-![Backlog](docs/backlog.png)
+![Backlog](docs/backlog.png?v=2)
 
 ### Epic Detail
 
-![Epics](docs/epics.png)
+![Epics](docs/epics.png?v=2)
 
 ### Document Viewer
 
-![Documents](docs/docs.png)
+![Documents](docs/docs.png?v=2)
 
 ### Diagnostics
 
-![Diagnostics](docs/diagnostics.png)
+![Diagnostics](docs/diagnostics.png?v=2)
 
 ---
 
