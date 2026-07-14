@@ -1,6 +1,6 @@
 ---
 baseline_commit: 4366220
-status: ready-for-dev
+status: done
 ---
 
 # Story 5b-ii.3: Implement Shiki Syntax Highlighting and Mermaid Diagrams
