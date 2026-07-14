@@ -214,15 +214,11 @@ export default function Sidebar() {
         <div className={`flex ${collapsed ? 'flex-col items-center gap-1 py-3 px-1' : 'items-center gap-2 p-4 pb-2'}`}>
           {!collapsed ? (
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent shrink-0">
-                BB
-              </div>
+              <img src="/icon.png" alt="BMAD Board" className="w-8 h-8 rounded shrink-0" />
               <h1 className="font-bold text-sm truncate">BMAD Board</h1>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-bold text-sm text-foreground-on-accent shrink-0">
-              BB
-            </div>
+            <img src="/icon.png" alt="BMAD Board" className="w-8 h-8 rounded shrink-0" />
           )}
         </div>
         <div className={`pb-3 ${collapsed ? 'px-1' : 'px-4'}`}>

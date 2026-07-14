@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, nativeImage } from "electron";
 import { join } from "path";
 import { setupIPC } from "./ipc";
 import { closeStorage, getStorageMode } from "./services/storage";
@@ -11,6 +11,9 @@ function createWindow(): void {
   const state = loadWindowState();
   logger.info("[Main] Restoring window state:", state);
 
+  const iconPath = join(app.getAppPath(), "resources", "icon.png");
+  logger.info("[Main] Icon path:", iconPath);
+
   mainWindow = new BrowserWindow({
     width: state.width,
     height: state.height,
@@ -19,6 +22,7 @@ function createWindow(): void {
     minWidth: 1024,
     minHeight: 768,
     title: "BMAD Board",
+    icon: nativeImage.createFromPath(iconPath),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
