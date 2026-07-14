@@ -33,7 +33,7 @@ describe('highlighter', () => {
       expect(mockCreateHighlighter).toHaveBeenCalledTimes(1);
       expect(mockCreateHighlighter).toHaveBeenCalledWith(
         expect.objectContaining({
-          themes: ['catppuccin-mocha', 'catppuccin-latte'],
+          themes: ['material-theme-ocean', 'light-plus'],
         })
       );
     });
@@ -47,19 +47,19 @@ describe('highlighter', () => {
   });
 
   describe('theme switching', () => {
-    it('uses catppuccin-mocha for dark mode', async () => {
+    it('uses material-theme-ocean for dark mode', async () => {
       await highlightCodeModule.highlightCode('code', 'typescript', true);
       expect(mockCodeToHtml).toHaveBeenCalledWith(
         'code',
-        expect.objectContaining({ theme: 'catppuccin-mocha' })
+        expect.objectContaining({ theme: 'material-theme-ocean' })
       );
     });
 
-    it('uses catppuccin-latte for light mode', async () => {
+    it('uses light-plus for light mode', async () => {
       await highlightCodeModule.highlightCode('code', 'typescript', false);
       expect(mockCodeToHtml).toHaveBeenCalledWith(
         'code',
-        expect.objectContaining({ theme: 'catppuccin-latte' })
+        expect.objectContaining({ theme: 'light-plus' })
       );
     });
   });

@@ -28,7 +28,7 @@ function ensureHighlighter(): Promise<Highlighter> {
 async function createHighlighter(): Promise<Highlighter> {
   const { createHighlighter: create } = await import('shiki');
   return create({
-    themes: ['catppuccin-mocha', 'catppuccin-latte'],
+    themes: ['material-theme-ocean', 'light-plus'],
     langs: [...LANGUAGES],
   });
 }
@@ -36,7 +36,7 @@ async function createHighlighter(): Promise<Highlighter> {
 export async function highlightCode(code: string, lang: string, dark: boolean): Promise<string> {
   const h = await ensureHighlighter();
   const safeLang = LANGUAGES.has(lang) ? lang : 'plaintext';
-  const theme = dark ? 'catppuccin-mocha' : 'catppuccin-latte';
+  const theme = dark ? 'material-theme-ocean' : 'light-plus';
 
   return h.codeToHtml(String(code ?? '').trimEnd(), { lang: safeLang, theme });
 }
