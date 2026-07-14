@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Check, Pencil } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
@@ -161,7 +162,7 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
               {epic && (
                 <div>
                   <div className="text-caption text-foreground-tertiary mb-1">{t('story.epic')}</div>
-                  <div className="text-sm text-foreground-primary">{epic.title}</div>
+                  <Link to={`/board?epic=${encodeURIComponent(story.epicId)}`} className="text-sm text-accent hover:underline">{epic.title}</Link>
                 </div>
               )}
               {story.assignee && (

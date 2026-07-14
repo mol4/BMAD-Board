@@ -156,7 +156,12 @@
 
 ## Deferred from: code review of 5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams (2026-07-14)
 
-- SVG sanitization � mermaid v11 uses DomPurify internally [MermaidRenderer.tsx:115]
+- SVG sanitization � mermaid v11 uses DomPurify internally [MermaidRenderer.tsx:115]
 - MarkdownModal save path may show stale content after edit [MarkdownModal.tsx:142]
 - Mermaid skeleton fixed aspect-video, doesn't match diagram dimensions [MermaidRenderer.tsx:78]
+
+## Deferred from: code review of epic-link-to-board (2026-07-14)
+
+- Epic link in StoryDetailTabs sidebar has no tooltip/icon indicating navigation to Board — consider adding `title` attribute or small external-link icon for UX clarity
+- Epic link missing `aria-label` — screen readers get only the epic title without context that clicking navigates to a filtered board view
 

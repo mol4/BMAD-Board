@@ -101,11 +101,11 @@ describe('StoryDetailTabs', () => {
     expect(screen.getByText('AC 2')).toBeInTheDocument();
   });
 
-  it('renders epic title as plain text (not a link)', () => {
+  it('renders epic title as a link to the board filtered by epic', () => {
     renderTabs();
-    const epicLabel = screen.getByText('Test Epic');
-    expect(epicLabel.tagName).not.toBe('A');
-    expect(epicLabel.closest('a')).toBeNull();
+    const epicLink = screen.getByText('Test Epic');
+    expect(epicLink.tagName).toBe('A');
+    expect(epicLink).toHaveAttribute('href', '#/board?epic=mock-epic-1');
   });
 
   it('switches between rendered and raw views', () => {

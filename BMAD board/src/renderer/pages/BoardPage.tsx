@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/Toast';
@@ -20,7 +21,8 @@ export default function BoardPage() {
   const getAllEpics = useAppStore((s) => s.getAllEpics);
   useAppStore((s) => s.stories);
   useAppStore((s) => s.epics);
-  const [selectedEpicId, setSelectedEpicId] = useState<string>('');
+  const [searchParams] = useSearchParams();
+  const [selectedEpicId, setSelectedEpicId] = useState<string>(() => searchParams.get('epic') || '');
   const mountedRef = useRef(true);
   const inFlightRef = useRef<Set<string>>(new Set());
   const [failedStories, setFailedStories] = useState<Set<string>>(new Set());
