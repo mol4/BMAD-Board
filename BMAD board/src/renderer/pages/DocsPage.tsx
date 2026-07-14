@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/Toast';
 import { writeMarkdownFile } from '@/lib/file-writer';
+import { getConfig } from '@/lib/config';
+import { useAppStore } from '@/lib/store';
 import MarkdownModal from '@/components/MarkdownModal';
 import { FileText } from 'lucide-react';
 
@@ -35,6 +37,7 @@ export default function DocsPage() {
   const { t } = useI18n();
   const { showToast } = useToast();
   const [docs, setDocs] = useState<DocItem[]>([]);
+  const activeProjectId = useAppStore((s) => s.activeProjectId);
   const [loading, setLoading] = useState(true);
   const [mdModalOpen, setMdModalOpen] = useState(false);
   const [mdContent, setMdContent] = useState<string | null>(null);
@@ -48,9 +51,10 @@ export default function DocsPage() {
 
   useEffect(() => {
     const loadDocs = async () => {
+      setLoading(true);
       try {
         if (typeof window !== 'undefined' && window.electronAPI) {
-          const config = await window.electronAPI.configRead();
+          const config = getConfig();
           const result = await scanDirectory(config.epicsDir, 'root', window.electronAPI);
           setDocs(result);
         }
@@ -61,7 +65,7 @@ export default function DocsPage() {
       setLoading(false);
     };
     loadDocs();
-  }, []);
+  }, [activeProjectId]);
 
   const openDoc = async (path: string) => {
     if (!window.electronAPI) return;
