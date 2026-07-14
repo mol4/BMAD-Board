@@ -57,8 +57,8 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
   const tabBase = 'px-4 py-2 text-[14px] border-b-2 transition-colors';
 
   return (
-    <div>
-      <div className="flex gap-6 border-b border-border-default">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex gap-6 border-b border-border-default shrink-0">
         <button
           className={`${tabBase} ${
             activeTab === 'info'
@@ -81,7 +81,7 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
         </button>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 flex-1 min-h-0 overflow-auto">
         {activeTab === 'info' && (
           <div className="grid grid-cols-3 gap-6">
             <div className="col-span-2 space-y-6">
@@ -184,7 +184,7 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
               {story.sourceFile && (
                 <div>
                   <div className="text-caption text-foreground-tertiary mb-1">{t('story.mdFile')}</div>
-                  <div className="text-sm text-foreground-primary truncate">{story.sourceFile}</div>
+                  <div className="text-sm text-foreground-primary truncate" title={story.sourceFile}>{story.sourceFile}</div>
                 </div>
               )}
             </aside>
@@ -192,8 +192,8 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
         )}
 
         {activeTab === 'markdown' && (
-          <div>
-            <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex items-center gap-2 mb-4 shrink-0">
               <button
                 className={`px-3 py-1 text-sm rounded ${
                   markdownView === 'rendered'
@@ -242,7 +242,7 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
               ) : (
                 <textarea
                   readOnly
-                  className="font-mono text-sm bg-surface-sunken rounded-lg p-4 w-full min-h-[200px] resize-y text-foreground-secondary whitespace-pre-wrap"
+                  className="font-mono text-sm bg-surface-sunken rounded-lg p-4 w-full flex-1 min-h-0 resize-none text-foreground-secondary whitespace-pre-wrap"
                   value={rawMarkdown}
                   style={{ fontFamily: '"JetBrains Mono", monospace' }}
                 />

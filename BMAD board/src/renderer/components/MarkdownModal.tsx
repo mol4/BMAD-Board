@@ -18,11 +18,13 @@ interface MarkdownModalProps {
     filePath?: string;
     /** Enable edit button in header */
     editable?: boolean;
+    /** Open directly in edit mode, skipping rendered preview */
+    startInEditMode?: boolean;
     /** Called when user confirms save; returns promise */
     onSave?: (content: string) => Promise<void>;
 }
 
-export default function MarkdownModal({ isOpen, onClose, title, markdownContent, filePath, editable, onSave }: MarkdownModalProps) {
+export default function MarkdownModal({ isOpen, onClose, title, markdownContent, filePath, editable, startInEditMode, onSave }: MarkdownModalProps) {
     const { t } = useI18n();
     const { showToast } = useToast();
 
@@ -46,6 +48,15 @@ export default function MarkdownModal({ isOpen, onClose, title, markdownContent,
             setDontShowAgain(false);
         }
     }, [isOpen]);
+
+    // Apply startInEditMode when modal opens
+    useEffect(() => {
+        if (!isOpen) return;
+        if (startInEditMode && editable && filePath) {
+            setIsEditing(true);
+            setDraftContent(markdownContent ?? '');
+        }
+    }, [isOpen, startInEditMode, editable, filePath]);
 
     // Parse markdown when content or modal opens
     useEffect(() => {

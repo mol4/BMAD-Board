@@ -12,7 +12,7 @@ export default function Layout() {
     <div className="flex h-screen bg-surface-base text-foreground-primary">
       <Sidebar />
       <main className="flex-1 overflow-auto p-6">
-        <div className={isBoard ? '' : 'max-w-7xl mx-auto w-full'}>
+          <div className={isBoard ? '' : 'max-w-7xl mx-auto w-full h-full'}>
           <Outlet />
         </div>
       </main>

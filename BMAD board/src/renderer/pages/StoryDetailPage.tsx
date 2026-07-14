@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
@@ -22,24 +22,31 @@ export default function StoryDetailPage() {
   const getEpic = useAppStore((s) => s.getEpic);
   const [mdModalOpen, setMdModalOpen] = useState(false);
   const [mdContent, setMdContent] = useState<string | null>(null);
+  const [mdStartInEdit, setMdStartInEdit] = useState(false);
   const mountedRef = useRef(true);
 
   useEffect(() => {
     return () => { mountedRef.current = false; };
   }, []);
 
-  const openMdModal = async (s: Story) => {
+  const openMdModal = async (s: Story, startInEdit = false) => {
     let content = s.rawMarkdown ?? null;
     if (!content && s.sourceFile) {
       const result = await window.electronAPI?.fileRead(s.sourceFile);
       content = result?.content ?? null;
     }
     setMdContent(content);
+    setMdStartInEdit(startInEdit);
     setMdModalOpen(true);
   };
 
   const loadMarkdown = useCallback(async () => {
-    if (!story?.sourceFile || mdContent !== null) return;
+    if (mdContent !== null) return;
+    if (story?.rawMarkdown) {
+      if (mountedRef.current) setMdContent(story.rawMarkdown);
+      return;
+    }
+    if (!story?.sourceFile) return;
     try {
       const result = await window.electronAPI?.fileRead(story.sourceFile);
       if (result?.content && mountedRef.current) {
@@ -73,6 +80,7 @@ export default function StoryDetailPage() {
     const found = getStoryByKey(id || '') || getStory(id || '');
     if (found) {
       setStory(found);
+      setMdContent(found.rawMarkdown ?? null);
     } else {
       setNotFound(true);
     }
@@ -87,11 +95,7 @@ export default function StoryDetailPage() {
   }
 
   if (notFound) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-foreground-secondary">{t('story.notFound')}</h2>
-      </div>
-    );
+    return <Navigate to="/board" replace />;
   }
 
   if (!story) {
@@ -105,8 +109,8 @@ export default function StoryDetailPage() {
   const epic = getEpic(story.epicId);
 
   return (
-    <div>
-      <div className="mb-6">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="mb-6 shrink-0">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{story.title}</h1>
           <StatusBadge status={story.status} />
@@ -129,20 +133,23 @@ export default function StoryDetailPage() {
         </div>
       </div>
 
-      <StoryDetailTabs
-        story={story}
-        rawMarkdown={mdContent}
-        onOpenMdModal={() => openMdModal(story)}
-        onLoadMarkdown={loadMarkdown}
-      />
+      <div className="flex-1 min-h-0">
+        <StoryDetailTabs
+          story={story}
+          rawMarkdown={mdContent}
+          onOpenMdModal={() => openMdModal(story, true)}
+          onLoadMarkdown={loadMarkdown}
+        />
+      </div>
 
       <MarkdownModal
         isOpen={mdModalOpen}
-        onClose={() => setMdModalOpen(false)}
+        onClose={() => { setMdModalOpen(false); setMdStartInEdit(false); }}
         title={story.title}
         markdownContent={mdContent}
         filePath={story.sourceFile}
         editable={!!story.sourceFile}
+        startInEditMode={mdStartInEdit}
         onSave={handleSaveMarkdown}
       />
     </div>
