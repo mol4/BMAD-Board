@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppStore } from '@/lib/store';
 import type { Story } from '@/lib/types';
-import { PriorityBadge } from '@/components/StatusBadge';
-
 interface KanbanCardProps {
   story: Story;
 }
@@ -10,6 +9,8 @@ interface KanbanCardProps {
 export default function KanbanCard({ story }: KanbanCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const navigate = useNavigate();
+  const getEpic = useAppStore((s) => s.getEpic);
+  const epic = getEpic(story.epicId);
 
   const handleDragStart = useCallback((e: React.DragEvent) => {
     if (e.dataTransfer) {
@@ -71,11 +72,15 @@ export default function KanbanCard({ story }: KanbanCardProps) {
         <div className="font-mono text-caption text-foreground-tertiary mb-1">
           {story.key}
         </div>
+        {epic && (
+          <div className="text-caption text-foreground-tertiary mb-1">
+            {epic.title}
+          </div>
+        )}
         <div className="text-body text-foreground-primary font-medium mb-2">
           {story.title}
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <PriorityBadge priority={story.priority} />
           {story.storyPoints !== undefined && (
             <span className="text-caption text-foreground-tertiary bg-surface-sunken rounded px-1.5 py-0.5">
               {story.storyPoints} SP

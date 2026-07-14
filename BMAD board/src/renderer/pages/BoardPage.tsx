@@ -5,7 +5,6 @@ import { useToast } from '@/components/Toast';
 import { writeStoryStatus } from '@/lib/file-writer';
 import KanbanColumn from '@/components/KanbanColumn';
 import KanbanCard from '@/components/KanbanCard';
-import Select from '@/components/Select';
 import { AlertCircle } from 'lucide-react';
 import type { StoryStatus } from '@/lib/types';
 
@@ -104,13 +103,6 @@ export default function BoardPage() {
     handleStatusChange(storyId, newStatus);
   }, [handleStatusChange]);
 
-  const handleSelectChange = useCallback((storyId: string, e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    if (COLUMNS.includes(value as StoryStatus)) {
-      handleStatusChange(storyId, value as StoryStatus);
-    }
-  }, [handleStatusChange]);
-
   if (!initialized) {
     return (
       <div className="text-center py-12 text-foreground-tertiary">
@@ -139,13 +131,6 @@ export default function BoardPage() {
               {columnStories.map((story) => (
                 <div key={story.id} className="relative">
                   <KanbanCard story={story} />
-                  <Select
-                    value={story.status}
-                    onChange={(e) => handleSelectChange(story.id, e)}
-                    options={COLUMNS.map((s) => ({ value: s, label: t(`status.${s}`) }))}
-                    className="mt-1 text-xs"
-                    aria-label={t('story.changeStatus')}
-                  />
                   {failedStories.has(story.id) && (
                     <div className="absolute top-1 right-1 flex items-center gap-1 text-destructive animate-pulse">
                       <AlertCircle size={16} />

@@ -3,15 +3,15 @@ story_id: 2.1
 story_key: 2-1-implement-sqlite-json-fallback-storage
 epic: 2
 title: Implement SQLite + JSON Fallback Storage
-status: review
+status: done
 baseline_commit: a75be01
 previous_story: 2-0-build-welcome-onboarding-screen
-date: 2026-06-05
+date: 2026-06-05T00:00:00.000Z
 ---
 
 # Story 2.1: Implement SQLite + JSON Fallback Storage
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

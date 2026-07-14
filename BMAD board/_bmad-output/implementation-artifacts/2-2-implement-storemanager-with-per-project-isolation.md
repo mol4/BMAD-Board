@@ -3,10 +3,10 @@ story_id: 2.2
 story_key: 2-2-implement-storemanager-with-per-project-isolation
 epic: 2
 title: Implement StoreManager with Per-Project Isolation
-status: review
+status: done
 baseline_commit: a75be01
 previous_story: 2-1-implement-sqlite-json-fallback-storage
-date: 2026-06-09
+date: 2026-06-09T00:00:00.000Z
 ---
 
 # Story 2.2: Implement StoreManager with Per-Project Isolation

@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
-import { StatusBadge, PriorityBadge } from '@/components/StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
 import { useToast } from '@/components/Toast';
 import { writeStoryStatus } from '@/lib/file-writer';
 import Select from '@/components/Select';
@@ -119,7 +119,6 @@ export default function BacklogPage() {
                           className="text-xs"
                           aria-label={t('story.changeStatus')}
                         />
-                        <PriorityBadge priority={story.priority} />
                       </div>
                     ))}
                   </div>

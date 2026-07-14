@@ -2,16 +2,13 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
-import { PriorityBadge } from '@/components/StatusBadge';
+import { StatusBadge } from '@/components/StatusBadge';
 import { useToast } from '@/components/Toast';
-import { writeStoryStatus, writeMarkdownFile } from '@/lib/file-writer';
+import { writeMarkdownFile } from '@/lib/file-writer';
 import { FileText } from 'lucide-react';
 import MarkdownModal from '@/components/MarkdownModal';
-import Select from '@/components/Select';
 import StoryDetailTabs from '@/components/StoryDetailTabs';
-import type { Story, StoryStatus } from '@/lib/types';
-
-const STATUSES: StoryStatus[] = ['backlog', 'todo', 'in-progress', 'in-review', 'done'];
+import type { Story } from '@/lib/types';
 
 export default function StoryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +20,6 @@ export default function StoryDetailPage() {
   const getStory = useAppStore((s) => s.getStory);
   const getStoryByKey = useAppStore((s) => s.getStoryByKey);
   const getEpic = useAppStore((s) => s.getEpic);
-  const updateStoryStatus = useAppStore((s) => s.updateStoryStatus);
   const [mdModalOpen, setMdModalOpen] = useState(false);
   const [mdContent, setMdContent] = useState<string | null>(null);
   const mountedRef = useRef(true);
@@ -53,39 +49,6 @@ export default function StoryDetailPage() {
       // file read failed — silently ignore, user sees "No markdown content"
     }
   }, [story, mdContent]);
-
-  const handleStatusChange = useCallback(async (newStatus: StoryStatus) => {
-    if (!story) return;
-    const previousStatus = story.status;
-
-    updateStoryStatus(story.id, newStatus);
-
-    const updatedStory = useAppStore.getState().getStory(story.id);
-    if (!updatedStory) {
-      updateStoryStatus(story.id, previousStatus);
-      return;
-    }
-    setStory(updatedStory);
-
-    const result = await writeStoryStatus(updatedStory, newStatus);
-    if (!result.ok && mountedRef.current) {
-      if (result.code === 'FILE_LOCKED') {
-        showToast(t('toast.fileLockedByAgent'), 'error');
-      } else if (result.code === 'FILE_CHANGED') {
-        showToast(t('toast.fileChanged'), 'error');
-      } else {
-        showToast(t('toast.statusUpdateFailed'), 'error');
-      }
-      updateStoryStatus(story.id, previousStatus);
-      setStory(useAppStore.getState().getStory(story.id) ?? updatedStory);
-      return;
-    }
-
-    if (mountedRef.current && result.ok) {
-      showToast(t('toast.statusUpdated'), 'success');
-      setStory(useAppStore.getState().getStory(story.id) ?? updatedStory);
-    }
-  }, [story, updateStoryStatus, showToast, t]);
 
   const handleSaveMarkdown = useCallback(async (content: string) => {
     if (!story?.sourceFile) return;
@@ -146,15 +109,7 @@ export default function StoryDetailPage() {
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-2xl font-bold">{story.title}</h1>
-          <Select
-            sunken
-            value={story.status}
-            onChange={(e) => handleStatusChange(e.target.value as StoryStatus)}
-            options={STATUSES.map((s) => ({ value: s, label: t(`status.${s}`) }))}
-            className="text-xs"
-            aria-label={t('story.changeStatus')}
-          />
-          <PriorityBadge priority={story.priority} />
+          <StatusBadge status={story.status} />
         </div>
         <div className="flex items-center gap-4 text-sm text-foreground-secondary">
           <span>{story.key}</span>

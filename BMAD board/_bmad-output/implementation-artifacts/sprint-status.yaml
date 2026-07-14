@@ -92,7 +92,7 @@ development_status:
   epic-5b-ii: done
   5b-ii-1-build-kanban-board-with-status-only-drag-and-drop: done
   5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs: done
-   5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: done
+  5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: done
   epic-5b-ii-retrospective: optional
 
   # Epic 6: Distribution & Auto-Updates
