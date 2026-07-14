@@ -13,11 +13,23 @@ vi.mock('marked', () => ({
     default: {
         setOptions: setOptionsMock,
         parse: parseMock,
+        Renderer: vi.fn().mockImplementation(() => ({
+            code: vi.fn(),
+        })),
     },
     marked: {
         setOptions: setOptionsMock,
         parse: parseMock,
+        Renderer: vi.fn().mockImplementation(() => ({
+            code: vi.fn(),
+        })),
     },
+}));
+
+vi.mock('@/components/RichMarkdown', () => ({
+    default: ({ markdown, className }: { markdown: string; className?: string }) => (
+        <div className={className} data-testid="rich-markdown">{markdown}</div>
+    ),
 }));
 
 vi.mock('gray-matter', () => ({
@@ -79,7 +91,7 @@ describe('MarkdownModal', () => {
         parseMock.mockReturnValue('<p>Rendered content</p>');
         renderModal();
         await waitFor(() => {
-            expect(screen.getByText('Rendered content')).toBeInTheDocument();
+            expect(screen.getByTestId('rich-markdown')).toBeInTheDocument();
         });
     });
 

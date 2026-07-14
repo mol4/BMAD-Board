@@ -1,5 +1,5 @@
 # generated: 2026-05-27
-# last_updated: 2026-07-13
+# last_updated: 2026-07-14
 # project: BMAD board
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-05-27
-last_updated: 2026-07-13
+last_updated: 2026-07-14
 project: BMAD board
 project_key: NOKEY
 tracking_system: file-system
@@ -89,10 +89,10 @@ development_status:
   epic-5b-i-retrospective: optional
 
   # Epic 5b-ii: Rich Components & Content Rendering
-  epic-5b-ii: in-progress
+  epic-5b-ii: done
   5b-ii-1-build-kanban-board-with-status-only-drag-and-drop: done
   5b-ii-2-build-epic-card-stat-card-and-story-detail-tabs: done
-  5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: backlog
+   5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams: done
   epic-5b-ii-retrospective: optional
 
   # Epic 6: Distribution & Auto-Updates

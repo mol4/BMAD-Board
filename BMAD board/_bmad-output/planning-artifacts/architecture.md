@@ -110,28 +110,28 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 **Перестроенная архитектура:**
 
-```
-┌─────────────────────────────────────────────────────┐
-│                  Electron Main Process               │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────┐ │
-│  │ Project     │  │ Filesystem   │  │ SQLite     │ │
-│  │ Manager     │  │ Watcher      │  │ Config DB  │ │
-│  └──────┬──────┘  └──────┬───────┘  └─────┬──────┘ │
-│         └────────────────┼────────────────┘         │
-│                    IPC Bridge                        │
-└────────────────────────┬────────────────────────────┘
-                         │
-┌────────────────────────▼────────────────────────────┐
-│               Electron Renderer Process              │
-│  ┌─────────────────────────────────────────────────┐ │
-│  │           React SPA (existing components)        │ │
-│  │  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │ │
-│  │  │ Store    │  │ Markdown │  │ UI Components │  │ │
-│  │  │ (per-    │  │ Parser   │  │ (reused)      │  │ │
-│  │  │ project) │  │ (sync)   │  │               │  │ │
-│  │  └──────────┘  └──────────┘  └───────────────┘  │ │
-│  └─────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────┘
+
+```mermaid
+graph TB
+  subgraph Main["Electron Main Process"]
+    PM["Project Manager"]
+    FW["Filesystem Watcher"]
+    SQL["SQLite Config DB"]
+    IPC["IPC Bridge"]
+    PM --> IPC
+    FW --> IPC
+    SQL --> IPC
+  end
+  IPC --> RENDERER
+  subgraph Renderer["Electron Renderer Process"]
+    RENDERER["React SPA"]
+    STORE["Store<br/>(per-project)"]
+    PARSER["Markdown Parser<br/>(sync)"]
+    UI["UI Components<br/>(reused)"]
+    STORE --> RENDERER
+    PARSER --> RENDERER
+    UI --> RENDERER
+  end
 ```
 
 **Ключевые архитектурные решения:**

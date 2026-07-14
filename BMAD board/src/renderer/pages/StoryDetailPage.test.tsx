@@ -26,12 +26,24 @@ vi.mock('marked', () => ({
         setOptions: vi.fn(),
         parse: vi.fn().mockReturnValue('<p>content</p>'),
         parseInline: vi.fn().mockReturnValue('content'),
+        Renderer: vi.fn().mockImplementation(() => ({
+            code: vi.fn(),
+        })),
     },
     marked: {
         setOptions: vi.fn(),
         parse: vi.fn().mockReturnValue('<p>content</p>'),
         parseInline: vi.fn().mockReturnValue('content'),
+        Renderer: vi.fn().mockImplementation(() => ({
+            code: vi.fn(),
+        })),
     },
+}));
+
+vi.mock('@/components/RichMarkdown', () => ({
+    default: ({ markdown, className }: { markdown: string; className?: string }) => (
+        <div className={className} data-testid="rich-markdown">{markdown}</div>
+    ),
 }));
 
 function setupWindowMock() {

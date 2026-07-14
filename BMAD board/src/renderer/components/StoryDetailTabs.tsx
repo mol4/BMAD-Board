@@ -4,7 +4,8 @@ import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { StatusBadge } from '@/components/StatusBadge';
 import EditWarningDialog from '@/components/EditWarningDialog';
-import { renderMarkdown, renderMarkdownInline } from '@/lib/markdown-render';
+import { renderMarkdownInline } from '@/lib/markdown-render';
+import RichMarkdown from '@/components/RichMarkdown';
 import type { Story } from '@/lib/types';
 
 type Tab = 'info' | 'markdown';
@@ -87,20 +88,16 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
                 <h2 className="text-sm font-semibold text-foreground-secondary uppercase mb-2">
                   {t('story.description')}
                 </h2>
-                <div
+                <RichMarkdown
+                  markdown={story.description || t('common.noDescription')}
                   className="prose prose-sm max-w-none prose-invert
                     prose-headings:text-foreground-primary prose-headings:font-semibold
                     prose-p:text-foreground-secondary
                     prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                    prose-code:text-foreground-primary prose-code:bg-surface-sunken prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono
-                    prose-pre:bg-surface-sunken prose-pre:border prose-pre:border-border-subtle
                     prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
                     prose-strong:text-foreground-primary
                     prose-li:text-foreground-secondary
                     prose-hr:border-border-subtle"
-                  dangerouslySetInnerHTML={{
-                    __html: renderMarkdown(story.description || t('common.noDescription')),
-                  }}
                 />
               </section>
 
@@ -230,18 +227,16 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
 
             {rawMarkdown ? (
               markdownView === 'rendered' ? (
-                <div
+                <RichMarkdown
+                  markdown={rawMarkdown}
                   className="prose prose-sm max-w-none prose-invert
                     prose-headings:text-foreground-primary prose-headings:font-semibold
                     prose-p:text-foreground-secondary
                     prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                    prose-code:text-foreground-primary prose-code:bg-surface-sunken prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono
-                    prose-pre:bg-surface-sunken prose-pre:border prose-pre:border-border-subtle
                     prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
                     prose-strong:text-foreground-primary
                     prose-li:text-foreground-secondary
                     prose-hr:border-border-subtle"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdown(rawMarkdown) }}
                 />
               ) : (
                 <textarea

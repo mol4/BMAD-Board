@@ -153,3 +153,10 @@
 - Missing React.memo on card components — EpicCard/StatCard re-render on parent list changes regardless of prop changes. Deferred: performance optimization, not a bug.
 - Hardcoded magic strings — Route paths, localStorage keys, tab identifiers are inline literals. Deferred: pre-existing pattern in codebase.
 - StatCard.iconBg coupling through raw class strings — Every call site hardcodes Tailwind classes. Deferred: design preference for semantic variants would be a separate refactor.
+
+## Deferred from: code review of 5b-ii-3-implement-shiki-syntax-highlighting-and-mermaid-diagrams (2026-07-14)
+
+- SVG sanitization � mermaid v11 uses DomPurify internally [MermaidRenderer.tsx:115]
+- MarkdownModal save path may show stale content after edit [MarkdownModal.tsx:142]
+- Mermaid skeleton fixed aspect-video, doesn't match diagram dimensions [MermaidRenderer.tsx:78]
+

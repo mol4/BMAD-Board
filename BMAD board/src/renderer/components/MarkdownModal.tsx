@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { useToast } from '@/components/Toast';
 import EditWarningDialog, { isEditWarningDismissedForSession, dismissEditWarningForSession } from './EditWarningDialog';
 import Textarea from '@/components/Textarea';
+import RichMarkdown from '@/components/RichMarkdown';
 import matter from 'gray-matter';
 
 interface MarkdownModalProps {
@@ -204,22 +205,20 @@ export default function MarkdownModal({ isOpen, onClose, title, markdownContent,
                         <div className="overflow-y-auto px-6 py-5 flex-1">
                             {loading ? (
                                 <p className="text-foreground-tertiary text-sm">{t('common.loading')}</p>
-                            ) : html ? (
-                                <div
+                            ) : markdownContent ? (
+                                <RichMarkdown
+                                    markdown={markdownContent}
                                     className="prose prose-invert prose-sm max-w-none
-                prose-headings:text-foreground-primary prose-headings:font-semibold
-                prose-p:text-foreground-secondary
-                prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                prose-code:text-foreground-primary prose-code:bg-surface-sunken prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono
-                prose-pre:bg-surface-sunken prose-pre:border prose-pre:border-border-subtle
-                prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
-                prose-strong:text-foreground-primary
-                prose-li:text-foreground-secondary
-                prose-hr:border-border-subtle
-                prose-table:text-foreground-secondary
-                prose-th:text-foreground-primary prose-th:border prose-th:border-border-subtle
-                prose-td:border prose-td:border-border-subtle"
-                                    dangerouslySetInnerHTML={{ __html: html }}
+                                        prose-headings:text-foreground-primary prose-headings:font-semibold
+                                        prose-p:text-foreground-secondary
+                                        prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+                                        prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
+                                        prose-strong:text-foreground-primary
+                                        prose-li:text-foreground-secondary
+                                        prose-hr:border-border-subtle
+                                        prose-table:text-foreground-secondary
+                                        prose-th:text-foreground-primary prose-th:border prose-th:border-border-subtle
+                                        prose-td:border prose-td:border-border-subtle"
                                 />
                             ) : (
                                 <p className="text-foreground-tertiary text-sm">{t('common.noDescription')}</p>

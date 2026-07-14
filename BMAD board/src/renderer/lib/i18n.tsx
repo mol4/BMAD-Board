@@ -290,6 +290,11 @@ const translations = {
     'toast.editSaved': 'Изменения сохранены',
     'toast.editSaveFailed': 'Не удалось сохранить изменения',
     'toast.invalidFrontmatter': 'Некорректный frontmatter',
+
+    'toast.kanbanRetry': 'Ошибка обновления статуса. Попробуйте снова.',
+
+    'mermaid.renderError': 'Ошибка рендеринга диаграммы',
+    'mermaid.loading': 'Загрузка диаграммы',
   },
   en: {
     'nav.dashboard': 'Dashboard',
@@ -543,6 +548,11 @@ const translations = {
     'toast.editSaved': 'Changes saved',
     'toast.editSaveFailed': 'Failed to save changes',
     'toast.invalidFrontmatter': 'Invalid frontmatter',
+
+    'toast.kanbanRetry': 'Status update failed. Please try again.',
+
+    'mermaid.renderError': 'Diagram rendering failed',
+    'mermaid.loading': 'Loading diagram',
 
     'toast.projectSwitched': 'Project switched',
     'toast.projectSwitchError': 'Failed to switch project',
