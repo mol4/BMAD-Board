@@ -1,10 +1,11 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useAppStore } from '@/lib/store';
 import { useToast } from '@/components/Toast';
 import { writeStoryStatus } from '@/lib/file-writer';
 import KanbanColumn from '@/components/KanbanColumn';
 import KanbanCard from '@/components/KanbanCard';
+import Select from '@/components/Select';
 import { AlertCircle } from 'lucide-react';
 import type { StoryStatus } from '@/lib/types';
 
@@ -16,7 +17,10 @@ export default function BoardPage() {
   const initialized = useAppStore((s) => s.initialized);
   const getStoriesByStatus = useAppStore((s) => s.getStoriesByStatus);
   const updateStoryStatus = useAppStore((s) => s.updateStoryStatus);
+  const getAllEpics = useAppStore((s) => s.getAllEpics);
   useAppStore((s) => s.stories);
+  useAppStore((s) => s.epics);
+  const [selectedEpicId, setSelectedEpicId] = useState<string>('');
   const mountedRef = useRef(true);
   const inFlightRef = useRef<Set<string>>(new Set());
   const [failedStories, setFailedStories] = useState<Set<string>>(new Set());
@@ -103,6 +107,14 @@ export default function BoardPage() {
     handleStatusChange(storyId, newStatus);
   }, [handleStatusChange]);
 
+  const epicOptions = useMemo(() => {
+    const epics = getAllEpics();
+    return [
+      { value: '', label: t('board.allEpics') },
+      ...epics.map((e) => ({ value: e.id, label: `${e.key}: ${e.title}` })),
+    ];
+  }, [getAllEpics, t]);
+
   if (!initialized) {
     return (
       <div className="text-center py-12 text-foreground-tertiary">
@@ -113,14 +125,28 @@ export default function BoardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-2">{t('board.title')}</h1>
-      <p className="text-sm text-foreground-secondary mb-6">
-        {t('board.updated')}: {new Date().toLocaleTimeString()}
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t('board.title')}</h1>
+          <p className="text-sm text-foreground-secondary">
+            {t('board.updated')}: {new Date().toLocaleTimeString()}
+          </p>
+        </div>
+        <div className="w-56">
+          <Select
+            options={epicOptions}
+            value={selectedEpicId}
+            onChange={(e) => setSelectedEpicId(e.target.value)}
+          />
+        </div>
+      </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex gap-3 overflow-x-auto pb-6">
         {COLUMNS.map((status) => {
-          const columnStories = getStoriesByStatus(status);
+          const allStories = getStoriesByStatus(status);
+          const columnStories = selectedEpicId
+            ? allStories.filter((s) => s.epicId === selectedEpicId)
+            : allStories;
           return (
             <KanbanColumn
               key={status}
