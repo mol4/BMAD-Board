@@ -21,7 +21,7 @@ export default function EpicCard({ epic }: { epic: Epic }) {
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        navigate(`/epics/${epic.id}`);
+        navigate(`/board?epic=${epic.id}`);
       }
     },
     [navigate, epic.id],
@@ -33,7 +33,7 @@ export default function EpicCard({ epic }: { epic: Epic }) {
       aria-label={epic.title}
       tabIndex={0}
       className="p-4 cursor-pointer group"
-      onClick={() => navigate(`/epics/${epic.id}`)}
+      onClick={() => navigate(`/board?epic=${epic.id}`)}
       onKeyDown={handleKeyDown}
     >
       <div className="flex items-center gap-2 mb-2">
