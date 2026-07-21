@@ -228,17 +228,19 @@ export default function StoryDetailTabs({ story, rawMarkdown, onOpenMdModal, onL
 
             {rawMarkdown ? (
               markdownView === 'rendered' ? (
-                <RichMarkdown
-                  markdown={rawMarkdown}
-                  className="prose prose-sm max-w-none prose-invert
-                    prose-headings:text-foreground-primary prose-headings:font-semibold
-                    prose-p:text-foreground-secondary
-                    prose-a:text-accent prose-a:no-underline hover:prose-a:underline
-                    prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
-                    prose-strong:text-foreground-primary
-                    prose-li:text-foreground-secondary
-                    prose-hr:border-border-subtle"
-                />
+                <div className="flex-1 overflow-auto min-h-0">
+                  <RichMarkdown
+                    markdown={rawMarkdown}
+                    className="prose prose-sm max-w-none prose-invert
+                      prose-headings:text-foreground-primary prose-headings:font-semibold
+                      prose-p:text-foreground-secondary
+                      prose-a:text-accent prose-a:no-underline hover:prose-a:underline
+                      prose-blockquote:border-l-accent prose-blockquote:text-foreground-tertiary
+                      prose-strong:text-foreground-primary
+                      prose-li:text-foreground-secondary
+                      prose-hr:border-border-subtle"
+                  />
+                </div>
               ) : (
                 <textarea
                   readOnly

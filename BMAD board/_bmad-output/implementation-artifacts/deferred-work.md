@@ -160,6 +160,19 @@
 - MarkdownModal save path may show stale content after edit [MarkdownModal.tsx:142]
 - Mermaid skeleton fixed aspect-video, doesn't match diagram dimensions [MermaidRenderer.tsx:78]
 
+## Deferred from: code review of add-scroll-to-rendered-markdown (2026-07-21)
+
+- Misuse of `h-full` inside an `overflow-auto` parent (`StoryDetailTabs.tsx:195`) — pre-existing layout issue, not caused by scroll fix
+- Parent content panel actively fights the child layout (`StoryDetailTabs.tsx:84`) — pre-existing, the outer `overflow-auto` is required by the info tab; refactor both tabs to own scrolling separately in a future UX pass
+- Inconsistent overflow architecture between tabs (`StoryDetailTabs.tsx`) — pre-existing, info tab uses outer scroller while markdown tab tries fixed-header pattern
+- `dangerouslySetInnerHTML` with no visible sanitization contract (`StoryDetailTabs.tsx:114`) — pre-existing, `renderMarkdownInline` may sanitize but no type guard or comment
+- Unstable callback in `useEffect` invites phantom requests (`StoryDetailTabs.tsx:39`) — pre-existing, `onLoadMarkdown` should be stabilized with `useCallback` at call site
+- Silent data loss in task list (`StoryDetailTabs.tsx:131`) — pre-existing, missing tasks return `null` without tombstone or warning
+- Store selectors are naked function references (`StoryDetailTabs.tsx:31-32`) — pre-existing, potential memoization break on unrelated state changes
+- Accessibility omitted entirely from custom tabs (`StoryDetailTabs.tsx:62,72`) — pre-existing, tab buttons lack `role="tab"`, `aria-selected`, `aria-controls`
+- Fragment index used as React key (`StoryDetailTabs.tsx:111`) — pre-existing, `acceptanceCriteria.map((ac, i) => ...)` uses array index as key
+- Raw textarea lacks an accessible name (`StoryDetailTabs.tsx:245`) — pre-existing, no `aria-label` or `<label>` on read-only raw markdown textarea
+
 ## Deferred from: code review of epic-link-to-board (2026-07-14)
 
 - Epic link in StoryDetailTabs sidebar has no tooltip/icon indicating navigation to Board — consider adding `title` attribute or small external-link icon for UX clarity
